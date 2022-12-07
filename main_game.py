@@ -5,11 +5,13 @@ if TYPE_CHECKING:
 
 from player import Player
 from scene import Scene
+from block import Block
 
 class MainGame(Scene):
     def __init__(self, manager: GameManager, previous_scene: Scene) -> None:
         super().__init__(manager, previous_scene)
         self.player = Player(self)
+        Block(self)
 
     def draw(self) -> None:
         self.manager.screen.fill((80, 80, 80))
