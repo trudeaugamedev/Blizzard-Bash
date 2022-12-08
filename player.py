@@ -84,5 +84,12 @@ class Player(VisibleSprite):
 
     def draw(self) -> None:
         pygame.draw.rect(self.manager.screen, (255, 0, 0), (*(self.pos - self.camera.offset), *self.size))
-        if self.throwing:
-            pygame.draw.line(self.manager.screen, (0, 0, 0), self.pos + self.SB_OFFSET - self.camera.offset, self.pos + self.sb_vel.normalize() * 80 - self.camera.offset, 4)
+        if not self.throwing: return
+        factor = 0.015 # Basically how accurate we want the calculation to be, the distance factor between two points
+        pos = self.pos + self.SB_OFFSET
+        vel = self.sb_vel.copy()
+        for i in range(40): # Number of points on the parabola that will be calculated
+            vel.y += GRAVITY * factor
+            pos += vel * factor
+            if i % 4: continue # For every 4 calculated points, we draw 1 point
+            pygame.draw.circle(self.manager.screen, (0, 0, 0), pos - self.camera.offset, 5)

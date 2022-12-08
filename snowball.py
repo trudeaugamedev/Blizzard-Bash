@@ -14,7 +14,7 @@ class Snowball(VisibleSprite):
         super().__init__(scene, Layers.SNOWBALL)
 
         self.player: Player = self.scene.player # Type annotation just bcs I need intellisense lol
-        self.pos = self.player.pos + self.player.size // 2 - (0, 10)
+        self.pos = self.player.pos + self.player.SB_OFFSET
         self.vel = VEC(vel)
         self.acc = VEC(0, 0)
 
