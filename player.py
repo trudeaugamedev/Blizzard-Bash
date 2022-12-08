@@ -3,12 +3,13 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from scene import Scene
 
-from pygame.locals import K_LEFT, K_RIGHT, K_UP
+from pygame.locals import K_LEFT, K_RIGHT, K_UP, KEYDOWN, KEYUP, K_SPACE
 import pygame
 
 from utils import intvec, snap, clamp, clamp_max
 from constants import VEC, SCR_DIM, GRAVITY
 from sprite import VisibleSprite, Layers
+from snowball import Snowball
 
 class Camera:
     def __init__(self, master: Player):
@@ -32,9 +33,14 @@ class Player(VisibleSprite):
         self.speed = 150
         self.on_ground = False
 
+        self.throwing = False
+        self.sb_vel = 0
+
         self.CONST_ACC = 500 # 500 pixels per second squared (physics :P)
         self.MAX_SPEED = 200
-        self.JUMP_VEL = -400
+        self.JUMP_SPEED = -400
+        self.THROW_SPEED = 800
+        self.SB_OFFSET = self.size // 2 - (0, 10)
 
         self.camera = Camera(self)
 
@@ -50,8 +56,19 @@ class Player(VisibleSprite):
             self.acc.x += self.CONST_ACC
         elif self.vel.x > 0:
             self.acc.x -= self.CONST_ACC
+
         if keys[K_UP] and self.on_ground:
-            self.vel.y = self.JUMP_VEL
+            self.vel.y = self.JUMP_SPEED
+
+        if keys[K_SPACE]:
+            m_pos = VEC(pygame.mouse.get_pos())
+            self.throwing = True
+            # Use camera offset to convert screen-space pos to in-world pos
+            self.sb_vel = ((m_pos - self.SB_OFFSET + self.camera.offset) - self.pos).normalize() * self.THROW_SPEED
+        if KEYUP in self.manager.events:
+            if self.manager.events[KEYUP].key == K_SPACE:
+                self.throwing = False
+                Snowball(self.scene, self.sb_vel)
 
         self.vel += self.acc * self.manager.dt
         # _ to catch the successful clamp return value
@@ -67,3 +84,5 @@ class Player(VisibleSprite):
 
     def draw(self) -> None:
         pygame.draw.rect(self.manager.screen, (255, 0, 0), (*(self.pos - self.camera.offset), *self.size))
+        if self.throwing:
+            pygame.draw.line(self.manager.screen, (0, 0, 0), self.pos + self.SB_OFFSET - self.camera.offset, self.pos + self.sb_vel.normalize() * 80 - self.camera.offset, 4)

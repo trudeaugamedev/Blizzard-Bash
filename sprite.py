@@ -8,7 +8,9 @@ from abc import abstractmethod
 from enum import Enum, auto
 
 class Layers(Enum):
+    MAP = auto()
     PLAYER = auto()
+    SNOWBALL = auto()
 
 class Sprite(AbstractClass):
     def __init__(self, scene: Scene, layer: int | Layers) -> None:
