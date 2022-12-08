@@ -90,10 +90,9 @@ class Player(VisibleSprite):
             if not self.rect.colliderect(ground.rect): continue
             if self.rect.bottom < ground.rect.top + 2:
                 self.pos.y = ground.rect.top - self.size.y
-                self.vel.y = 0
             else:
                 self.pos.y -= 200 * self.manager.dt
-                self.vel.y = 0
+            self.vel.y = 0
             self.on_ground = True
 
         self.camera.update()
