@@ -3,11 +3,11 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from scene import Scene
 
-from pygame.locals import K_LEFT, K_RIGHT, K_UP, KEYDOWN, KEYUP, K_SPACE
+from pygame.locals import K_LEFT, K_RIGHT, K_UP, KEYUP, K_SPACE
 import pygame
 
 from utils import intvec, snap, clamp, clamp_max
-from constants import VEC, SCR_DIM, GRAVITY
+from constants import VEC, WIDTH, HEIGHT, GRAVITY
 from sprite import VisibleSprite, Layers
 from snowball import Snowball
 
@@ -15,11 +15,11 @@ class Camera:
     def __init__(self, master: Player):
         self.master = master
         self.manager = self.master.manager
-        self.float_offset = self.master.pos - VEC(SCR_DIM) / 2 + self.master.size / 2
+        self.float_offset = self.master.pos - (WIDTH // 2, HEIGHT // 2 + 100) + self.master.size / 2
         self.offset = intvec(self.float_offset)
 
     def update(self):
-        tick_offset = self.master.pos - self.offset - VEC(SCR_DIM) / 2 + self.master.size / 2
+        tick_offset = self.master.pos - self.offset - (WIDTH // 2, HEIGHT // 2 + 100) + self.master.size / 2
         self.float_offset += tick_offset * 5 * self.manager.dt
         self.offset = intvec(self.float_offset)
 
@@ -64,7 +64,10 @@ class Player(VisibleSprite):
             m_pos = VEC(pygame.mouse.get_pos())
             self.throwing = True
             # Use camera offset to convert screen-space pos to in-world pos
-            self.sb_vel = ((m_pos - self.SB_OFFSET + self.camera.offset) - self.pos).normalize() * self.THROW_SPEED
+            try:
+                self.sb_vel = -((m_pos - self.SB_OFFSET + self.camera.offset) - self.pos).normalize() * self.THROW_SPEED
+            except ValueError:
+                self.sb_vel = VEC() # 0 vector
         if KEYUP in self.manager.events:
             if self.manager.events[KEYUP].key == K_SPACE:
                 self.throwing = False
