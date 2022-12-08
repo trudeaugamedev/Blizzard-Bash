@@ -8,6 +8,7 @@ import pygame
 
 from sprite import VisibleSprite, Layers
 from constants import VEC, GRAVITY
+from ground import Ground
 
 class Snowball(VisibleSprite):
     def __init__(self, scene: Scene, vel: tuple[float, float]) -> None:
@@ -24,7 +25,10 @@ class Snowball(VisibleSprite):
         self.vel += self.acc * self.manager.dt
         self.pos += self.vel * self.manager.dt
 
-        if self.pos.y > 100:
+        for ground in Ground.instances:
+            if ground.rect.collidepoint(self.pos):
+                self.kill()
+        if self.pos.y > 1000:
             self.kill()
 
     def draw(self) -> None:

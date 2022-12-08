@@ -10,11 +10,15 @@ from sprite import VisibleSprite, Layers
 from constants import VEC
 
 # Test blocks for reference, to actually be able to see the player moving
-class Block(VisibleSprite):
-    def __init__(self, scene: Scene) -> None:
+class Ground(VisibleSprite):
+    instances = []
+
+    def __init__(self, scene: Scene, pos: tuple[int, int], size: tuple[int, int]) -> None:
         super().__init__(scene, Layers.PLAYER)
-        self.size = VEC(500, 50)
-        self.pos = VEC(-200, 100)
+        self.__class__.instances.append(self)
+        self.size = VEC(size)
+        self.pos = VEC(pos)
+        self.rect = pygame.Rect(self.pos, self.size)
 
     def update(self) -> None:
         ...

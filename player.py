@@ -3,13 +3,14 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from scene import Scene
 
-from pygame.locals import K_LEFT, K_RIGHT, K_UP, KEYUP, K_SPACE
+from pygame.locals import K_a, K_d, K_w, KEYUP, K_SPACE
 import pygame
 
 from utils import intvec, snap, clamp, clamp_max
 from constants import VEC, WIDTH, HEIGHT, GRAVITY
 from sprite import VisibleSprite, Layers
 from snowball import Snowball
+from ground import Ground
 
 class Camera:
     def __init__(self, master: Player):
@@ -31,6 +32,7 @@ class Player(VisibleSprite):
         self.vel = VEC(0, 0)
         self.acc = VEC(0, 0)
         self.speed = 150
+        self.rect = pygame.Rect(self.pos, self.size)
         self.on_ground = False
 
         self.throwing = False
@@ -48,16 +50,16 @@ class Player(VisibleSprite):
         keys = pygame.key.get_pressed()
 
         self.acc = VEC(0, GRAVITY)
-        if keys[K_LEFT]: # Acceleration
+        if keys[K_a]: # Acceleration
             self.acc.x -= self.CONST_ACC
         elif self.vel.x < 0: # Deceleration
             self.acc.x += self.CONST_ACC
-        if keys[K_RIGHT]:
+        if keys[K_d]:
             self.acc.x += self.CONST_ACC
         elif self.vel.x > 0:
             self.acc.x -= self.CONST_ACC
 
-        if keys[K_UP] and self.on_ground:
+        if keys[K_w] and self.on_ground:
             self.vel.y = self.JUMP_SPEED
 
         if keys[K_SPACE]:
@@ -81,7 +83,18 @@ class Player(VisibleSprite):
         self.vel.x = snap(self.vel.x, 0, self.CONST_ACC * self.manager.dt)
         self.pos += self.vel * self.manager.dt
 
-        self.pos.y, self.on_ground = clamp_max(self.pos.y, 100 - self.size.y)
+        self.rect.topleft = self.pos
+
+        self.on_ground = False
+        for ground in Ground.instances:
+            if not self.rect.colliderect(ground.rect): continue
+            if self.rect.bottom < ground.rect.top + 2:
+                self.pos.y = ground.rect.top - self.size.y
+                self.vel.y = 0
+            else:
+                self.pos.y -= 200 * self.manager.dt
+                self.vel.y = 0
+            self.on_ground = True
 
         self.camera.update()
 
