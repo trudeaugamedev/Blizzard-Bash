@@ -28,7 +28,7 @@ class Player(VisibleSprite):
     def __init__(self, scene: Scene) -> None:
         super().__init__(scene, Layers.PLAYER)
         self.size = VEC(30, 60)
-        self.pos = VEC(0, 0)
+        self.pos = VEC(0, -100)
         self.vel = VEC(0, 0)
         self.acc = VEC(0, 0)
         self.speed = 150
@@ -86,14 +86,19 @@ class Player(VisibleSprite):
         self.rect.topleft = self.pos
 
         self.on_ground = False
-        for ground in Ground.instances:
-            if not self.rect.colliderect(ground.rect): continue
-            if self.rect.bottom < ground.rect.top + 2:
-                self.pos.y = ground.rect.top - self.size.y
+        for y in sorted(Ground.instances.keys()): # Sort by highest ground first
+            for ground in Ground.instances[y]:
+                if not self.rect.colliderect(ground.rect): continue
+                if self.rect.bottom < ground.rect.top + 2: # Snap to top if the player is just standing
+                    self.pos.y = ground.rect.top - self.size.y
+                else:
+                    self.pos.y -= 200 * self.manager.dt # Move up smoothly if stepping up
+                self.vel.y = 0
+                self.on_ground = True
+                break
             else:
-                self.pos.y -= 200 * self.manager.dt
-            self.vel.y = 0
-            self.on_ground = True
+                continue # I hate this syntax :( but can't be bothered to make it better
+            break
 
         self.camera.update()
 

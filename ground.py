@@ -3,7 +3,6 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from scene import Scene
 
-from pygame.locals import K_UP, K_DOWN, K_LEFT, K_RIGHT
 import pygame
 
 from sprite import VisibleSprite, Layers
@@ -11,14 +10,18 @@ from constants import VEC
 
 # Test blocks for reference, to actually be able to see the player moving
 class Ground(VisibleSprite):
-    instances = []
+    instances = {}
 
     def __init__(self, scene: Scene, pos: tuple[int, int], size: tuple[int, int]) -> None:
         super().__init__(scene, Layers.PLAYER)
-        self.__class__.instances.append(self)
         self.size = VEC(size)
         self.pos = VEC(pos)
         self.rect = pygame.Rect(self.pos, self.size)
+
+        if int(self.pos.y) not in self.__class__.instances:
+            self.__class__.instances[int(self.pos.y)] = [self]
+        else:
+            self.__class__.instances[int(self.pos.y)].append(self)
 
     def update(self) -> None:
         ...
