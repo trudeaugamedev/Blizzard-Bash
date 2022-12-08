@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from scene import Scene
 
-from pygame.locals import K_a, K_d, K_w, KEYUP, K_SPACE
+from pygame.locals import K_a, K_d, K_w, K_SPACE, MOUSEBUTTONUP
 import pygame
 
 from utils import intvec, snap, clamp, clamp_max
@@ -59,10 +59,10 @@ class Player(VisibleSprite):
         elif self.vel.x > 0:
             self.acc.x -= self.CONST_ACC
 
-        if keys[K_w] and self.on_ground:
+        if (keys[K_w] or keys[K_SPACE]) and self.on_ground:
             self.vel.y = self.JUMP_SPEED
 
-        if keys[K_SPACE]:
+        if pygame.mouse.get_pressed()[0]:
             m_pos = VEC(pygame.mouse.get_pos())
             self.throwing = True
             # Use camera offset to convert screen-space pos to in-world pos
@@ -70,8 +70,8 @@ class Player(VisibleSprite):
                 self.sb_vel = -((m_pos - self.SB_OFFSET + self.camera.offset) - self.pos).normalize() * self.THROW_SPEED
             except ValueError:
                 self.sb_vel = VEC() # 0 vector
-        if KEYUP in self.manager.events:
-            if self.manager.events[KEYUP].key == K_SPACE:
+        if MOUSEBUTTONUP in self.manager.events:
+            if self.manager.events[MOUSEBUTTONUP].button == 1:
                 self.throwing = False
                 Snowball(self.scene, self.sb_vel)
 
@@ -86,8 +86,8 @@ class Player(VisibleSprite):
         self.rect.topleft = self.pos
 
         self.on_ground = False
-        for y in sorted(Ground.instances.keys()): # Sort by highest ground first
-            for ground in Ground.instances[y]:
+        for y in sorted(Ground.sorted_instances.keys()): # Sort by highest ground first
+            for ground in Ground.sorted_instances[y]:
                 if not self.rect.colliderect(ground.rect): continue
                 if self.rect.bottom < ground.rect.top + 2: # Snap to top if the player is just standing
                     self.pos.y = ground.rect.top - self.size.y
