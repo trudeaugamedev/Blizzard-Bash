@@ -14,15 +14,15 @@ from snowball import Snowball
 from ground import Ground
 
 class Camera:
-    def __init__(self, master: Player):
+    def __init__(self, master: VisibleSprite):
         self.master = master
         self.manager = self.master.manager
         self.float_offset = self.master.pos - (WIDTH // 2, HEIGHT // 2 + 100) + self.master.size / 2
         self.offset = intvec(self.float_offset)
 
-    def update(self):
+    def update(self, follow: int = 5):
         tick_offset = self.master.pos - self.offset - (WIDTH // 2, HEIGHT // 2 + 100) + self.master.size / 2
-        self.float_offset += tick_offset * 5 * self.manager.dt
+        self.float_offset += tick_offset * follow * self.manager.dt
         self.offset = intvec(self.float_offset)
 
 class Player(VisibleSprite):
@@ -39,6 +39,7 @@ class Player(VisibleSprite):
         self.throwing = False
         self.sb_vel = 0
         self.cooldown_time = time.time()
+        self.snowball = None
 
         self.CONST_ACC = 500 # 500 pixels per second squared (physics :P)
         self.MAX_SPEED = 200
@@ -78,7 +79,7 @@ class Player(VisibleSprite):
             if self.manager.events[MOUSEBUTTONUP].button == 1 and can_throw:
                 self.cooldown_time = time.time()
                 self.throwing = False
-                Snowball(self.scene, self.sb_vel)
+                self.snowball = Snowball(self.scene, self.sb_vel)
 
         self.vel += self.acc * self.manager.dt
         # _ to catch the successful clamp return value
@@ -105,7 +106,11 @@ class Player(VisibleSprite):
                 continue # I hate this syntax :( but can't be bothered to make it better
             break
 
-        self.camera.update()
+        if self.snowball:
+            self.camera.master = self.snowball
+        else:
+            self.camera.master = self
+        self.camera.update(follow=2 if self.snowball else 5)
 
     def draw(self) -> None:
         pygame.draw.rect(self.manager.screen, (255, 0, 0), (*(self.pos - self.camera.offset), *self.size))

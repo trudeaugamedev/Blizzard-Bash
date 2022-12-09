@@ -33,10 +33,13 @@ class SnowFlake(VisibleSprite):
         self.rect.topleft = self.pos
 
         # Fast solution instead of looping through every single ground object
-        if self.pos.y + self.size.y > Ground.height_map[self.pos.x // STEP_WIDTH * STEP_WIDTH]:
-            self.kill()
-            return
-        if self.pos.y > HEIGHT:
+        try:
+            if self.pos.y + self.size.y > Ground.height_map[self.pos.x // STEP_WIDTH * STEP_WIDTH]:
+                self.kill()
+                return
+        except KeyError:
+            pass
+        if self.pos.y > 2000:
             self.kill()
 
     def draw(self) -> None:

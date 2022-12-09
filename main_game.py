@@ -40,7 +40,7 @@ class MainGame(Scene):
         if time.time() - self.snowflake_time > 0.05:
             self.snowflake_time = time.time()
             for _ in range(7):
-                SnowFlake(self, VEC(randint(0 - 1000, WIDTH + 1000), randint(-100, -40)) + self.player.camera.offset)
+                SnowFlake(self, VEC(randint(0 - 1000, WIDTH + 1000), randint(-700, -400)) + self.player.camera.offset)
 
     def draw(self) -> None:
         self.manager.screen.fill((169, 192, 203))

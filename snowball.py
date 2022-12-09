@@ -19,6 +19,8 @@ class Snowball(VisibleSprite):
         self.vel = VEC(vel)
         self.acc = VEC(0, 0)
 
+        self.size = VEC(0, 0) # Only here for camera follow support
+
     def update(self) -> None:
         self.acc = VEC(0, GRAVITY)
         self.acc += self.scene.wind
@@ -34,3 +36,7 @@ class Snowball(VisibleSprite):
 
     def draw(self) -> None:
         pygame.draw.circle(self.manager.screen, (255, 255, 255), self.pos - self.player.camera.offset, 5)
+
+    def kill(self) -> None:
+        self.scene.player.snowball = None
+        super().kill()
