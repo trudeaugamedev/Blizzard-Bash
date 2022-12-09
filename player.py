@@ -8,7 +8,7 @@ import pygame
 import time
 
 from utils import intvec, snap, clamp, clamp_max
-from constants import VEC, WIDTH, HEIGHT, GRAVITY
+from constants import VEC, SCR_DIM, GRAVITY
 from sprite import VisibleSprite, Layers
 from snowball import Snowball
 from ground import Ground
@@ -17,11 +17,11 @@ class Camera:
     def __init__(self, master: VisibleSprite):
         self.master = master
         self.manager = self.master.manager
-        self.float_offset = self.master.pos - (WIDTH // 2, HEIGHT // 2 + 100) + self.master.size / 2
+        self.float_offset = self.master.pos - (SCR_DIM // 2 + (0, 100)) + self.master.size / 2
         self.offset = intvec(self.float_offset)
 
-    def update(self, follow: int = 5):
-        tick_offset = self.master.pos - self.offset - (WIDTH // 2, HEIGHT // 2 + 100) + self.master.size / 2
+    def update(self, follow: int = 5, offset: tuple[int, int] = (0, 100)):
+        tick_offset = self.master.pos - self.offset - (SCR_DIM // 2 + offset) + self.master.size / 2
         self.float_offset += tick_offset * follow * self.manager.dt
         self.offset = intvec(self.float_offset)
 
@@ -110,7 +110,7 @@ class Player(VisibleSprite):
             self.camera.master = self.snowball
         else:
             self.camera.master = self
-        self.camera.update(follow=2 if self.snowball else 5)
+        self.camera.update(follow=3 if self.snowball else 5, offset=(0, 0) if self.snowball else (0, 100))
 
     def draw(self) -> None:
         pygame.draw.rect(self.manager.screen, (255, 0, 0), (*(self.pos - self.camera.offset), *self.size))
