@@ -12,6 +12,7 @@ from constants import VEC
 class Ground(VisibleSprite):
     sorted_instances = {}
     instances = []
+    height_map = {}
 
     def __init__(self, scene: Scene, pos: tuple[int, int], size: tuple[int, int]) -> None:
         super().__init__(scene, Layers.PLAYER)
@@ -24,6 +25,7 @@ class Ground(VisibleSprite):
         else:
             self.__class__.sorted_instances[int(self.pos.y)].append(self)
         self.__class__.instances.append(self)
+        self.__class__.height_map[int(self.pos.x)] = self.pos.y
 
     def update(self) -> None:
         ...
