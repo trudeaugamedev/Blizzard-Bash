@@ -3,12 +3,13 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from manager import GameManager
 
-from random import randint, choice
+from random import randint, choice, random
 from vnoise import Noise
 import time
 
 from constants import STEP_WIDTH, WIDTH, VEC
 from snowflake import SnowFlake
+from house import House
 from ground import Ground
 from player import Player
 from scene import Scene
@@ -23,6 +24,9 @@ class MainGame(Scene):
             # Horizontal stretch and vertical stretch (essentially)
             y = noise.noise1(x * 0.05) * 200
             Ground(self, (x * STEP_WIDTH, y), (STEP_WIDTH, 500))
+        for _ in range(10):
+            ground = choice(Ground.instances)
+            House(self, (ground.pos.x, ground.pos.y))
         self.snowflake_time = time.time()
         
         self.wind = VEC(choice([randint(-600, -200), randint(200, 600)]), 0)

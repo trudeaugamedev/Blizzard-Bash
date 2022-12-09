@@ -14,15 +14,17 @@ from snowball import Snowball
 from ground import Ground
 
 class Camera:
-    def __init__(self, master: VisibleSprite):
+    def __init__(self, master: VisibleSprite, extra_offset: tuple[int, int], follow: int):
         self.master = master
         self.manager = self.master.manager
-        self.float_offset = self.master.pos - (SCR_DIM // 2 + (0, 100)) + self.master.size / 2
+        self.extra_offset = VEC(extra_offset)
+        self.follow = follow
+        self.float_offset = self.master.pos - SCR_DIM // 2 - extra_offset + self.master.size / 2
         self.offset = intvec(self.float_offset)
 
-    def update(self, follow: int = 5, offset: tuple[int, int] = (0, 100)):
-        tick_offset = self.master.pos - self.offset - (SCR_DIM // 2 + offset) + self.master.size / 2
-        self.float_offset += tick_offset * follow * self.manager.dt
+    def update(self):
+        tick_offset = self.master.pos - self.offset - SCR_DIM // 2 - self.extra_offset + self.master.size / 2
+        self.float_offset += tick_offset * self.follow * self.manager.dt
         self.offset = intvec(self.float_offset)
 
 class Player(VisibleSprite):
@@ -44,11 +46,11 @@ class Player(VisibleSprite):
         self.CONST_ACC = 500 # 500 pixels per second squared (physics :P)
         self.MAX_SPEED = 200
         self.JUMP_SPEED = -400
-        self.THROW_SPEED = 800
+        self.THROW_SPEED = 900
         self.SB_OFFSET = self.size // 2 - (0, 10)
         self.THROW_COOLDOWN = 1
 
-        self.camera = Camera(self)
+        self.camera = Camera(self, (0, 100), 5)
 
     def update(self) -> None:
         keys = pygame.key.get_pressed()
@@ -72,7 +74,8 @@ class Player(VisibleSprite):
             self.throwing = True
             # Use camera offset to convert screen-space pos to in-world pos
             try:
-                self.sb_vel = -((m_pos - self.SB_OFFSET + self.camera.offset) - self.pos).normalize() * self.THROW_SPEED
+                self.sb_vel = -((m_pos - self.SB_OFFSET + self.camera.offset) - self.pos) * 5
+                self.sb_vel.clamp_magnitude_ip(self.THROW_SPEED)
             except ValueError:
                 self.sb_vel = VEC() # 0 vector
         if MOUSEBUTTONUP in self.manager.events:
@@ -108,9 +111,13 @@ class Player(VisibleSprite):
 
         if self.snowball:
             self.camera.master = self.snowball
+            self.camera.follow = 3
+            self.camera.extra_offset = VEC(0, 0)
         else:
             self.camera.master = self
-        self.camera.update(follow=3 if self.snowball else 5, offset=(0, 0) if self.snowball else (0, 100))
+            self.camera.follow = 5
+            self.camera.extra_offset = VEC(0, 100)
+        self.camera.update()
 
     def draw(self) -> None:
         pygame.draw.rect(self.manager.screen, (255, 0, 0), (*(self.pos - self.camera.offset), *self.size))

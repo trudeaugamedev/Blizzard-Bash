@@ -8,14 +8,13 @@ import pygame
 from sprite import VisibleSprite, Layers
 from constants import VEC
 
-# Test blocks for reference, to actually be able to see the player moving
 class Ground(VisibleSprite):
     sorted_instances = {}
     instances = []
     height_map = {}
 
     def __init__(self, scene: Scene, pos: tuple[int, int], size: tuple[int, int]) -> None:
-        super().__init__(scene, Layers.PLAYER)
+        super().__init__(scene, Layers.MAP)
         self.size = VEC(size)
         self.pos = VEC(pos)
         self.rect = pygame.Rect(self.pos, self.size)
