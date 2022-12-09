@@ -26,6 +26,7 @@ class SnowFlake(VisibleSprite):
 
     def update(self) -> None:
         self.vel.y += GRAVITY * self.manager.dt
+        self.vel += self.scene.wind * 5 * self.manager.dt
         self.vel *= self.resistance
         self.pos += self.vel * self.manager.dt
 

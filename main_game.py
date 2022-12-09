@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from manager import GameManager
 
-from random import randint
+from random import randint, choice
 from vnoise import Noise
 import time
 
@@ -24,13 +24,23 @@ class MainGame(Scene):
             y = noise.noise1(x * 0.05) * 200
             Ground(self, (x * STEP_WIDTH, y), (STEP_WIDTH, 500))
         self.snowflake_time = time.time()
+        
+        self.wind = VEC(choice([randint(-600, -200), randint(200, 600)]), 0)
+        self.wind_time = time.time()
+        self.wind_interval = randint(5, 10)
 
     def update(self) -> None:
         super().update()
+
+        if time.time() - self.wind_time > self.wind_interval:
+            self.wind = VEC(choice([randint(-600, -200), randint(200, 600)]), 0)
+            self.wind_time = time.time()
+            self.wind_interval = randint(3, 6)
+
         if time.time() - self.snowflake_time > 0.05:
             self.snowflake_time = time.time()
-            for _ in range(4):
-                SnowFlake(self, VEC(randint(0 - 400, WIDTH + 400), randint(-100, -40)) + self.player.camera.offset)
+            for _ in range(7):
+                SnowFlake(self, VEC(randint(0 - 1000, WIDTH + 1000), randint(-100, -40)) + self.player.camera.offset)
 
     def draw(self) -> None:
         self.manager.screen.fill((169, 192, 203))

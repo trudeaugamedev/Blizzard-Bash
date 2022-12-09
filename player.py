@@ -108,8 +108,9 @@ class Player(VisibleSprite):
         factor = 0.015 # Basically how accurate we want the calculation to be, the distance factor between two points
         pos = self.pos + self.SB_OFFSET
         vel = self.sb_vel.copy()
-        for i in range(40): # Number of points on the parabola that will be calculated
+        for i in range(60): # Number of points on the parabola that will be calculated
             vel.y += GRAVITY * factor
+            vel += self.scene.wind * factor
             pos += vel * factor
-            if i % 4: continue # For every 4 calculated points, we draw 1 point
-            pygame.draw.circle(self.manager.screen, (0, 0, 0), pos - self.camera.offset, 5)
+            if i % 3: continue # For every 4 calculated points, we draw 1 point
+            pygame.draw.circle(self.manager.screen, (0, 0, 0), pos - self.camera.offset, 3)

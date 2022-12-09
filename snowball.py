@@ -21,6 +21,7 @@ class Snowball(VisibleSprite):
 
     def update(self) -> None:
         self.acc = VEC(0, GRAVITY)
+        self.acc += self.scene.wind
 
         self.vel += self.acc * self.manager.dt
         self.pos += self.vel * self.manager.dt
