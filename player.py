@@ -39,7 +39,7 @@ class Player(VisibleSprite):
         self.on_ground = False
 
         self.throwing = False
-        self.sb_vel = 0
+        self.sb_vel = VEC(0, 0)
         self.cooldown_time = time.time()
         self.snowball = None
 
@@ -116,7 +116,10 @@ class Player(VisibleSprite):
         else:
             self.camera.master = self
             self.camera.follow = 5
-            self.camera.extra_offset = VEC(0, 200)
+            if self.sb_vel:
+                self.camera.extra_offset = -VEC(self.sb_vel.x * 0.3, self.sb_vel.y * 0.05)
+            else:
+                self.camera.extra_offset = VEC(0, 200)
         self.camera.update()
 
     def draw(self) -> None:
