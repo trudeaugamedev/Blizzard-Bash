@@ -1,7 +1,9 @@
 import pygame
 
+from exe import pathof
+
 def load_img(file: str, factor: float = 4):
-    return pygame.transform.scale_by(pygame.image.load(file).convert_alpha(), factor)
+    return pygame.transform.scale_by(pygame.image.load(pathof(file)).convert_alpha(), factor)
 
 pygame.display.set_mode()
 
