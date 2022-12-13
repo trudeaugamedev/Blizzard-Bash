@@ -9,7 +9,6 @@ import pygame
 from sprite import VisibleSprite, Layers
 from constants import VEC, GRAVITY
 from ground import Ground
-from house import House
 
 class Snowball(VisibleSprite):
     def __init__(self, scene: Scene, vel: tuple[float, float]) -> None:
@@ -21,8 +20,6 @@ class Snowball(VisibleSprite):
         self.acc = VEC(0, 0)
         self.size = VEC(0, 0) # Only here for camera follow support
 
-        self.in_house = False
-
     def update(self) -> None:
         self.acc = VEC(0, GRAVITY)
         self.acc += self.scene.wind
@@ -32,12 +29,6 @@ class Snowball(VisibleSprite):
 
         for ground in Ground.instances:
             if ground.rect.collidepoint(self.pos):
-                self.kill()
-                return
-
-        self.in_house = False
-        for house in House.instances:
-            if house.rect.collidepoint(self.pos):
                 self.kill()
                 return
 

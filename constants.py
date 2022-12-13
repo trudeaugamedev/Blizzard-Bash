@@ -1,7 +1,7 @@
 import pygame
 
 VEC = pygame.math.Vector2
-WIDTH, HEIGHT = 800, 600
+WIDTH, HEIGHT = 1200, 800
 SCR_DIM = VEC(WIDTH, HEIGHT)
 FPS = 144
 

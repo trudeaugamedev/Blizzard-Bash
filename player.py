@@ -30,7 +30,7 @@ class Camera:
 class Player(VisibleSprite):
     def __init__(self, scene: Scene) -> None:
         super().__init__(scene, Layers.PLAYER)
-        self.size = VEC(30, 60)
+        self.size = VEC(30, 40)
         self.pos = VEC(0, -100)
         self.vel = VEC(0, 0)
         self.acc = VEC(0, 0)
@@ -74,7 +74,7 @@ class Player(VisibleSprite):
             self.throwing = True
             # Use camera offset to convert screen-space pos to in-world pos
             try:
-                self.sb_vel = -((m_pos - self.SB_OFFSET + self.camera.offset) - self.pos) * 5
+                self.sb_vel = -((m_pos - self.SB_OFFSET + self.camera.offset) - self.pos) * 8
                 self.sb_vel.clamp_magnitude_ip(self.THROW_SPEED)
             except ValueError:
                 self.sb_vel = VEC() # 0 vector
@@ -116,7 +116,7 @@ class Player(VisibleSprite):
         else:
             self.camera.master = self
             self.camera.follow = 5
-            self.camera.extra_offset = VEC(0, 100)
+            self.camera.extra_offset = VEC(0, 200)
         self.camera.update()
 
     def draw(self) -> None:
