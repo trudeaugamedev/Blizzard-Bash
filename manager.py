@@ -1,3 +1,8 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from client import Client
+
 from pygame.locals import HWSURFACE, DOUBLEBUF, RESIZABLE, SCALED, WINDOWRESIZED, WINDOWMOVED, QUIT
 from enum import Enum
 import pygame
@@ -12,9 +17,10 @@ class AbortScene(Exception):
         return "Scene aborted but not caught with a try/except block."
 
 class GameManager:
-    def __init__(self) -> None:
+    def __init__(self, client: Client) -> None:
         pygame.init()
 
+        self.client = client
         self.flags = HWSURFACE | DOUBLEBUF | RESIZABLE | SCALED
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT), self.flags)
         self.clock = pygame.time.Clock()
@@ -22,6 +28,7 @@ class GameManager:
         self.window_changing = False
         self.events = []
         self.scene = MainGame(self, None)
+        self.other_players = {}
 
     def run(self) -> None:
         while self.scene.running:
@@ -51,6 +58,12 @@ class GameManager:
             self.dt = 0
 
         pygame.display.flip()
+
+    def recv(self, msg: str) -> None:
+        print(msg)
+
+    def send(self) -> None:
+        self.client.socket.send(f"{self.scene.player.pos}")
 
     def quit(self) -> None:
         pygame.quit()
