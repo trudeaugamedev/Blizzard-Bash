@@ -8,7 +8,8 @@ from enum import Enum
 import pygame
 import sys
 
-from constants import WIDTH, HEIGHT, FPS
+from constants import WIDTH, HEIGHT, FPS, VEC
+from other_player import OtherPlayer
 from main_game import MainGame
 from scene import Scene
 
@@ -38,6 +39,7 @@ class GameManager:
                 self.scene.draw()
             except AbortScene:
                 pass
+            self.send()
 
     def update(self) -> None:
         self.dt = self.clock.tick_busy_loop(FPS) / 1000
@@ -59,13 +61,20 @@ class GameManager:
 
         pygame.display.flip()
 
-    def recv(self, msg: str) -> None:
-        print(msg)
+    def parse(self, msg: str) -> None:
+        parsed = msg.split(maxsplit=2)
+        i = int(parsed[1])
+        pos = tuple(map(int, parsed[2].split(",")))
+        if i in self.other_players:
+            self.other_players[i].pos = VEC(pos)
+        else:
+            self.other_players[i] = OtherPlayer(self.scene, pos)
 
     def send(self) -> None:
-        self.client.socket.send(f"{self.scene.player.pos}")
+        self.client.socket.send(f"{int(self.scene.player.pos.x)},{int(self.scene.player.pos.y)}")
 
     def quit(self) -> None:
+        self.client.quit()
         pygame.quit()
         sys.exit()
 
