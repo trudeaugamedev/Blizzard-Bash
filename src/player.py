@@ -31,7 +31,7 @@ class Camera:
 class Player(VisibleSprite):
     def __init__(self, scene: Scene) -> None:
         super().__init__(scene, Layers.PLAYER)
-        self.size = VEC(30, 40)
+        self.size = VEC(45, 60)
         self.pos = VEC(0, -100)
         self.vel = VEC(0, 0)
         self.acc = VEC(0, 0)
