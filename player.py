@@ -7,7 +7,7 @@ from pygame.locals import K_a, K_d, K_w, K_SPACE, MOUSEBUTTONUP
 import pygame
 import time
 
-from utils import intvec, snap, clamp, clamp_max
+from utils import intvec, snap, clamp, snap
 from constants import VEC, SCR_DIM, GRAVITY
 from sprite import VisibleSprite, Layers
 from snowball import Snowball
@@ -24,6 +24,7 @@ class Camera:
 
     def update(self):
         tick_offset = self.master.pos - self.offset - SCR_DIM // 2 - self.extra_offset + self.master.size / 2
+        tick_offset = snap(tick_offset, VEC(), VEC(1, 1))
         self.float_offset += tick_offset * self.follow * self.manager.dt
         self.offset = intvec(self.float_offset)
 
