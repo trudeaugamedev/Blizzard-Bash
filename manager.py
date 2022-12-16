@@ -4,6 +4,7 @@ if TYPE_CHECKING:
     from client import Client
 
 from pygame.locals import HWSURFACE, DOUBLEBUF, RESIZABLE, SCALED, WINDOWRESIZED, WINDOWMOVED, QUIT
+from websocket._exceptions import WebSocketConnectionClosedException
 from enum import Enum
 import pygame
 import sys
@@ -71,7 +72,10 @@ class GameManager:
             self.other_players[i] = OtherPlayer(self.scene, pos)
 
     def send(self) -> None:
-        self.client.socket.send(f"{int(self.scene.player.pos.x)},{int(self.scene.player.pos.y)}")
+        try:
+            self.client.socket.send(f"{int(self.scene.player.pos.x)},{int(self.scene.player.pos.y)}")
+        except WebSocketConnectionClosedException:
+            pass
 
     def quit(self) -> None:
         self.client.quit()
