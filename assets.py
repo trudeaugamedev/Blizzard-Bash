@@ -1,7 +1,8 @@
 import pygame
 
 def load_img(file: str, factor: float = 4):
-    return pygame.transform.scale_by(pygame.image.load(file).convert_alpha(), factor)
+    img = pygame.image.load(file).convert_alpha()
+    return pygame.transform.scale(img, (img.get_width() * factor, img.get_height() * factor))
 
 pygame.display.set_mode()
 
