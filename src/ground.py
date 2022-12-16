@@ -5,8 +5,8 @@ if TYPE_CHECKING:
 
 import pygame
 
-from sprite import VisibleSprite, Layers
-from constants import VEC
+from .sprite import VisibleSprite, Layers
+from .constants import VEC
 
 class Ground(VisibleSprite):
     sorted_instances = {}

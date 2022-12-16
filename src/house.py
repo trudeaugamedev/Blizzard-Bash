@@ -6,8 +6,8 @@ if TYPE_CHECKING:
 from random import randint
 import pygame
 
-from sprite import VisibleSprite, Layers
-from constants import VEC
+from .sprite import VisibleSprite, Layers
+from .constants import VEC
 
 class House(VisibleSprite):
     instances = []

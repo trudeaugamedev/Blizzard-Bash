@@ -6,9 +6,9 @@ if TYPE_CHECKING:
 
 import pygame
 
-from sprite import VisibleSprite, Layers
-from constants import VEC, GRAVITY
-from ground import Ground
+from .sprite import VisibleSprite, Layers
+from .constants import VEC, GRAVITY
+from .ground import Ground
 
 class Snowball(VisibleSprite):
     def __init__(self, scene: Scene, vel: tuple[float, float]) -> None:

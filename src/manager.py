@@ -9,10 +9,10 @@ from enum import Enum
 import pygame
 import sys
 
-from constants import WIDTH, HEIGHT, FPS, VEC
-from other_player import OtherPlayer
-from main_game import MainGame
-from scene import Scene
+from .constants import WIDTH, HEIGHT, FPS, VEC
+from .other_player import OtherPlayer
+from .main_game import MainGame
+from .scene import Scene
 
 class AbortScene(Exception):
     def __str__(self):

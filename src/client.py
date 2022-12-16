@@ -1,7 +1,7 @@
 from websocket import WebSocketApp
 from threading import Thread
 
-from manager import GameManager
+from .manager import GameManager
 
 class Client:
     def __init__(self) -> None:

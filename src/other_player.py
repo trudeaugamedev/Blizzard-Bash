@@ -7,11 +7,11 @@ from pygame.locals import K_a, K_d, K_w, K_SPACE, MOUSEBUTTONUP
 import pygame
 import time
 
-from utils import intvec, snap, clamp, clamp_max
-from constants import VEC, SCR_DIM, GRAVITY
-from sprite import VisibleSprite, Layers
-from snowball import Snowball
-from ground import Ground
+from .utils import intvec, snap, clamp, clamp_max
+from .constants import VEC, SCR_DIM, GRAVITY
+from .sprite import VisibleSprite, Layers
+from .snowball import Snowball
+from .ground import Ground
 
 class OtherPlayer(VisibleSprite):
     def __init__(self, scene: Scene, pos: tuple[int, int]) -> None:

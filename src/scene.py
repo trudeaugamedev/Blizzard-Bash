@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from manager import GameManager
 
-from sprite import SpriteManager
+from .sprite import SpriteManager
 
 class Scene:
     def __init__(self, manager: GameManager, previous_scene: Scene) -> None:

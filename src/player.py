@@ -7,11 +7,11 @@ from pygame.locals import K_a, K_d, K_w, K_SPACE, MOUSEBUTTONUP
 import pygame
 import time
 
-from utils import intvec, snap, clamp, snap
-from constants import VEC, SCR_DIM, GRAVITY
-from sprite import VisibleSprite, Layers
-from snowball import Snowball
-from ground import Ground
+from .utils import intvec, snap, clamp, snap
+from .constants import VEC, SCR_DIM, GRAVITY
+from .sprite import VisibleSprite, Layers
+from .snowball import Snowball
+from .ground import Ground
 
 class Camera:
     def __init__(self, master: VisibleSprite, extra_offset: tuple[int, int], follow: int):

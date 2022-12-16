@@ -1,6 +1,6 @@
 import pygame
 
-from exe import pathof
+from .exe import pathof
 
 def load_img(file: str, factor: float = 4):
     img = pygame.image.load(pathof(file)).convert_alpha()

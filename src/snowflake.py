@@ -7,10 +7,10 @@ if TYPE_CHECKING:
 from random import choices, uniform
 import pygame
 
-from constants import VEC, GRAVITY, HEIGHT, STEP_WIDTH
-from sprite import VisibleSprite, Layers
-from ground import Ground
-import assets
+from .constants import VEC, GRAVITY, HEIGHT, STEP_WIDTH
+from .sprite import VisibleSprite, Layers
+from .ground import Ground
+from . import assets
 
 class SnowFlake(VisibleSprite):
     def __init__(self, scene: Scene, pos: tuple[int, int]) -> None:

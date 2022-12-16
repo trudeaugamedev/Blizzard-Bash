@@ -7,12 +7,12 @@ from random import randint, choice
 from vnoise import Noise
 import time
 
-from constants import STEP_WIDTH, WIDTH, VEC, HEIGHT
-from snowflake import SnowFlake
-from house import House
-from ground import Ground
-from player import Player
-from scene import Scene
+from .constants import STEP_WIDTH, WIDTH, VEC, HEIGHT
+from .snowflake import SnowFlake
+from .house import House
+from .ground import Ground
+from .player import Player
+from .scene import Scene
 
 noise = Noise()
 
