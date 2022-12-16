@@ -5,7 +5,7 @@ from manager import GameManager
 
 class Client:
     def __init__(self) -> None:
-        self.socket = WebSocketApp("ws://192.168.0.88:1200/", on_message=self.on_message)
+        self.socket = WebSocketApp("wss://trudeaugamedev-winter.herokuapp.com", on_message=self.on_message)
         self.socket_thread = Thread(target=self.socket.run_forever, daemon=True)
 
     def run(self) -> None:
