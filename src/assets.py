@@ -13,7 +13,7 @@ pygame.display.set_mode()
 
 snowflakes: list[pygame.Surface] = []
 for i in range(10):
-    snowflakes.append(load_img(f"{TEXTURES}/snowflakes/snowflake_{i}.png"))
+    snowflakes.append(load_img(f"{TEXTURES}/snowflakes/snowflake_{i}.png", 2))
 
 class Frames:
     def __init__(self, path: str, prefix: str) -> None:
