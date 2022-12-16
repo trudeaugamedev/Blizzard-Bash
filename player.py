@@ -7,7 +7,7 @@ from pygame.locals import K_a, K_d, K_w, K_SPACE, MOUSEBUTTONUP
 import pygame
 import time
 
-from utils import intvec, snap, clamp, clamp_max
+from utils import intvec, snap, clamp, snap
 from constants import VEC, SCR_DIM, GRAVITY
 from sprite import VisibleSprite, Layers
 from snowball import Snowball
@@ -24,6 +24,7 @@ class Camera:
 
     def update(self):
         tick_offset = self.master.pos - self.offset - SCR_DIM // 2 - self.extra_offset + self.master.size / 2
+        tick_offset = snap(tick_offset, VEC(), VEC(1, 1))
         self.float_offset += tick_offset * self.follow * self.manager.dt
         self.offset = intvec(self.float_offset)
 
@@ -75,7 +76,8 @@ class Player(VisibleSprite):
             # Use camera offset to convert screen-space pos to in-world pos
             try:
                 self.sb_vel = -((m_pos - self.SB_OFFSET + self.camera.offset) - self.pos) * 8
-                self.sb_vel.clamp_magnitude_ip(self.THROW_SPEED)
+                if self.sb_vel.length() > self.THROW_SPEED:
+                    self.sb_vel.scale_to_length(self.THROW_SPEED)
             except ValueError:
                 self.sb_vel = VEC() # 0 vector
         if MOUSEBUTTONUP in self.manager.events:
@@ -116,7 +118,7 @@ class Player(VisibleSprite):
         else:
             self.camera.master = self
             self.camera.follow = 5
-            if self.sb_vel:
+            if self.throwing:
                 self.camera.extra_offset = -VEC(self.sb_vel.x * 0.3, self.sb_vel.y * 0.05)
             else:
                 self.camera.extra_offset = VEC(0, 200)
