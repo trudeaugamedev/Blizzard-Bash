@@ -1,9 +1,16 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from client import Client
+
 from pygame.locals import HWSURFACE, DOUBLEBUF, RESIZABLE, SCALED, WINDOWRESIZED, WINDOWMOVED, QUIT
+from websocket._exceptions import WebSocketConnectionClosedException
 from enum import Enum
 import pygame
 import sys
 
-from constants import WIDTH, HEIGHT, FPS
+from constants import WIDTH, HEIGHT, FPS, VEC
+from other_player import OtherPlayer
 from main_game import MainGame
 from scene import Scene
 
@@ -12,9 +19,10 @@ class AbortScene(Exception):
         return "Scene aborted but not caught with a try/except block."
 
 class GameManager:
-    def __init__(self) -> None:
+    def __init__(self, client: Client) -> None:
         pygame.init()
 
+        self.client = client
         self.flags = HWSURFACE | DOUBLEBUF | RESIZABLE | SCALED
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT), self.flags)
         self.clock = pygame.time.Clock()
@@ -22,6 +30,7 @@ class GameManager:
         self.window_changing = False
         self.events = []
         self.scene = MainGame(self, None)
+        self.other_players = {}
 
     def run(self) -> None:
         while self.scene.running:
@@ -31,6 +40,7 @@ class GameManager:
                 self.scene.draw()
             except AbortScene:
                 pass
+            self.send()
 
     def update(self) -> None:
         self.dt = self.clock.tick_busy_loop(FPS) / 1000
@@ -52,7 +62,23 @@ class GameManager:
 
         pygame.display.flip()
 
+    def parse(self, msg: str) -> None:
+        parsed = msg.split(maxsplit=2)
+        i = int(parsed[1])
+        pos = tuple(map(int, parsed[2].split(",")))
+        if i in self.other_players:
+            self.other_players[i].pos = VEC(pos)
+        else:
+            self.other_players[i] = OtherPlayer(self.scene, pos)
+
+    def send(self) -> None:
+        try:
+            self.client.socket.send(f"{int(self.scene.player.pos.x)},{int(self.scene.player.pos.y)}")
+        except WebSocketConnectionClosedException:
+            pass
+
     def quit(self) -> None:
+        self.client.quit()
         pygame.quit()
         sys.exit()
 

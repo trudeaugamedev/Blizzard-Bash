@@ -1,0 +1,15 @@
+{
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/trudeaugamedev/Winter-Game.git"
+  },
+  "dependencies": {
+    "bufferutil": "^4.0.7",
+    "utf-8-validate": "^5.0.10",
+    "ws": "^8.11.0"
+  }
+}

@@ -1,4 +1,4 @@
-from manager import GameManager
+from client import Client
 
 if __name__ == "__main__":
-    GameManager().run()
+    Client().run()
