@@ -76,7 +76,8 @@ class Player(VisibleSprite):
             # Use camera offset to convert screen-space pos to in-world pos
             try:
                 self.sb_vel = -((m_pos - self.SB_OFFSET + self.camera.offset) - self.pos) * 8
-                self.sb_vel.clamp_magnitude_ip(self.THROW_SPEED)
+                if self.sb_vel.length() > self.THROW_SPEED:
+                    self.sb_vel.scale_to_length(self.THROW_SPEED)
             except ValueError:
                 self.sb_vel = VEC() # 0 vector
         if MOUSEBUTTONUP in self.manager.events:
