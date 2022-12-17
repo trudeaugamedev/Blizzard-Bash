@@ -7,8 +7,8 @@ from pygame.locals import K_a, K_d, K_w, K_SPACE, MOUSEBUTTONUP
 import pygame
 import time
 
-from .constants import VEC, SCR_DIM, GRAVITY, PIXEL_SIZE
-from .utils import intvec, snap, clamp, snap
+from .constants import VEC, SCR_DIM, GRAVITY, PIXEL_SIZE, TILE_SIZE
+from .utils import intvec, snap, clamp, snap, sign
 from .sprite import VisibleSprite, Layers
 from .snowball import Snowball
 from .ground import Ground
@@ -37,9 +37,14 @@ class Player(VisibleSprite):
         self.vel = VEC(0, 0)
         self.acc = VEC(0, 0)
         self.speed = 150
-        self.image = assets.player
+        self.upright_image = assets.player
+        self.image = self.upright_image
         self.rect = pygame.Rect(self.pos, self.size)
+        self.real_rect = self.rect.copy()
+        self.real_rect.size = (10, 16)
         self.on_ground = False
+        self.ground = Ground.instances[int(self.pos.x // TILE_SIZE * TILE_SIZE)]
+        self.rotation = 30
 
         self.throwing = False
         self.sb_vel = VEC(0, 0)
@@ -59,12 +64,12 @@ class Player(VisibleSprite):
         self.acc = VEC(0, GRAVITY)
         if keys[K_a]: # Acceleration
             self.acc.x -= self.CONST_ACC
-            self.image = pygame.transform.flip(assets.player, True, False)
+            self.upright_image = pygame.transform.flip(assets.player, True, False)
         elif self.vel.x < 0: # Deceleration
             self.acc.x += self.CONST_ACC
         if keys[K_d]:
             self.acc.x += self.CONST_ACC
-            self.image = assets.player
+            self.upright_image = assets.player
         elif self.vel.x > 0:
             self.acc.x -= self.CONST_ACC
 
@@ -95,15 +100,18 @@ class Player(VisibleSprite):
         self.vel.x = snap(self.vel.x, 0, self.CONST_ACC * self.manager.dt)
         self.pos += self.vel * self.manager.dt
 
-        self.rect.bottomleft = self.pos
+        self.ground = Ground.instances[int(self.pos.x // TILE_SIZE * TILE_SIZE)]
+        self.rotation += sign(self.ground.incline - self.rotation) * 50 * self.manager.dt
+        self.rotation = snap(self.rotation, self.ground.incline, 1)
+        self.image = pygame.transform.rotate(self.upright_image, self.rotation)
+
+        self.rect = self.image.get_rect(midbottom=self.pos)
+        self.real_rect.midbottom = self.rect.midbottom
 
         self.on_ground = False
-        ground_y = Ground.pixel_height_map[int(self.rect.centerx // PIXEL_SIZE * PIXEL_SIZE)]
-        if self.pos.y > ground_y:
-            if self.rect.bottom < ground_y + 2: # Snap to top if the player is just standing
-                self.pos.y = ground_y
-            else:
-                self.pos.y -= (self.rect.bottom - ground_y) * 20 * self.manager.dt # Move up smoothly if stepping up
+        ground_y = Ground.height_map[int(self.rect.centerx // PIXEL_SIZE * PIXEL_SIZE)]
+        if self.pos.y > ground_y + 5:
+            self.pos.y = ground_y + 5
             self.vel.y = 0
             self.on_ground = True
 

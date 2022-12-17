@@ -57,7 +57,7 @@ class Snowball(VisibleSprite):
         self.rect = self.image.get_rect(center=self.pos)
         self.real_rect.center = self.rect.center
 
-        ground_y = Ground.pixel_height_map[int(self.rect.centerx // PIXEL_SIZE * PIXEL_SIZE)]
+        ground_y = Ground.height_map[int(self.rect.centerx // PIXEL_SIZE * PIXEL_SIZE)]
         if self.pos.y > ground_y:
             self.kill()
             return

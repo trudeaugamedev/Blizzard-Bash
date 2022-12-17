@@ -20,17 +20,18 @@ class MainGame(Scene):
         while "seed" not in self.client.thread_data:
             time.sleep(0.01)
         noise.seed(self.client.thread_data["seed"])
-        self.player = Player(self)
 
         for x in range(-100, 101):
             # Horizontal stretch and vertical stretch (essentially)
             y = noise.noise2(x * 0.1, 0) * 200
             Ground(self, (x * TILE_SIZE, y), (TILE_SIZE, 500))
-        for ground in Ground.instances:
+        for ground in Ground.instances.values():
             ground.generate_image() # Create a images only after all tiles have been created
 
+        self.player = Player(self)
+
         for _ in range(10):
-            ground = choice(Ground.instances)
+            ground = choice(list(Ground.instances.values()))
             House(self, (ground.pos.x, ground.pos.y))
 
         self.snowflake_time = time.time()

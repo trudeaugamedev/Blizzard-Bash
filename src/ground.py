@@ -12,9 +12,8 @@ from .sprite import VisibleSprite, Layers
 from . import assets
 
 class Ground(VisibleSprite):
-    instances = []
+    instances = {}
     height_map = {}
-    pixel_height_map = {}
 
     def __init__(self, scene: Scene, pos: tuple[int, int], size: tuple[int, int]) -> None:
         super().__init__(scene, Layers.MAP)
@@ -22,8 +21,7 @@ class Ground(VisibleSprite):
         self.pos = VEC(pos)
         self.rect = pygame.Rect(self.pos, self.size)
 
-        self.__class__.instances.append(self)
-        self.__class__.height_map[int(self.pos.x)] = self.pos.y
+        self.__class__.instances[int(self.pos.x)] = self
 
     def generate_image(self) -> None:
         self.unsliced_image = pygame.Surface(self.size)
@@ -33,11 +31,11 @@ class Ground(VisibleSprite):
             self.unsliced_image.blit(assets.ground_tiles[1], (0, i * TILE_SIZE))
 
         try:
-            left_height = self.__class__.height_map[int(self.pos.x - TILE_SIZE)]
+            left_height = self.__class__.instances[int(self.pos.x - TILE_SIZE)].pos.y
         except KeyError: # leftmost ground tile
             left_height = self.pos.y
         try:
-            right_height = self.__class__.height_map[int(self.pos.x + TILE_SIZE)]
+            right_height = self.__class__.instances[int(self.pos.x + TILE_SIZE)].pos.y
         except KeyError: # rightmost ground tile
             right_height = self.pos.y
 
@@ -60,9 +58,9 @@ class Ground(VisibleSprite):
             column = self.unsliced_image.subsurface(x * PIXEL_SIZE, 0, PIXEL_SIZE, self.size.y)
             y = x * interval + y_offset
             self.image.blit(column, (x * PIXEL_SIZE, y))
-            self.__class__.pixel_height_map[int(self.pos.x + x * PIXEL_SIZE)] = self.pos.y + y
+            self.__class__.height_map[int(self.pos.x + x * PIXEL_SIZE)] = self.pos.y + y
 
-        self.incline = degrees(atan2(interval, PIXEL_SIZE))
+        self.incline = degrees(atan2(-interval, PIXEL_SIZE))
 
     def update(self) -> None:
         ...

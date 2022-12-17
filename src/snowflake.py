@@ -34,7 +34,7 @@ class SnowFlake(VisibleSprite):
 
         # Fast solution instead of looping through every single ground object
         try:
-            if self.pos.y + self.size.y > Ground.pixel_height_map[self.pos.x // PIXEL_SIZE * PIXEL_SIZE]:
+            if self.pos.y + self.size.y > Ground.height_map[self.pos.x // PIXEL_SIZE * PIXEL_SIZE]:
                 self.kill()
                 return
         except KeyError:
