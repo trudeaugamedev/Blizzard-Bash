@@ -9,8 +9,8 @@ from enum import Enum
 import pygame
 import sys
 
+from .other_player import OtherPlayer, OtherSnowball
 from .constants import WIDTH, HEIGHT, FPS, VEC
-from .other_player import OtherPlayer
 from .main_game import MainGame
 from .scene import Scene
 
@@ -63,17 +63,35 @@ class GameManager:
         pygame.display.flip()
 
     def parse(self, msg: str) -> None:
-        parsed = msg.split(maxsplit=2)
+        # Received format: "cl [id] [x],[y] [snowballx],[snowbally]"
+        parsed = msg.split()
         i = int(parsed[1])
+
         pos = tuple(map(int, parsed[2].split(",")))
         if i in self.other_players:
             self.other_players[i].pos = VEC(pos)
         else:
             self.other_players[i] = OtherPlayer(self.scene, pos)
+        player = self.other_players[i]
+
+        if parsed[3] != "_":
+            sb_pos = tuple(map(int, parsed[3].split(",")))
+            if not player.snowball:
+                player.snowball = OtherSnowball(self.scene, sb_pos)
+            player.snowball.pos = VEC(sb_pos)
+        else:
+            player.snowball.kill()
+            player.snowball = None
 
     def send(self) -> None:
+        pos = f"{int(self.scene.player.pos.x)},{int(self.scene.player.pos.y)}"
+        if self.scene.player.snowball:
+            sb_pos = f"{int(self.scene.player.snowball.pos.x)},{int(self.scene.player.snowball.pos.y)}"
+        else:
+            sb_pos = "_"
+
         try:
-            self.client.socket.send(f"{int(self.scene.player.pos.x)},{int(self.scene.player.pos.y)}")
+            self.client.socket.send(f"{pos} {sb_pos}")
         except WebSocketConnectionClosedException:
             pass
 
