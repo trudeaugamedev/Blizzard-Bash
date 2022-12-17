@@ -24,7 +24,7 @@ class MainGame(Scene):
         for x in range(-100, 101):
             # Horizontal stretch and vertical stretch (essentially)
             y = noise.noise2(x * 0.1, 0) * 200
-            Ground(self, (x * TILE_SIZE, y), (TILE_SIZE, 500))
+            Ground(self, (x * TILE_SIZE, y), (TILE_SIZE, 800))
         for ground in Ground.instances.values():
             ground.generate_image() # Create a images only after all tiles have been created
 

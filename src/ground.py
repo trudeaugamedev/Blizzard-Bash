@@ -27,7 +27,7 @@ class Ground(VisibleSprite):
         self.unsliced_image = pygame.Surface(self.size)
         self.image = pygame.Surface(self.size, SRCALPHA)
         self.unsliced_image.blit(assets.ground_tiles[0], (0, 0))
-        for i in range(1, 11):
+        for i in range(1, 20):
             self.unsliced_image.blit(assets.ground_tiles[1], (0, i * TILE_SIZE))
 
         try:
