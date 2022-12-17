@@ -103,7 +103,7 @@ class Player(VisibleSprite):
                 if self.rect.bottom < ground.rect.top + 2: # Snap to top if the player is just standing
                     self.pos.y = ground.rect.top - self.size.y
                 else:
-                    self.pos.y -= 200 * self.manager.dt # Move up smoothly if stepping up
+                    self.pos.y -= (self.rect.bottom - ground.rect.top) * 20 * self.manager.dt # Move up smoothly if stepping up
                 self.vel.y = 0
                 self.on_ground = True
                 break
