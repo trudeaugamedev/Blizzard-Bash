@@ -3,20 +3,15 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from scene import Scene
 
-from pygame.locals import K_a, K_d, K_w, K_SPACE, MOUSEBUTTONUP
 import pygame
-import time
 
-from .utils import intvec, snap, clamp, clamp_max
-from .constants import VEC, SCR_DIM, GRAVITY
 from .sprite import VisibleSprite, Layers
-from .snowball import Snowball
-from .ground import Ground
+from .constants import VEC
 
 class OtherPlayer(VisibleSprite):
     def __init__(self, scene: Scene, pos: tuple[int, int]) -> None:
         super().__init__(scene, Layers.PLAYER)
-        self.size = VEC(30, 40)
+        self.size = VEC(45, 60)
         self.pos = VEC(pos)
 
     def update(self) -> None:
