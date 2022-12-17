@@ -8,6 +8,7 @@ from .sprite import SpriteManager
 class Scene:
     def __init__(self, manager: GameManager, previous_scene: Scene) -> None:
         self.manager = manager
+        self.client = manager.client
         self.previous_scene = previous_scene
         self.sprite_manager = SpriteManager(self)
         self.running = True

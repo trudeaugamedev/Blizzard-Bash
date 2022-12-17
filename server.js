@@ -1,5 +1,9 @@
 const { WebSocketServer } = require("ws");
 
+function randint(min, max) {
+	return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 let nextid = 0;
 
 const wss = new WebSocketServer({
@@ -24,6 +28,8 @@ function xbroadcast(xid, msg) {
 	}
 }
 
+const seed = randint(0, 99999999)
+
 wss.on("connection", (socket) => {
 	const client = {
 		id: nextid++,
@@ -44,5 +50,5 @@ wss.on("connection", (socket) => {
 		xbroadcast(client.id, `cl ${client.id} ${msg}`);
 	});
 
-	socket.send("hi");
+	socket.send(`hi ${seed}`);
 });

@@ -29,8 +29,8 @@ class GameManager:
         self.dt = self.clock.tick_busy_loop(FPS) / 1000
         self.window_changing = False
         self.events = []
-        self.scene = MainGame(self, None)
         self.other_players = {}
+        self.scene = MainGame(self, None)
 
     def run(self) -> None:
         while self.scene.running:

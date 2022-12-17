@@ -5,8 +5,10 @@ from .manager import GameManager
 
 class Client:
     def __init__(self) -> None:
+        # self.socket = WebSocketApp("ws://localhost:3000", on_message=self.on_message)
         self.socket = WebSocketApp("wss://trudeaugamedev-winter.herokuapp.com", on_message=self.on_message)
         self.socket_thread = Thread(target=self.socket.run_forever, daemon=True)
+        self.thread_data = {}
 
     def run(self) -> None:
         self.socket_thread.start()
@@ -17,15 +19,14 @@ class Client:
         match parsed[0]:
             case "hi": # Connection signal
                 print("Connected to server!")
+                seed = int(parsed[1])
+                self.thread_data["seed"] = seed
             case "dc": # Disconnection signal
                 print(f"Client {parsed[1]} disconnected!")
                 self.manager.other_players[int(parsed[1])].kill()
                 del self.manager.other_players[int(parsed[1])]
             case "cl": # Client data signal
-                # try:
-                    self.manager.parse(message)
-                # except: # Invalid message
-                #     print(f"Invalid message: '{message}'")
+                self.manager.parse(message)
 
     def run_game(self) -> None:
         self.manager = GameManager(self)
