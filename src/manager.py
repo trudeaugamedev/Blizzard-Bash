@@ -63,19 +63,21 @@ class GameManager:
         pygame.display.flip()
 
     def parse(self, msg: str) -> None:
-        # Received format: "cl [id] [x],[y] [snowball_x],[snowball_y];[snowball_frame]"
+        # Received format: "cl [id] [score] [x],[y] [snowball_x],[snowball_y];[snowball_frame]"
         parsed = msg.split()
         i = int(parsed[1])
 
-        pos = tuple(map(int, parsed[2].split(",")))
+        pos = tuple(map(int, parsed[3].split(",")))
         if i in self.other_players:
             self.other_players[i].pos = VEC(pos)
         else:
             self.other_players[i] = OtherPlayer(self.scene, pos)
         player = self.other_players[i]
 
-        if parsed[3] != "_":
-            sb_data = parsed[3].split(";")
+        player.score = int(parsed[2])
+
+        if parsed[4] != "_":
+            sb_data = parsed[4].split(";")
             sb_pos = tuple(map(int, sb_data[0].split(",")))
             sb_frame = int(sb_data[1])
             if not player.snowball:
@@ -87,7 +89,10 @@ class GameManager:
             player.snowball = None
 
     def send(self) -> None:
+        score = self.scene.score
+
         pos = f"{int(self.scene.player.pos.x)},{int(self.scene.player.pos.y)}"
+
         if self.scene.player.snowball:
             sb_pos = f"{int(self.scene.player.snowball.pos.x)},{int(self.scene.player.snowball.pos.y)}"
             sb_frame = self.scene.player.snowball.frame
@@ -96,7 +101,7 @@ class GameManager:
             sb_data = "_"
 
         try:
-            self.client.socket.send(f"{pos} {sb_data}")
+            self.client.socket.send(f"{score} {pos} {sb_data}")
         except WebSocketConnectionClosedException:
             pass
 

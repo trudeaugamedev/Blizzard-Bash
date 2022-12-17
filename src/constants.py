@@ -12,3 +12,4 @@ TILE_SIZE = REAL_TILE_SIZE * PIXEL_SIZE
 
 pygame.font.init()
 FONT = pygame.font.SysFont("arial", 32, True)
+FONT2 = pygame.font.SysFont("arial", 20, True)
