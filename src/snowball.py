@@ -63,7 +63,7 @@ class Snowball(VisibleSprite):
             return
 
         for player in self.manager.other_players.values():
-            if player.rect.colliderect(self.real_rect):
+            if player.real_rect.colliderect(self.real_rect):
                 self.kill()
                 self.scene.score += 1
                 return

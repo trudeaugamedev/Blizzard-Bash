@@ -5,8 +5,8 @@ if TYPE_CHECKING:
 
 import pygame
 
+from .constants import VEC, FONT, PIXEL_SIZE
 from .sprite import VisibleSprite, Layers
-from .constants import VEC, FONT
 from . import assets
 
 class OtherPlayer(VisibleSprite):
@@ -17,6 +17,8 @@ class OtherPlayer(VisibleSprite):
         self.upright_image = assets.player
         self.image = self.upright_image
         self.rect = pygame.Rect(self.pos, self.size)
+        self.real_rect = self.rect.copy()
+        self.real_rect.size = (10 * PIXEL_SIZE, 20 * PIXEL_SIZE)
         self.snowball = None
         self.rotation = 0
         self.flip = False
@@ -24,6 +26,8 @@ class OtherPlayer(VisibleSprite):
 
     def update(self) -> None:
         self.rect = self.image.get_rect(midbottom=self.pos)
+        self.real_rect.midbottom = self.rect.midbottom
+
         self.upright_image = pygame.transform.flip(assets.player, self.flip, False)
         self.image = pygame.transform.rotate(self.upright_image, self.rotation)
 

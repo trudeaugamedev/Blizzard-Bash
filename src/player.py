@@ -41,7 +41,7 @@ class Player(VisibleSprite):
         self.image = self.upright_image
         self.rect = pygame.Rect(self.pos, self.size)
         self.real_rect = self.rect.copy()
-        self.real_rect.size = (10, 16)
+        self.real_rect.size = (10 * PIXEL_SIZE, 20 * PIXEL_SIZE)
         self.on_ground = False
         self.ground = Ground.instances[int(self.pos.x // TILE_SIZE * TILE_SIZE)]
         self.flip = False
