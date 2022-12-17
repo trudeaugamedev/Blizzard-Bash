@@ -63,15 +63,20 @@ class GameManager:
         pygame.display.flip()
 
     def parse(self, msg: str) -> None:
-        # Received format: "cl [id] [score] [x],[y] [snowball_x],[snowball_y];[snowball_frame]"
+        # Received format: "cl [id] [score] [x],[y];[rotation];[flip] [snowball_x],[snowball_y];[snowball_frame]"
         parsed = msg.split()
         i = int(parsed[1])
 
-        pos = tuple(map(int, parsed[3].split(",")))
+        p_data = parsed[3].split(";")
+        p_pos = VEC(tuple(map(int, p_data[0].split(","))))
+        p_rot = int(p_data[1])
+        p_flip = bool(int(p_data[2]))
         if i in self.other_players:
-            self.other_players[i].pos = VEC(pos)
+            self.other_players[i].pos = p_pos
+            self.other_players[i].rotation = p_rot
+            self.other_players[i].flip = p_flip
         else:
-            self.other_players[i] = OtherPlayer(self.scene, pos)
+            self.other_players[i] = OtherPlayer(self.scene, p_pos)
         player = self.other_players[i]
 
         player.score = int(parsed[2])
@@ -91,7 +96,10 @@ class GameManager:
     def send(self) -> None:
         score = self.scene.score
 
-        pos = f"{int(self.scene.player.pos.x)},{int(self.scene.player.pos.y)}"
+        p_pos = f"{int(self.scene.player.pos.x)},{int(self.scene.player.pos.y)}"
+        p_rot = f"{int(self.scene.player.rotation)}"
+        p_flip = f"{int(self.scene.player.flip)}"
+        p_data = f"{p_pos};{p_rot};{p_flip}"
 
         if self.scene.player.snowball:
             sb_pos = f"{int(self.scene.player.snowball.pos.x)},{int(self.scene.player.snowball.pos.y)}"
@@ -101,7 +109,7 @@ class GameManager:
             sb_data = "_"
 
         try:
-            self.client.socket.send(f"{score} {pos} {sb_data}")
+            self.client.socket.send(f"{score} {p_data} {sb_data}")
         except WebSocketConnectionClosedException:
             pass
 

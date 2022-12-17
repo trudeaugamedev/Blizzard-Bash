@@ -44,6 +44,7 @@ class Player(VisibleSprite):
         self.real_rect.size = (10, 16)
         self.on_ground = False
         self.ground = Ground.instances[int(self.pos.x // TILE_SIZE * TILE_SIZE)]
+        self.flip = False
         self.rotation = 30
 
         self.throwing = False
@@ -65,11 +66,13 @@ class Player(VisibleSprite):
         if keys[K_a]: # Acceleration
             self.acc.x -= self.CONST_ACC
             self.upright_image = pygame.transform.flip(assets.player, True, False)
+            self.flip = True
         elif self.vel.x < 0: # Deceleration
             self.acc.x += self.CONST_ACC
         if keys[K_d]:
             self.acc.x += self.CONST_ACC
             self.upright_image = assets.player
+            self.flip = False
         elif self.vel.x > 0:
             self.acc.x -= self.CONST_ACC
 
@@ -101,7 +104,7 @@ class Player(VisibleSprite):
         self.pos += self.vel * self.manager.dt
 
         self.ground = Ground.instances[int(self.pos.x // TILE_SIZE * TILE_SIZE)]
-        self.rotation += sign(self.ground.incline - self.rotation) * 50 * self.manager.dt
+        self.rotation += (self.ground.incline - self.rotation) * 8 * self.manager.dt
         self.rotation = snap(self.rotation, self.ground.incline, 1)
         self.image = pygame.transform.rotate(self.upright_image, self.rotation)
 

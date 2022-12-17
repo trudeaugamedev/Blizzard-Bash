@@ -14,15 +14,21 @@ class OtherPlayer(VisibleSprite):
         super().__init__(scene, Layers.PLAYER)
         self.size = VEC(45, 60)
         self.pos = VEC(pos)
+        self.upright_image = assets.player
+        self.image = self.upright_image
         self.rect = pygame.Rect(self.pos, self.size)
         self.snowball = None
+        self.rotation = 0
+        self.flip = False
         self.score = 0
 
     def update(self) -> None:
-        self.rect = pygame.Rect(self.pos, self.size)
+        self.rect = self.image.get_rect(midbottom=self.pos)
+        self.upright_image = pygame.transform.flip(assets.player, self.flip, False)
+        self.image = pygame.transform.rotate(self.upright_image, self.rotation)
 
     def draw(self) -> None:
-        pygame.draw.rect(self.manager.screen, (255, 255, 0), (*(self.pos - self.scene.player.camera.offset), *self.size))
+        self.manager.screen.blit(self.image, (*(VEC(self.rect.topleft) - self.scene.player.camera.offset), *self.size))
         font_surf = FONT[24].render(f"{self.score}", True, (0, 0, 0))
         pos = VEC(self.rect.midtop) - (font_surf.get_width() // 2, font_surf.get_height())
         self.manager.screen.blit(font_surf, pos - self.scene.player.camera.offset)
