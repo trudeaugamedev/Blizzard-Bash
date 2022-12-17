@@ -14,6 +14,8 @@ TEXTURES = "assets/textures"
 
 pygame.display.set_mode()
 
+player = load_img(f"{TEXTURES}/player/player.png")
+
 snowflakes: list[pygame.Surface] = []
 for i in range(10):
     snowflakes.append(load_img(f"{TEXTURES}/snowflake/snowflake_{i}.png", 2))

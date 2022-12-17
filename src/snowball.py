@@ -35,6 +35,7 @@ class Snowball(VisibleSprite):
 
     def update(self) -> None:
         self.image = self.type[self.frame]
+        self.rect = self.image.get_rect(center=self.pos)
 
         if self.landed:
             if time.time() - self.frame_time > 0.08:

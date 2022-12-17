@@ -12,6 +12,7 @@ from .constants import VEC, SCR_DIM, GRAVITY
 from .sprite import VisibleSprite, Layers
 from .snowball import Snowball
 from .ground import Ground
+from . import assets
 
 class Camera:
     def __init__(self, master: VisibleSprite, extra_offset: tuple[int, int], follow: int):
@@ -36,6 +37,7 @@ class Player(VisibleSprite):
         self.vel = VEC(0, 0)
         self.acc = VEC(0, 0)
         self.speed = 150
+        self.image = assets.player
         self.rect = pygame.Rect(self.pos, self.size)
         self.on_ground = False
 
@@ -57,10 +59,12 @@ class Player(VisibleSprite):
         self.acc = VEC(0, GRAVITY)
         if keys[K_a]: # Acceleration
             self.acc.x -= self.CONST_ACC
+            self.image = pygame.transform.flip(assets.player, True, False)
         elif self.vel.x < 0: # Deceleration
             self.acc.x += self.CONST_ACC
         if keys[K_d]:
             self.acc.x += self.CONST_ACC
+            self.image = assets.player
         elif self.vel.x > 0:
             self.acc.x -= self.CONST_ACC
 
@@ -122,7 +126,7 @@ class Player(VisibleSprite):
         self.camera.update()
 
     def draw(self) -> None:
-        pygame.draw.rect(self.manager.screen, (255, 0, 0), (*(self.pos - self.camera.offset), *self.size))
+        self.manager.screen.blit(self.image, (*(self.pos - self.camera.offset), *self.size))
         if not self.throwing: return
         factor = 0.015 # Basically how accurate we want the calculation to be, the distance factor between two points
         pos = self.pos + self.SB_OFFSET
