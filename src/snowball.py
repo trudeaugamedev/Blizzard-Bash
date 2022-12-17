@@ -4,6 +4,7 @@ if TYPE_CHECKING:
     from scene import Scene
     from player import Player
 
+from random import randint, choice
 import pygame
 import time
 
@@ -26,10 +27,11 @@ class Snowball(VisibleSprite):
         self.type = assets.snowball_large
         self.image = self.type[self.frame]
         self.rect = self.image.get_rect(center=self.pos)
-        self.real_rect = pygame.Rect(0, 0, *(8, 8) if self.type == assets.snowball_large else (5, 5))
+        self.real_rect = pygame.Rect(0, 0, *(10, 10) if self.type == assets.snowball_large else (7, 7))
         self.real_rect.center = self.rect.center
-
         self.landed = False
+        self.rotation = 0
+        self.rot_speed = choice([randint(-400, -100), randint(100, 400)])
 
     def update(self) -> None:
         self.image = self.type[self.frame]
@@ -42,6 +44,9 @@ class Snowball(VisibleSprite):
                     self.scene.player.snowball = None
                     super().kill()
             return
+
+        self.rotation += self.rot_speed * self.manager.dt
+        self.image = pygame.transform.rotate(self.type[self.frame], self.rotation)
 
         self.acc = VEC(0, GRAVITY)
         self.acc += self.scene.wind_vel
