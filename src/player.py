@@ -113,11 +113,11 @@ class Player(VisibleSprite):
 
         if self.snowball:
             self.camera.master = self.snowball
-            self.camera.follow = 3
+            self.camera.follow = 2.5
             self.camera.extra_offset = VEC(0, 0)
         else:
             self.camera.master = self
-            self.camera.follow = 5
+            self.camera.follow = 4
             if self.throwing:
                 self.camera.extra_offset = -VEC(self.sb_vel.x * 0.3, self.sb_vel.y * 0.05)
             else:
