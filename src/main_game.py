@@ -62,4 +62,4 @@ class MainGame(Scene):
     def draw(self) -> None:
         self.manager.screen.fill((169, 192, 203))
         super().draw()
-        self.manager.screen.blit(FONT.render(f"Score: {self.score}", True, (0, 0, 0)), (10, 10))
+        self.manager.screen.blit(FONT[56].render(f"Score: {self.score}", True, (0, 0, 0)), (10, 10))

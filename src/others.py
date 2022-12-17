@@ -6,7 +6,7 @@ if TYPE_CHECKING:
 import pygame
 
 from .sprite import VisibleSprite, Layers
-from .constants import VEC, FONT2
+from .constants import VEC, FONT
 from . import assets
 
 class OtherPlayer(VisibleSprite):
@@ -23,7 +23,7 @@ class OtherPlayer(VisibleSprite):
 
     def draw(self) -> None:
         pygame.draw.rect(self.manager.screen, (255, 255, 0), (*(self.pos - self.scene.player.camera.offset), *self.size))
-        font_surf = FONT2.render(f"{self.score}", True, (0, 0, 0))
+        font_surf = FONT[24].render(f"{self.score}", True, (0, 0, 0))
         pos = VEC(self.rect.midtop) - (font_surf.get_width() // 2, font_surf.get_height())
         self.manager.screen.blit(font_surf, pos - self.scene.player.camera.offset)
 
