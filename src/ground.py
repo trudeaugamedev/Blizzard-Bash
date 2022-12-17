@@ -21,6 +21,14 @@ class Ground(VisibleSprite):
         self.pos = VEC(pos)
         self.rect = pygame.Rect(self.pos, self.size)
         
+        if int(self.pos.y) not in self.__class__.sorted_instances:
+            self.__class__.sorted_instances[int(self.pos.y)] = [self]
+        else:
+            self.__class__.sorted_instances[int(self.pos.y)].append(self)
+        self.__class__.instances.append(self)
+        self.__class__.height_map[int(self.pos.x)] = self.pos.y
+
+    def generate_image(self) -> None:
         self.unsliced_image = pygame.Surface(self.size)
         self.image = pygame.Surface(self.size, SRCALPHA)
         self.unsliced_image.blit(assets.ground_tiles[0], (0, 0))
@@ -31,20 +39,29 @@ class Ground(VisibleSprite):
             left_height = self.__class__.height_map[int(self.pos.x - TILE_SIZE)]
         except KeyError: # leftmost ground tile
             left_height = self.pos.y
-        interval = (self.pos.y - left_height) / REAL_TILE_SIZE # The height that will be increased for every pixel
+        try:
+            right_height = self.__class__.height_map[int(self.pos.x + TILE_SIZE)]
+        except KeyError: # rightmost ground tile
+            right_height = self.pos.y
+
+        # interval: The height that will be increased for every pixel
+        if right_height > self.pos.y and left_height < self.pos.y: # If it's a downwards slope
+            interval = right_height - self.pos.y
+            y_offset = 0
+        elif left_height > self.pos.y and right_height < self.pos.y: # If it's an upwards slope
+            interval = self.pos.y - left_height
+            y_offset = left_height - self.pos.y
+        else: # If it's at the top or bottom of a hill
+            interval = right_height - left_height
+            y_offset = min(left_height - self.pos.y, right_height - self.pos.y)
+        interval /= REAL_TILE_SIZE
+
         for x in range(REAL_TILE_SIZE): # naming it "surf" instead of "slice" bcs slice is a builtin
             column = self.unsliced_image.subsurface(x * PIXEL_SIZE, 0, PIXEL_SIZE, self.size.y)
-            y = x * interval + ((left_height - self.pos.y) if interval < 0 else 0)
+            y = x * interval + y_offset
             self.image.blit(column, (x * PIXEL_SIZE, y))
             
-        self.rect.y += abs(self.pos.y - left_height) * 2
-        
-        if int(self.pos.y) not in self.__class__.sorted_instances:
-            self.__class__.sorted_instances[int(self.pos.y)] = [self]
-        else:
-            self.__class__.sorted_instances[int(self.pos.y)].append(self)
-        self.__class__.instances.append(self)
-        self.__class__.height_map[int(self.pos.x)] = self.pos.y
+        self.rect.y += abs(self.pos.y - left_height) * 1.5
 
     def update(self) -> None:
         ...
