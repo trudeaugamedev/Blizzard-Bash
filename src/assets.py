@@ -1,10 +1,13 @@
 import pygame
 
-from .constants import VEC
+from .constants import VEC, PIXEL_SIZE
 from .exe import pathof
 
-def load_img(file: str, factor: float = 3):
-    img = pygame.image.load(pathof(file)).convert_alpha()
+def load_img(file: str, factor: float = PIXEL_SIZE, alpha: bool = True):
+    if alpha:
+        img = pygame.image.load(pathof(file)).convert_alpha()
+    else:
+        img = pygame.image.load(pathof(file)).convert()
     return pygame.transform.scale(img, (img.get_width() * factor, img.get_height() * factor))
 
 TEXTURES = "assets/textures"
@@ -13,7 +16,12 @@ pygame.display.set_mode()
 
 snowflakes: list[pygame.Surface] = []
 for i in range(10):
-    snowflakes.append(load_img(f"{TEXTURES}/snowflakes/snowflake_{i}.png", 2))
+    snowflakes.append(load_img(f"{TEXTURES}/snowflake/snowflake_{i}.png", 2))
+
+ground_tiles: list[pygame.Surface] = [
+    load_img(f"{TEXTURES}/ground/ground_0.png", alpha=False),
+    load_img(f"{TEXTURES}/ground/ground_1.png", alpha=False)
+]
 
 class Frames:
     def __init__(self, path: str, prefix: str) -> None:
@@ -31,7 +39,7 @@ class Frames:
     def __getitem__(self, i) -> pygame.Surface:
         return self.elements[i]
 
-snowball_large = Frames("snowballs", "snowball_large_")
-snowball_small = Frames("snowballs", "snowball_small_")
+snowball_large = Frames("snowball", "snowball_large_")
+snowball_small = Frames("snowball", "snowball_small_")
 
 pygame.display.quit()

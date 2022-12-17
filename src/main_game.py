@@ -7,7 +7,7 @@ from random import randint, choice
 from vnoise import Noise
 import time
 
-from .constants import STEP_WIDTH, WIDTH, VEC, HEIGHT
+from .constants import TILE_SIZE, WIDTH, VEC, HEIGHT
 from .snowflake import SnowFlake
 from .house import House
 from .ground import Ground
@@ -26,7 +26,7 @@ class MainGame(Scene):
         for x in range(-100, 101):
             # Horizontal stretch and vertical stretch (essentially)
             y = self.noise.noise1(x * 0.05) * 200
-            Ground(self, (x * STEP_WIDTH, y), (STEP_WIDTH, 500))
+            Ground(self, (x * TILE_SIZE, y), (TILE_SIZE, 500))
         for _ in range(10):
             ground = choice(Ground.instances)
             House(self, (ground.pos.x, ground.pos.y))
