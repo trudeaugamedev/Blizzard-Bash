@@ -132,7 +132,7 @@ class Player(VisibleSprite):
         vel = self.sb_vel.copy()
         for i in range(60): # Number of points on the parabola that will be calculated
             vel.y += GRAVITY * factor
-            vel += self.scene.wind * factor
+            vel += self.scene.wind_vel * factor
             pos += vel * factor
             if i % 3: continue # For every 4 calculated points, we draw 1 point
             pygame.draw.circle(self.manager.screen, (0, 0, 0), pos - self.camera.offset, 3)

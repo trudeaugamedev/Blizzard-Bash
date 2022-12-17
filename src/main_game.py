@@ -35,17 +35,12 @@ class MainGame(Scene):
         for _ in range(1000):
             SnowFlake(self, VEC(randint(0 - 1000, WIDTH + 1000), randint(-400, HEIGHT)) + self.player.camera.offset)
 
-        self.wind = VEC(choice([randint(-600, -200), randint(200, 600)]), 0)
-        self.wind_time = time.time()
-        self.wind_interval = randint(5, 10)
+        self.wind_vel = VEC((self.client.thread_data["wind"] if "wind" in self.client.thread_data else 0), 0)
 
     def update(self) -> None:
         super().update()
 
-        if time.time() - self.wind_time > self.wind_interval:
-            self.wind = VEC(choice([randint(-600, -200), randint(200, 600)]), 0)
-            self.wind_time = time.time()
-            self.wind_interval = randint(3, 6)
+        self.wind_vel = VEC((self.client.thread_data["wind"] if "wind" in self.client.thread_data else 0), 0)
 
         if time.time() - self.snowflake_time > 0.05:
             self.snowflake_time = time.time()

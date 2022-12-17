@@ -41,7 +41,7 @@ class Snowball(VisibleSprite):
             return
 
         self.acc = VEC(0, GRAVITY)
-        self.acc += self.scene.wind
+        self.acc += self.scene.wind_vel
 
         self.vel += self.acc * self.manager.dt
         self.pos += self.vel * self.manager.dt

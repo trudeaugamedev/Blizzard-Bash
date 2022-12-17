@@ -19,12 +19,13 @@ class Client:
         match parsed[0]:
             case "hi": # Connection signal
                 print("Connected to server!")
-                seed = int(parsed[1])
-                self.thread_data["seed"] = seed
+                self.thread_data["seed"] = int(parsed[1])
             case "dc": # Disconnection signal
                 print(f"Client {parsed[1]} disconnected!")
                 self.manager.other_players[int(parsed[1])].kill()
                 del self.manager.other_players[int(parsed[1])]
+            case "wd": # New wind speed
+                self.thread_data["wind"] = int(parsed[1])
             case "cl": # Client data signal
                 self.manager.parse(message)
 
