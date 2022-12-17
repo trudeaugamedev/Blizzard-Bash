@@ -32,7 +32,7 @@ class OtherSnowball(VisibleSprite):
         self.rect = self.image.get_rect(center=self.pos)
 
     def update(self) -> None:
-        print("YEs")
+        self.image = self.type[self.frame]
         self.rect = self.image.get_rect(center=self.pos)
 
     def draw(self) -> None:
