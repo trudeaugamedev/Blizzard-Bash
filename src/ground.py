@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from scene import Scene
 
+from pygame.locals import SRCALPHA
 import pygame
 
 from .constants import TILE_SIZE, VEC, PIXEL_SIZE, REAL_TILE_SIZE
@@ -19,16 +20,24 @@ class Ground(VisibleSprite):
         self.size = VEC(size)
         self.pos = VEC(pos)
         self.rect = pygame.Rect(self.pos, self.size)
-
+        
         self.unsliced_image = pygame.Surface(self.size)
-        self.image = self.unsliced_image.copy()
+        self.image = pygame.Surface(self.size, SRCALPHA)
         self.unsliced_image.blit(assets.ground_tiles[0], (0, 0))
         for i in range(1, 11):
             self.unsliced_image.blit(assets.ground_tiles[1], (0, i * TILE_SIZE))
-        for x in range(REAL_TILE_SIZE): # naming is "surf" instead of "slice" bcs slice is a builtin
+
+        try:
+            left_height = self.__class__.height_map[int(self.pos.x - TILE_SIZE)]
+        except KeyError: # leftmost ground tile
+            left_height = self.pos.y
+        interval = (self.pos.y - left_height) / REAL_TILE_SIZE # The height that will be increased for every pixel
+        for x in range(REAL_TILE_SIZE): # naming it "surf" instead of "slice" bcs slice is a builtin
             column = self.unsliced_image.subsurface(x * PIXEL_SIZE, 0, PIXEL_SIZE, self.size.y)
-            y = 0 # Do math here
+            y = x * interval + ((left_height - self.pos.y) if interval < 0 else 0)
             self.image.blit(column, (x * PIXEL_SIZE, y))
+            
+        self.rect.y += abs(self.pos.y - left_height) * 2
         
         if int(self.pos.y) not in self.__class__.sorted_instances:
             self.__class__.sorted_instances[int(self.pos.y)] = [self]

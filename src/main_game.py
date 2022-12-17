@@ -27,6 +27,7 @@ class MainGame(Scene):
             # Horizontal stretch and vertical stretch (essentially)
             y = self.noise.noise1(x * 0.05) * 200
             Ground(self, (x * TILE_SIZE, y), (TILE_SIZE, 500))
+
         for _ in range(10):
             ground = choice(Ground.instances)
             House(self, (ground.pos.x, ground.pos.y))
