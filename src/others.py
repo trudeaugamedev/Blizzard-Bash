@@ -14,10 +14,11 @@ class OtherPlayer(VisibleSprite):
         super().__init__(scene, Layers.PLAYER)
         self.size = VEC(45, 60)
         self.pos = VEC(pos)
+        self.rect = pygame.Rect(self.pos, self.size)
         self.snowball = None
 
     def update(self) -> None:
-        ...
+        self.rect = pygame.Rect(self.pos, self.size)
 
     def draw(self) -> None:
         pygame.draw.rect(self.manager.screen, (255, 255, 0), (*(self.pos - self.scene.player.camera.offset), *self.size))

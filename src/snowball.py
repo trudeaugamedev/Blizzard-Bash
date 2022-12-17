@@ -26,6 +26,8 @@ class Snowball(VisibleSprite):
         self.type = assets.snowball_large
         self.image = self.type[self.frame]
         self.rect = self.image.get_rect(center=self.pos)
+        self.real_rect = pygame.Rect(0, 0, *(8, 8) if self.type == assets.snowball_large else (5, 5))
+        self.real_rect.center = self.rect.center
 
         self.landed = False
 
@@ -47,10 +49,17 @@ class Snowball(VisibleSprite):
         self.vel += self.acc * self.manager.dt
         self.pos += self.vel * self.manager.dt
         self.rect = self.image.get_rect(center=self.pos)
+        self.real_rect.center = self.rect.center
 
         for ground in Ground.instances:
-            if ground.rect.collidepoint(self.pos):
+            if ground.rect.colliderect(self.real_rect):
                 self.kill()
+                return
+
+        for player in self.manager.other_players.values():
+            if player.rect.colliderect(self.real_rect):
+                self.kill()
+                self.scene.score += 1
                 return
 
         if self.pos.y > 1000:

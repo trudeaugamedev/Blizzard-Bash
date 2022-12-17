@@ -7,7 +7,7 @@ from random import randint, choice
 from vnoise import Noise
 import time
 
-from .constants import TILE_SIZE, WIDTH, VEC, HEIGHT
+from .constants import TILE_SIZE, WIDTH, VEC, HEIGHT, FONT
 from .snowflake import SnowFlake
 from .house import House
 from .ground import Ground
@@ -40,6 +40,8 @@ class MainGame(Scene):
 
         self.wind_vel = VEC((self.client.thread_data["wind"] if "wind" in self.client.thread_data else 0), 0)
 
+        self.score = 0
+
     def update(self) -> None:
         super().update()
 
@@ -60,3 +62,4 @@ class MainGame(Scene):
     def draw(self) -> None:
         self.manager.screen.fill((169, 192, 203))
         super().draw()
+        self.manager.screen.blit(FONT.render(f"Score: {self.score}", True, (0, 0, 0)), (10, 10))
