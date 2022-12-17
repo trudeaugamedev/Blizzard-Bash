@@ -33,10 +33,11 @@ class Snowball(VisibleSprite):
         self.image = self.type[self.frame]
 
         if self.landed:
-            if time.time() - self.frame_time > 0.1:
+            if time.time() - self.frame_time > 0.08:
                 self.frame_time = time.time()
                 self.frame += 1
                 if self.frame == self.type.length:
+                    self.scene.player.snowball = None
                     super().kill()
             return
 
@@ -60,5 +61,4 @@ class Snowball(VisibleSprite):
         self.manager.screen.blit(self.image, VEC(self.rect.topleft) - self.player.camera.offset)
 
     def kill(self) -> None:
-        self.scene.player.snowball = None
         self.landed = True
