@@ -8,8 +8,8 @@ from random import randint, choice
 import pygame
 import time
 
+from .constants import VEC, GRAVITY, PIXEL_SIZE
 from .sprite import VisibleSprite, Layers
-from .constants import VEC, GRAVITY
 from .ground import Ground
 from . import assets
 
@@ -18,7 +18,7 @@ class Snowball(VisibleSprite):
         super().__init__(scene, Layers.SNOWBALL)
 
         self.player: Player = self.scene.player # Type annotation just bcs I need intellisense lol
-        self.pos = self.player.pos + self.player.SB_OFFSET
+        self.pos = self.player.rect.topleft + self.player.SB_OFFSET
         self.vel = VEC(vel)
         self.acc = VEC(0, 0)
         self.size = VEC(0, 0)
@@ -57,10 +57,10 @@ class Snowball(VisibleSprite):
         self.rect = self.image.get_rect(center=self.pos)
         self.real_rect.center = self.rect.center
 
-        for ground in Ground.instances:
-            if ground.rect.colliderect(self.real_rect):
-                self.kill()
-                return
+        ground_y = Ground.pixel_height_map[int(self.rect.centerx // PIXEL_SIZE * PIXEL_SIZE)]
+        if self.pos.y > ground_y:
+            self.kill()
+            return
 
         for player in self.manager.other_players.values():
             if player.rect.colliderect(self.real_rect):

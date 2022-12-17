@@ -7,7 +7,7 @@ if TYPE_CHECKING:
 from random import choices, uniform
 import pygame
 
-from .constants import VEC, GRAVITY, HEIGHT, TILE_SIZE
+from .constants import VEC, GRAVITY, PIXEL_SIZE
 from .sprite import VisibleSprite, Layers
 from .ground import Ground
 from . import assets
@@ -34,7 +34,7 @@ class SnowFlake(VisibleSprite):
 
         # Fast solution instead of looping through every single ground object
         try:
-            if self.pos.y + self.size.y > Ground.height_map[self.pos.x // TILE_SIZE * TILE_SIZE]:
+            if self.pos.y + self.size.y > Ground.pixel_height_map[self.pos.x // PIXEL_SIZE * PIXEL_SIZE]:
                 self.kill()
                 return
         except KeyError:

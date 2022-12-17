@@ -7,8 +7,8 @@ from pygame.locals import K_a, K_d, K_w, K_SPACE, MOUSEBUTTONUP
 import pygame
 import time
 
+from .constants import VEC, SCR_DIM, GRAVITY, PIXEL_SIZE
 from .utils import intvec, snap, clamp, snap
-from .constants import VEC, SCR_DIM, GRAVITY
 from .sprite import VisibleSprite, Layers
 from .snowball import Snowball
 from .ground import Ground
@@ -95,22 +95,17 @@ class Player(VisibleSprite):
         self.vel.x = snap(self.vel.x, 0, self.CONST_ACC * self.manager.dt)
         self.pos += self.vel * self.manager.dt
 
-        self.rect.topleft = self.pos
+        self.rect.bottomleft = self.pos
 
         self.on_ground = False
-        for y in sorted(Ground.sorted_instances.keys()): # Sort by highest ground first
-            for ground in Ground.sorted_instances[y]:
-                if not self.rect.colliderect(ground.rect): continue
-                if self.rect.bottom < ground.rect.top + 2: # Snap to top if the player is just standing
-                    self.pos.y = ground.rect.top - self.size.y
-                else:
-                    self.pos.y -= (self.rect.bottom - ground.rect.top) * 20 * self.manager.dt # Move up smoothly if stepping up
-                self.vel.y = 0
-                self.on_ground = True
-                break
+        ground_y = Ground.pixel_height_map[int(self.rect.centerx // PIXEL_SIZE * PIXEL_SIZE)]
+        if self.pos.y > ground_y:
+            if self.rect.bottom < ground_y + 2: # Snap to top if the player is just standing
+                self.pos.y = ground_y
             else:
-                continue # I hate this syntax :( but can't be bothered to make it better
-            break
+                self.pos.y -= (self.rect.bottom - ground_y) * 20 * self.manager.dt # Move up smoothly if stepping up
+            self.vel.y = 0
+            self.on_ground = True
 
         if self.snowball:
             self.camera.master = self.snowball
@@ -126,10 +121,10 @@ class Player(VisibleSprite):
         self.camera.update()
 
     def draw(self) -> None:
-        self.manager.screen.blit(self.image, (*(self.pos - self.camera.offset), *self.size))
+        self.manager.screen.blit(self.image, (*(VEC(self.rect.topleft) - self.camera.offset), *self.size))
         if not self.throwing: return
         factor = 0.015 # Basically how accurate we want the calculation to be, the distance factor between two points
-        pos = self.pos + self.SB_OFFSET
+        pos = VEC(self.rect.topleft) + self.SB_OFFSET
         vel = self.sb_vel.copy()
         for i in range(60): # Number of points on the parabola that will be calculated
             vel.y += GRAVITY * factor
