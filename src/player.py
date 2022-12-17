@@ -41,7 +41,6 @@ class Player(VisibleSprite):
 
         self.throwing = False
         self.sb_vel = VEC(0, 0)
-        self.cooldown_time = time.time()
         self.snowball = None
 
         self.CONST_ACC = 500 # 500 pixels per second squared (physics :P)
@@ -49,7 +48,6 @@ class Player(VisibleSprite):
         self.JUMP_SPEED = -400
         self.THROW_SPEED = 900
         self.SB_OFFSET = self.size // 2 - (0, 10)
-        self.THROW_COOLDOWN = 1
 
         self.camera = Camera(self, (0, 100), 5)
 
@@ -69,8 +67,7 @@ class Player(VisibleSprite):
         if (keys[K_w] or keys[K_SPACE]) and self.on_ground:
             self.vel.y = self.JUMP_SPEED
 
-        can_throw = time.time() - self.cooldown_time > self.THROW_COOLDOWN
-        if pygame.mouse.get_pressed()[0] and can_throw:
+        if pygame.mouse.get_pressed()[0] and not self.snowball:
             m_pos = VEC(pygame.mouse.get_pos())
             self.throwing = True
             # Use camera offset to convert screen-space pos to in-world pos
@@ -81,7 +78,7 @@ class Player(VisibleSprite):
             except ValueError:
                 self.sb_vel = VEC() # 0 vector
         if MOUSEBUTTONUP in self.manager.events:
-            if self.manager.events[MOUSEBUTTONUP].button == 1 and can_throw:
+            if self.manager.events[MOUSEBUTTONUP].button == 1 and not self.snowball:
                 self.cooldown_time = time.time()
                 self.throwing = False
                 self.snowball = Snowball(self.scene, self.sb_vel)
