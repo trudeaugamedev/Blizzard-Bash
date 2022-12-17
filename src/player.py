@@ -65,13 +65,11 @@ class Player(VisibleSprite):
         self.acc = VEC(0, GRAVITY)
         if keys[K_a]: # Acceleration
             self.acc.x -= self.CONST_ACC
-            self.upright_image = pygame.transform.flip(assets.player, True, False)
             self.flip = True
         elif self.vel.x < 0: # Deceleration
             self.acc.x += self.CONST_ACC
         if keys[K_d]:
             self.acc.x += self.CONST_ACC
-            self.upright_image = assets.player
             self.flip = False
         elif self.vel.x > 0:
             self.acc.x -= self.CONST_ACC
@@ -95,6 +93,12 @@ class Player(VisibleSprite):
                 self.throwing = False
                 self.snowball = Snowball(self.scene, self.sb_vel)
 
+        if self.throwing:
+            if self.sb_vel.x > 0:
+                self.flip = False
+            else:
+                self.flip = True
+
         self.vel += self.acc * self.manager.dt
         # _ to catch the successful clamp return value
         # Baiscally if it clamped to the left it would be -1, right would be 1, if it didn't clamp (value is in range), it's 0
@@ -106,6 +110,8 @@ class Player(VisibleSprite):
         self.ground = Ground.instances[int(self.pos.x // TILE_SIZE * TILE_SIZE)]
         self.rotation += (self.ground.incline - self.rotation) * 8 * self.manager.dt
         self.rotation = snap(self.rotation, self.ground.incline, 1)
+
+        self.upright_image = pygame.transform.flip(assets.player, self.flip, False)
         self.image = pygame.transform.rotate(self.upright_image, self.rotation)
 
         self.rect = self.image.get_rect(midbottom=self.pos)
