@@ -53,7 +53,7 @@ class Ground(VisibleSprite):
             y_offset = left_height - self.pos.y
         else: # If it's at the top or bottom of a hill
             interval = right_height - left_height
-            y_offset = min(left_height - self.pos.y, right_height - self.pos.y)
+            y_offset = (max if right_height < left_height else min)(left_height - self.pos.y, right_height - self.pos.y)
         interval /= REAL_TILE_SIZE
 
         for x in range(REAL_TILE_SIZE): # naming it "surf" instead of "slice" bcs slice is a builtin
