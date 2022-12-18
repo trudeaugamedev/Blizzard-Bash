@@ -65,7 +65,7 @@ class GameManager:
 
     def parse(self, msg: str) -> None:
         # Received format:
-        # cl [id] [score] [x],[y];[rotation];[flip];[frame] [snowball_x],[snowball_y];[snowball_frame]|<repeat> [powerup_x],[powerup_y]
+        # cl [id] [score] [x],[y];[rotation];[flip];[frame] [sb_x],[sb_y];[sb_frame];[sb_type]|<repeat> [powerup_x],[powerup_y]
         parsed = msg.split()
         i = int(parsed[1])
 
@@ -91,10 +91,12 @@ class GameManager:
                 data = data.split(";")
                 sb_pos = VEC(tuple(map(int, data[0].split(","))))
                 sb_frame = int(data[1])
+                sb_type = assets.snowball_large if int(data[2]) else assets.snowball_small
                 if i >= len(player.snowballs):
                     player.snowballs.append(OtherSnowball(self.scene, sb_pos))
                 player.snowballs[i].pos = sb_pos
                 player.snowballs[i].frame = sb_frame
+                player.snowballs[i].type = sb_type
             for j in range(i + 1, len(sb_data)):
                 player.snowballs[j].kill()
                 player.snowballs.pop()
@@ -126,7 +128,8 @@ class GameManager:
             for snowball in self.scene.player.snowballs:
                 sb_pos = f"{int(snowball.pos.x)},{int(snowball.pos.y)}"
                 sb_frame = snowball.frame
-                sb_data += f"{sb_pos};{sb_frame}|"
+                sb_type = 0 if snowball.type == assets.snowball_small else 1
+                sb_data += f"{sb_pos};{sb_frame};{sb_type}|"
             sb_data = sb_data[:-1]
         else:
             sb_data = "_"
