@@ -13,6 +13,7 @@ from .others import OtherPlayer, OtherSnowball, OtherPowerup
 from .constants import WIDTH, HEIGHT, FPS, VEC
 from .main_game import MainGame
 from .scene import Scene
+from . import assets
 
 class AbortScene(Exception):
     def __str__(self):
@@ -63,7 +64,8 @@ class GameManager:
         pygame.display.flip()
 
     def parse(self, msg: str) -> None:
-        # Received format: "cl [id] [score] [x],[y];[rotation];[flip] [snowball_x],[snowball_y];[snowball_frame]|<repeat> [powerup_x],[powerup_y]"
+        # Received format:
+        # cl [id] [score] [x],[y];[rotation];[flip];[frame] [snowball_x],[snowball_y];[snowball_frame]|<repeat> [powerup_x],[powerup_y]
         parsed = msg.split()
         i = int(parsed[1])
 
@@ -71,10 +73,12 @@ class GameManager:
         p_pos = VEC(tuple(map(int, p_data[0].split(","))))
         p_rot = int(p_data[1])
         p_flip = bool(int(p_data[2]))
+        p_frame = int(p_data[3])
         if i in self.other_players:
             self.other_players[i].pos = p_pos
             self.other_players[i].rotation = p_rot
             self.other_players[i].flip = p_flip
+            self.other_players[i].frame = p_frame
         else:
             self.other_players[i] = OtherPlayer(self.scene, p_pos)
         player = self.other_players[i]
@@ -114,7 +118,8 @@ class GameManager:
         p_pos = f"{int(self.scene.player.pos.x)},{int(self.scene.player.pos.y)}"
         p_rot = f"{int(self.scene.player.rotation)}"
         p_flip = f"{int(self.scene.player.flip)}"
-        p_data = f"{p_pos};{p_rot};{p_flip}"
+        p_frame = f"{(assets.player.index(self.scene.player.orig_image))}"
+        p_data = f"{p_pos};{p_rot};{p_flip};{p_frame}"
 
         if self.scene.player.snowballs:
             sb_data = ""

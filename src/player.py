@@ -37,7 +37,8 @@ class Player(VisibleSprite):
         self.vel = VEC(0, 0)
         self.acc = VEC(0, 0)
         self.speed = 150
-        self.upright_image = assets.player_idle[0]
+        self.orig_image = assets.player_idle[0]
+        self.upright_image = self.orig_image
         self.image = self.upright_image
         self.rect = pygame.Rect(self.pos, self.size)
         self.real_rect = self.rect.copy()
@@ -177,7 +178,8 @@ class Player(VisibleSprite):
                     self.frame = 0
                     self.dig_iterations += 1
 
-        self.upright_image = pygame.transform.flip(self.frame_group[self.frame], self.flip, False)
+        self.orig_image = self.frame_group[self.frame]
+        self.upright_image = pygame.transform.flip(self.orig_image, self.flip, False)
         self.image = pygame.transform.rotate(self.upright_image, self.rotation)
 
         self.rect = self.image.get_rect(midbottom=self.pos)

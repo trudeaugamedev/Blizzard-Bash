@@ -14,7 +14,9 @@ class OtherPlayer(VisibleSprite):
         super().__init__(scene, Layers.PLAYER)
         self.size = VEC(45, 60)
         self.pos = VEC(pos)
-        self.upright_image = assets.player
+        self.frame = 0
+        self.orig_image = assets.player[self.frame]
+        self.upright_image = self.orig_image
         self.image = self.upright_image
         self.rect = pygame.Rect(self.pos, self.size)
         self.real_rect = self.rect.copy()
@@ -29,7 +31,8 @@ class OtherPlayer(VisibleSprite):
         self.rect = self.image.get_rect(midbottom=self.pos)
         self.real_rect.midbottom = self.rect.midbottom
 
-        self.upright_image = pygame.transform.flip(assets.player, self.flip, False)
+        self.orig_image = assets.player[self.frame]
+        self.upright_image = pygame.transform.flip(self.orig_image, self.flip, False)
         self.image = pygame.transform.rotate(self.upright_image, self.rotation)
 
     def draw(self) -> None:
