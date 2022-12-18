@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from scene import Scene
 
-from pygame.locals import K_a, K_d, K_w, K_SPACE, MOUSEBUTTONUP
+from pygame.locals import K_a, K_d, K_w, K_SPACE, MOUSEBUTTONUP, KEYDOWN
 import pygame
 import time
 
@@ -54,6 +54,9 @@ class Player(VisibleSprite):
         self.throwing = False
         self.sb_vel = VEC(0, 0)
         self.snowballs = []
+
+        self.frame = 0
+        self.frame_time = time.time()
 
         self.CONST_ACC = 500 # 500 pixels per second squared (physics :P)
         self.MAX_SPEED = 200

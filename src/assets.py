@@ -14,8 +14,6 @@ TEXTURES = "assets/textures"
 
 pygame.display.set_mode()
 
-player = load_img(f"{TEXTURES}/player/player.png")
-
 snowflakes: list[pygame.Surface] = []
 for i in range(10):
     snowflakes.append(load_img(f"{TEXTURES}/snowflake/snowflake_{i}.png", 2))
@@ -40,6 +38,10 @@ class Frames:
 
     def __getitem__(self, i) -> pygame.Surface:
         return self.elements[i]
+
+player_idle = Frames("player", "player_idle_")
+player_dig = Frames("player", "player_dig_")
+player = player_idle.elements + player_dig.elements
 
 snowball_large = Frames("snowball", "snowball_large_")
 snowball_small = Frames("snowball", "snowball_small_")
