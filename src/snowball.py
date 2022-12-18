@@ -42,7 +42,7 @@ class Snowball(VisibleSprite):
                 self.frame_time = time.time()
                 self.frame += 1
                 if self.frame == self.type.length:
-                    self.scene.player.snowball = None
+                    self.scene.player.snowballs.remove(self)
                     super().kill()
             return
 

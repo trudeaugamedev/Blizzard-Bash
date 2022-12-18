@@ -9,9 +9,10 @@ import time
 
 from .constants import TILE_SIZE, WIDTH, VEC, HEIGHT, FONT
 from .snowflake import SnowFlake
-from .house import House
+from .powerup import Powerup
 from .ground import Ground
 from .player import Player
+from .house import House
 from .scene import Scene
 
 class MainGame(Scene):
@@ -40,6 +41,9 @@ class MainGame(Scene):
 
         self.wind_vel = VEC((self.client.thread_data["wind"] if "wind" in self.client.thread_data else 0), 0)
 
+        self.powerup_spawn_time = time.time()
+        self.powerup = None
+
         self.score = 0
 
     def update(self) -> None:
@@ -58,6 +62,10 @@ class MainGame(Scene):
                     VEC(randint(WIDTH, WIDTH + 600), randint(-100, HEIGHT)) # Right
                 ])
                 SnowFlake(self, pos + self.player.camera.offset)
+
+        if time.time() - self.powerup_spawn_time > 5:
+            self.powerup_spawn_time = time.time()
+            self.powerup = Powerup(self, self.player.pos + (randint(-200, 200), -600))
 
     def draw(self) -> None:
         self.manager.screen.fill((169, 192, 203))

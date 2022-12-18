@@ -5,7 +5,7 @@ from .manager import GameManager
 
 class Client:
     def __init__(self) -> None:
-        # self.socket = WebSocketApp("ws://localhost:3000", on_message=self.on_message)
+        # self.socket = WebSocketApp("ws://localhost:3000", on_message=self.on_message, on_error=self.on_error)
         self.socket = WebSocketApp("wss://trudeaugamedev-winter.herokuapp.com", on_message=self.on_message)
         self.socket_thread = Thread(target=self.socket.run_forever, daemon=True)
         self.thread_data = {}
@@ -28,6 +28,9 @@ class Client:
                 self.thread_data["wind"] = int(parsed[1])
             case "cl": # Client data signal
                 self.manager.parse(message)
+
+    def on_error(self, ws, error):
+        print(error)
 
     def run_game(self) -> None:
         self.manager = GameManager(self)

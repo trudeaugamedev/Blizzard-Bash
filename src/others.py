@@ -19,10 +19,11 @@ class OtherPlayer(VisibleSprite):
         self.rect = pygame.Rect(self.pos, self.size)
         self.real_rect = self.rect.copy()
         self.real_rect.size = (10 * PIXEL_SIZE, 20 * PIXEL_SIZE)
-        self.snowball = None
+        self.snowballs = []
         self.rotation = 0
         self.flip = False
         self.score = 0
+        self.powerup = None
 
     def update(self) -> None:
         self.rect = self.image.get_rect(midbottom=self.pos)
@@ -52,3 +53,14 @@ class OtherSnowball(VisibleSprite):
 
     def draw(self) -> None:
         self.manager.screen.blit(self.image, VEC(self.rect.topleft) - self.scene.player.camera.offset)
+
+class OtherPowerup(VisibleSprite):
+    def __init__(self, scene: Scene, pos: tuple[int, int]) -> None:
+        super().__init__(scene, Layers.POWERUP)
+        self.pos = VEC(pos)
+
+    def update(self) -> None:
+        ...
+
+    def draw(self) -> None:
+        pygame.draw.circle(self.manager.screen, (255, 0, 0), self.pos - self.scene.player.camera.offset, 14)

@@ -47,9 +47,12 @@ class Player(VisibleSprite):
         self.flip = False
         self.rotation = 30
 
+        self.powerup = False
+        self.powerup_time = time.time()
+
         self.throwing = False
         self.sb_vel = VEC(0, 0)
-        self.snowball = None
+        self.snowballs = []
 
         self.CONST_ACC = 500 # 500 pixels per second squared (physics :P)
         self.MAX_SPEED = 200
@@ -77,7 +80,8 @@ class Player(VisibleSprite):
         if (keys[K_w] or keys[K_SPACE]) and self.on_ground:
             self.vel.y = self.JUMP_SPEED
 
-        if pygame.mouse.get_pressed()[0] and not self.snowball:
+        self.can_throw = True if self.powerup else not self.snowballs
+        if pygame.mouse.get_pressed()[0] and self.can_throw:
             m_pos = VEC(pygame.mouse.get_pos())
             self.throwing = True
             # Use camera offset to convert screen-space pos to in-world pos
@@ -88,10 +92,13 @@ class Player(VisibleSprite):
             except ValueError:
                 self.sb_vel = VEC() # 0 vector
         if MOUSEBUTTONUP in self.manager.events:
-            if self.manager.events[MOUSEBUTTONUP].button == 1 and not self.snowball:
+            if self.manager.events[MOUSEBUTTONUP].button == 1 and self.can_throw:
                 self.cooldown_time = time.time()
                 self.throwing = False
-                self.snowball = Snowball(self.scene, self.sb_vel)
+                self.snowballs.append(Snowball(self.scene, self.sb_vel))
+
+        if time.time() - self.powerup_time > 4 and self.powerup:
+            self.powerup = False
 
         if self.throwing:
             if self.sb_vel.x > 0:
@@ -124,8 +131,13 @@ class Player(VisibleSprite):
             self.vel.y = 0
             self.on_ground = True
 
-        if self.snowball:
-            self.camera.master = self.snowball
+        for player in self.manager.other_players.values():
+            if not player.powerup: continue
+            if player.powerup.pos.distance_to(VEC(self.real_rect.center)) < 60:
+                self.powerup = True
+
+        if self.snowballs and not self.powerup:
+            self.camera.master = self.snowballs[-1]
             self.camera.follow = 2.5
             self.camera.extra_offset = VEC(0, 0)
         else:
@@ -136,6 +148,8 @@ class Player(VisibleSprite):
             else:
                 self.camera.extra_offset = VEC(0, 200)
         self.camera.update()
+        if self.manager.other_players:
+            print(list(self.manager.other_players.values())[0].snowballs)
 
     def draw(self) -> None:
         self.manager.screen.blit(self.image, (*(VEC(self.rect.topleft) - self.camera.offset), *self.size))

@@ -9,7 +9,7 @@ from enum import Enum
 import pygame
 import sys
 
-from .others import OtherPlayer, OtherSnowball
+from .others import OtherPlayer, OtherSnowball, OtherPowerup
 from .constants import WIDTH, HEIGHT, FPS, VEC
 from .main_game import MainGame
 from .scene import Scene
@@ -63,7 +63,7 @@ class GameManager:
         pygame.display.flip()
 
     def parse(self, msg: str) -> None:
-        # Received format: "cl [id] [score] [x],[y];[rotation];[flip] [snowball_x],[snowball_y];[snowball_frame]"
+        # Received format: "cl [id] [score] [x],[y];[rotation];[flip] [snowball_x],[snowball_y];[snowball_frame]|<repeat> [powerup_x],[powerup_y]"
         parsed = msg.split()
         i = int(parsed[1])
 
@@ -82,16 +82,31 @@ class GameManager:
         player.score = int(parsed[2])
 
         if parsed[4] != "_":
-            sb_data = parsed[4].split(";")
-            sb_pos = tuple(map(int, sb_data[0].split(",")))
-            sb_frame = int(sb_data[1])
-            if not player.snowball:
-                player.snowball = OtherSnowball(self.scene, sb_pos)
-            player.snowball.pos = VEC(sb_pos)
-            player.snowball.frame = sb_frame
-        else:
-            player.snowball.kill()
-            player.snowball = None
+            sb_data = parsed[4].split("|")
+            for i, data in enumerate(sb_data):
+                data = data.split(";")
+                sb_pos = VEC(tuple(map(int, data[0].split(","))))
+                sb_frame = int(data[1])
+                if i >= len(player.snowballs):
+                    player.snowballs.append(OtherSnowball(self.scene, sb_pos))
+                player.snowballs[i].pos = sb_pos
+                player.snowballs[i].frame = sb_frame
+            for j in range(i + 1, len(sb_data)):
+                player.snowballs[j].kill()
+                player.snowballs.pop()
+        elif player.snowballs:
+            for snowball in player.snowballs:
+                snowball.kill()
+            player.snowballs = []
+
+        if parsed[5] != "_":
+            pw_pos = tuple(map(int, parsed[5].split(",")))
+            if not player.powerup:
+                player.powerup = OtherPowerup(self.scene, pw_pos)
+            player.powerup.pos = VEC(pw_pos)
+        elif player.powerup:
+            player.powerup.kill()
+            player.powerup = None
 
     def send(self) -> None:
         score = self.scene.score
@@ -101,15 +116,23 @@ class GameManager:
         p_flip = f"{int(self.scene.player.flip)}"
         p_data = f"{p_pos};{p_rot};{p_flip}"
 
-        if self.scene.player.snowball:
-            sb_pos = f"{int(self.scene.player.snowball.pos.x)},{int(self.scene.player.snowball.pos.y)}"
-            sb_frame = self.scene.player.snowball.frame
-            sb_data = f"{sb_pos};{sb_frame}"
+        if self.scene.player.snowballs:
+            sb_data = ""
+            for snowball in self.scene.player.snowballs:
+                sb_pos = f"{int(snowball.pos.x)},{int(snowball.pos.y)}"
+                sb_frame = snowball.frame
+                sb_data += f"{sb_pos};{sb_frame}|"
+            sb_data = sb_data[:-1]
         else:
             sb_data = "_"
 
+        if self.scene.powerup:
+            pw_pos = f"{int(self.scene.powerup.pos.x)},{int(self.scene.powerup.pos.y)}"
+        else:
+            pw_pos = "_"
+
         try:
-            self.client.socket.send(f"{score} {p_data} {sb_data}")
+            self.client.socket.send(f"{score} {p_data} {sb_data} {pw_pos}")
         except WebSocketConnectionClosedException:
             pass
 

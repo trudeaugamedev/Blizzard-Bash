@@ -29,9 +29,9 @@ function xbroadcast(xid, msg) {
 }
 
 const seed = randint(0, 99999999)
-var wind_time = Date.now();
-var wind_duration = randint(3000, 6000);
-var wind_speed = [randint(-600, -200), randint(200, 600)][randint(0, 1)];
+let wind_time = Date.now();
+let wind_duration = randint(3000, 6000);
+let wind_speed = [randint(-600, -200), randint(200, 600)][randint(0, 1)];
 
 wss.on("connection", (socket) => {
 	const client = {
