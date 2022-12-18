@@ -148,8 +148,6 @@ class Player(VisibleSprite):
             else:
                 self.camera.extra_offset = VEC(0, 200)
         self.camera.update()
-        if self.manager.other_players:
-            print(list(self.manager.other_players.values())[0].snowballs)
 
     def draw(self) -> None:
         self.manager.screen.blit(self.image, (*(VEC(self.rect.topleft) - self.camera.offset), *self.size))
