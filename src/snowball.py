@@ -14,7 +14,7 @@ from .ground import Ground
 from . import assets
 
 class Snowball(VisibleSprite):
-    def __init__(self, scene: Scene, vel: tuple[float, float]) -> None:
+    def __init__(self, scene: Scene, vel: tuple[float, float], sb_type) -> None:
         super().__init__(scene, Layers.SNOWBALL)
 
         self.player: Player = self.scene.player # Type annotation just bcs I need intellisense lol
@@ -24,7 +24,7 @@ class Snowball(VisibleSprite):
         self.size = VEC(0, 0)
         self.frame = 0
         self.frame_time = time.time()
-        self.type = assets.snowball_large
+        self.type = sb_type
         self.image = self.type[self.frame]
         self.rect = self.image.get_rect(center=self.pos)
         self.real_rect = pygame.Rect(0, 0, *(10, 10) if self.type == assets.snowball_large else (7, 7))

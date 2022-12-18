@@ -46,7 +46,10 @@ class Player(VisibleSprite):
         self.ground = Ground.instances[int(self.pos.x // TILE_SIZE * TILE_SIZE)]
         self.flip = False
         self.rotation = 30
+
         self.digging = False
+        self.can_move = True
+        self.dig_iterations = 0
 
         self.powerup = False
         self.powerup_time = time.time()
@@ -55,6 +58,7 @@ class Player(VisibleSprite):
         self.sb_vel = VEC(0, 0)
         self.snowballs = []
 
+        self.frame_group = assets.player_idle
         self.frame = 0
         self.frame_time = time.time()
 
@@ -91,12 +95,12 @@ class Player(VisibleSprite):
         keys = pygame.key.get_pressed()
 
         self.acc = VEC(0, GRAVITY)
-        if keys[K_a] and not self.digging: # Acceleration
+        if keys[K_a] and self.can_move: # Acceleration
             self.acc.x -= self.CONST_ACC
             self.flip = True
         elif self.vel.x < 0: # Deceleration
             self.acc.x += self.CONST_ACC
-        if keys[K_d] and not self.digging:
+        if keys[K_d] and self.can_move:
             self.acc.x += self.CONST_ACC
             self.flip = False
         elif self.vel.x > 0:
@@ -105,11 +109,11 @@ class Player(VisibleSprite):
         if keys[K_w] and self.on_ground:
             self.vel.y = self.JUMP_SPEED
 
-        if KEYDOWN in self.manager.events and self.manager.events[KEYDOWN] == K_SPACE:
-            self.digging = True
+        if KEYDOWN in self.manager.events and self.manager.events[KEYDOWN].key == K_SPACE:
+            self.digging = not self.digging
 
     def update_throw(self) -> None:
-        self.can_throw = True if self.powerup else not self.snowballs
+        self.can_throw = True if self.powerup else not self.snowballs and self.can_move and self.dig_iterations
         if pygame.mouse.get_pressed()[0] and self.can_throw:
             m_pos = VEC(pygame.mouse.get_pos())
             self.throwing = True
@@ -124,7 +128,8 @@ class Player(VisibleSprite):
             if self.manager.events[MOUSEBUTTONUP].button == 1 and self.can_throw:
                 self.cooldown_time = time.time()
                 self.throwing = False
-                self.snowballs.append(Snowball(self.scene, self.sb_vel))
+                self.snowballs.append(Snowball(self.scene, self.sb_vel, assets.snowball_small if self.dig_iterations < 3 or self.powerup else assets.snowball_large))
+                self.dig_iterations = 0
 
     def update_position(self) -> None:
         self.vel += self.acc * self.manager.dt
@@ -142,18 +147,37 @@ class Player(VisibleSprite):
             self.vel.y = 0
             self.on_ground = True
 
+        self.can_move = self.frame_group != assets.player_dig
+
     def update_image(self) -> None:
         if self.throwing:
-            if self.sb_vel.x > 0:
-                self.flip = False
-            else:
-                self.flip = True
+            self.flip = self.sb_vel.x < 0
 
         self.ground = Ground.instances[int(self.pos.x // TILE_SIZE * TILE_SIZE)]
         self.rotation += (self.ground.incline - self.rotation) * 8 * self.manager.dt
         self.rotation = snap(self.rotation, self.ground.incline, 1)
 
-        self.upright_image = pygame.transform.flip(assets.player_idle[0], self.flip, False)
+        if self.digging and self.on_ground:
+            if self.frame == 0:
+                self.dig_iterations = 0
+            self.frame_group = assets.player_dig
+            if time.time() - self.frame_time > 0.1:
+                # 0 - 9 frames, repeat fram 4 - 8
+                self.frame_time = time.time()
+                self.frame += 1
+                if self.frame > 8:
+                    self.frame = 4
+                    self.dig_iterations += 1
+        elif self.frame_group == assets.player_dig:
+            if time.time() - self.frame_time > 0.1:
+                self.frame_time = time.time()
+                self.frame += 1
+                if self.frame >= self.frame_group.length:
+                    self.frame_group = assets.player_idle
+                    self.frame = 0
+                    self.dig_iterations += 1
+
+        self.upright_image = pygame.transform.flip(self.frame_group[self.frame], self.flip, False)
         self.image = pygame.transform.rotate(self.upright_image, self.rotation)
 
         self.rect = self.image.get_rect(midbottom=self.pos)
