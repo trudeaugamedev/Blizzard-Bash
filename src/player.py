@@ -158,8 +158,6 @@ class Player(VisibleSprite):
         self.rotation = snap(self.rotation, self.ground.incline, 1)
 
         if self.digging and self.on_ground:
-            if self.frame == 0:
-                self.dig_iterations = 0
             self.frame_group = assets.player_dig
             if time.time() - self.frame_time > 0.1:
                 # 0 - 9 frames, repeat fram 4 - 8
