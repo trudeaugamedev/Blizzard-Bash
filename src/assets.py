@@ -46,7 +46,9 @@ player_dig = Frames("player", "player_dig_")
 player_run = Frames("player", "player_run_")
 player_run_s = Frames("player", "player_run_s_")
 player_run_l = Frames("player", "player_run_l_")
-player = player_idle.elements + player_dig.elements + player_run.elements + player_run_s.elements + player_run_l.elements
+player_throw_l = Frames("player", "player_throw_l_")
+player_throw_s = Frames("player", "player_throw_s_")
+player = player_idle.elements + player_dig.elements + player_run.elements + player_run_s.elements + player_run_l.elements + player_throw_l.elements + player_throw_s.elements
 
 snowball_large = Frames("snowball", "snowball_large_")
 snowball_small = Frames("snowball", "snowball_small_")

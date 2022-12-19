@@ -47,6 +47,7 @@ class Player(VisibleSprite):
         self.ground = Ground.instances[int(self.pos.x // TILE_SIZE * TILE_SIZE)]
         self.flip = False
         self.rotation = 30
+        self.idle = True
 
         self.digging = False
         self.can_move = True
@@ -96,6 +97,7 @@ class Player(VisibleSprite):
         keys = pygame.key.get_pressed()
 
         self.acc = VEC(0, GRAVITY)
+        self.idle = False
         if keys[K_a] and self.can_move: # Acceleration
             self.acc.x -= self.CONST_ACC
             self.flip = True
@@ -106,11 +108,7 @@ class Player(VisibleSprite):
                 self.frame_group = assets.player_run_l
         elif self.vel.x < 0: # Deceleration
             self.acc.x += self.CONST_ACC
-            self.frame_group = assets.player_idle
-            if self.can_throw and self.dig_iterations < 3:
-                self.frame_group = assets.player_idle # Replace with idle small
-            elif self.can_throw:
-                self.frame_group = assets.player_idle # Replace with idle large
+            self.idle = True
         if keys[K_d] and self.can_move:
             self.acc.x += self.CONST_ACC
             self.flip = False
@@ -121,11 +119,7 @@ class Player(VisibleSprite):
                 self.frame_group = assets.player_run_l
         elif self.vel.x > 0:
             self.acc.x -= self.CONST_ACC
-            self.frame_group = assets.player_idle
-            if self.can_throw and self.dig_iterations < 3:
-                self.frame_group = assets.player_idle # Replace with idle small
-            elif self.can_throw:
-                self.frame_group = assets.player_idle # Replace with idle large
+            self.idle = True
 
         if keys[K_w] and self.on_ground and self.can_move:
             self.vel.y = self.JUMP_SPEED
@@ -137,6 +131,10 @@ class Player(VisibleSprite):
         if pygame.mouse.get_pressed()[0] and self.can_throw:
             m_pos = VEC(pygame.mouse.get_pos())
             self.throwing = True
+            if self.can_throw and self.dig_iterations < 3:
+                self.frame_group = assets.player_throw_s
+            elif self.can_throw:
+                self.frame_group = assets.player_throw_l
             # Use camera offset to convert screen-space pos to in-world pos
             try:
                 self.sb_vel = -((m_pos - self.SB_OFFSET + self.camera.offset) - self.pos) * 8
@@ -175,6 +173,13 @@ class Player(VisibleSprite):
         if self.throwing:
             self.flip = self.sb_vel.x < 0
 
+        if self.idle:
+            self.frame_group = assets.player_idle
+            if self.can_throw and self.dig_iterations < 3:
+                self.frame_group = assets.player_idle # Replace with idle small
+            elif self.can_throw:
+                self.frame_group = assets.player_idle # Replace with idle large
+
         try:
             self.ground = Ground.instances[int(self.rect.centerx // TILE_SIZE * TILE_SIZE)]
         except KeyError:
@@ -199,12 +204,22 @@ class Player(VisibleSprite):
                     self.frame_group = assets.player_idle
                     self.frame = 0
                     self.dig_iterations += 1
-        else:
+        elif self.frame_group in {assets.player_run, assets.player_run_l, assets.player_run_s}:
             if time.time() - self.frame_time > 0.1:
                 self.frame_time = time.time()
                 self.frame += 1
                 if self.frame >= self.frame_group.length:
                     self.frame = 0
+        elif self.frame_group in {assets.player_throw_l, assets.player_throw_s}:
+            if self.throwing:
+                self.frame = 0
+            else:
+                if time.time() - self.frame_time > 0.1:
+                    self.frame_time = time.time()
+                    self.frame += 1
+                    if self.frame >= self.frame_group.length:
+                        self.idle = True
+
         if self.frame >= self.frame_group.length:
             self.frame = self.frame_group.length - 1
 
