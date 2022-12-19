@@ -195,6 +195,7 @@ class Player(VisibleSprite):
         for player in self.manager.other_players.values():
             if not player.powerup: continue
             if player.powerup.pos.distance_to(VEC(self.real_rect.center)) < 60:
+                self.powerup_time = time.time()
                 self.powerup = True
 
     def update_camera(self) -> None:
