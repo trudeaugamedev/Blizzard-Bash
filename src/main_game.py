@@ -22,10 +22,16 @@ class MainGame(Scene):
             time.sleep(0.01)
         noise.seed(self.client.thread_data["seed"])
 
-        for x in range(-100, 101):
+        for x in range(-42, 43):
             # Horizontal stretch and vertical stretch (essentially)
             y = noise.noise2(x * 0.1, 0) * 200
             Ground(self, (x * TILE_SIZE, y), (TILE_SIZE, 800))
+        for x in range(-63, -42):
+            y = noise.noise2(x * 0.1, 0) * 200 - 400
+            Ground(self, (x * TILE_SIZE, y), (TILE_SIZE, 2000))
+        for x in range(43, 64):
+            y = noise.noise2(x * 0.1, 0) * 200 - 400
+            Ground(self, (x * TILE_SIZE, y), (TILE_SIZE, 2000))
         for ground in Ground.instances.values():
             ground.generate_image() # Create a images only after all tiles have been created
 

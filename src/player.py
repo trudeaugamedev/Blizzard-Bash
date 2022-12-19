@@ -147,13 +147,18 @@ class Player(VisibleSprite):
             self.vel.y = 0
             self.on_ground = True
 
+        self.pos.x, _ = clamp(self.pos.x, -2007, 2061)
+
         self.can_move = self.frame_group != assets.player_dig
 
     def update_image(self) -> None:
         if self.throwing:
             self.flip = self.sb_vel.x < 0
 
-        self.ground = Ground.instances[int(self.pos.x // TILE_SIZE * TILE_SIZE)]
+        try:
+            self.ground = Ground.instances[int(self.rect.centerx // TILE_SIZE * TILE_SIZE)]
+        except KeyError:
+            pass
         self.rotation += (self.ground.incline - self.rotation) * 8 * self.manager.dt
         self.rotation = snap(self.rotation, self.ground.incline, 1)
 
