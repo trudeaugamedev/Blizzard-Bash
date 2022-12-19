@@ -120,6 +120,9 @@ class Player(VisibleSprite):
         elif self.vel.x > 0:
             self.acc.x -= self.CONST_ACC
             self.idle = True
+        if keys[K_a] and keys[K_d]:
+            self.acc.x = -sign(self.vel.x) * self.CONST_ACC
+            self.idle = True
 
         if keys[K_w] and self.on_ground and self.can_move:
             self.vel.y = self.JUMP_SPEED
