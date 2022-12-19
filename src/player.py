@@ -107,7 +107,7 @@ class Player(VisibleSprite):
         elif self.vel.x > 0:
             self.acc.x -= self.CONST_ACC
 
-        if keys[K_w] and self.on_ground:
+        if keys[K_w] and self.on_ground and self.can_move:
             self.vel.y = self.JUMP_SPEED
 
         self.digging = keys[K_SPACE]
