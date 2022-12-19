@@ -23,6 +23,8 @@ ground_tiles: list[pygame.Surface] = [
     load_img(f"{TEXTURES}/ground/ground_1.png", alpha=False)
 ]
 
+powerup_icon = load_img(f"{TEXTURES}/misc/icon_rapidfire.png", alpha=False)
+
 class Frames:
     def __init__(self, path: str, prefix: str) -> None:
         self.elements = []

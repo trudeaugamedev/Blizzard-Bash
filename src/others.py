@@ -60,10 +60,12 @@ class OtherSnowball(VisibleSprite):
 class OtherPowerup(VisibleSprite):
     def __init__(self, scene: Scene, pos: tuple[int, int]) -> None:
         super().__init__(scene, Layers.POWERUP)
+        self.image = assets.powerup_icon
+        self.size = VEC(self.image.get_size())
         self.pos = VEC(pos)
 
     def update(self) -> None:
         ...
 
     def draw(self) -> None:
-        pygame.draw.circle(self.manager.screen, (255, 0, 0), self.pos - self.scene.player.camera.offset, 14)
+        self.manager.screen.blit(self.image, self.pos - self.size // 2 - self.scene.player.camera.offset)
