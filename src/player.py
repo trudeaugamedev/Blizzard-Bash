@@ -110,8 +110,7 @@ class Player(VisibleSprite):
         if keys[K_w] and self.on_ground:
             self.vel.y = self.JUMP_SPEED
 
-        if KEYDOWN in self.manager.events and self.manager.events[KEYDOWN].key == K_SPACE:
-            self.digging = not self.digging
+        self.digging = keys[K_SPACE]
 
     def update_throw(self) -> None:
         self.can_throw = True if self.powerup else not self.snowballs and self.can_move and self.dig_iterations
