@@ -99,13 +99,33 @@ class Player(VisibleSprite):
         if keys[K_a] and self.can_move: # Acceleration
             self.acc.x -= self.CONST_ACC
             self.flip = True
+            self.frame_group = assets.player_run
+            if self.can_throw and self.dig_iterations < 3:
+                self.frame_group = assets.player_run_s
+            elif self.can_throw:
+                self.frame_group = assets.player_run_l
         elif self.vel.x < 0: # Deceleration
             self.acc.x += self.CONST_ACC
+            self.frame_group = assets.player_idle
+            if self.can_throw and self.dig_iterations < 3:
+                self.frame_group = assets.player_idle # Replace with idle small
+            elif self.can_throw:
+                self.frame_group = assets.player_idle # Replace with idle large
         if keys[K_d] and self.can_move:
             self.acc.x += self.CONST_ACC
             self.flip = False
+            self.frame_group = assets.player_run
+            if self.can_throw and self.dig_iterations < 3:
+                self.frame_group = assets.player_run_s
+            elif self.can_throw:
+                self.frame_group = assets.player_run_l
         elif self.vel.x > 0:
             self.acc.x -= self.CONST_ACC
+            self.frame_group = assets.player_idle
+            if self.can_throw and self.dig_iterations < 3:
+                self.frame_group = assets.player_idle # Replace with idle small
+            elif self.can_throw:
+                self.frame_group = assets.player_idle # Replace with idle large
 
         if keys[K_w] and self.on_ground and self.can_move:
             self.vel.y = self.JUMP_SPEED
@@ -179,6 +199,14 @@ class Player(VisibleSprite):
                     self.frame_group = assets.player_idle
                     self.frame = 0
                     self.dig_iterations += 1
+        else:
+            if time.time() - self.frame_time > 0.1:
+                self.frame_time = time.time()
+                self.frame += 1
+                if self.frame >= self.frame_group.length:
+                    self.frame = 0
+        if self.frame >= self.frame_group.length:
+            self.frame = self.frame_group.length - 1
 
         self.orig_image = self.frame_group[self.frame]
         self.upright_image = pygame.transform.flip(self.orig_image, self.flip, False)

@@ -43,7 +43,10 @@ class Frames:
 
 player_idle = Frames("player", "player_idle_")
 player_dig = Frames("player", "player_dig_")
-player = player_idle.elements + player_dig.elements
+player_run = Frames("player", "player_run_")
+player_run_s = Frames("player", "player_run_s_")
+player_run_l = Frames("player", "player_run_l_")
+player = player_idle.elements + player_dig.elements + player_run.elements + player_run_s.elements + player_run_l.elements
 
 snowball_large = Frames("snowball", "snowball_large_")
 snowball_small = Frames("snowball", "snowball_small_")
