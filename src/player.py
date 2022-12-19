@@ -185,6 +185,7 @@ class Player(VisibleSprite):
     def update_powerup(self) -> None:
         if time.time() - self.powerup_time > 4 and self.powerup:
             self.powerup = False
+            self.throwing = False
 
         for player in self.manager.other_players.values():
             if not player.powerup: continue
