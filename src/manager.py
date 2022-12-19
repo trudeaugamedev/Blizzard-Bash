@@ -87,19 +87,18 @@ class GameManager:
 
         if parsed[4] != "_":
             sb_data = parsed[4].split("|")
+            for snowball in player.snowballs:
+                snowball.kill()
+            player.snowballs = []
             for i, data in enumerate(sb_data):
                 data = data.split(";")
                 sb_pos = VEC(tuple(map(int, data[0].split(","))))
                 sb_frame = int(data[1])
                 sb_type = assets.snowball_large if int(data[2]) else assets.snowball_small
-                if i >= len(player.snowballs):
-                    player.snowballs.append(OtherSnowball(self.scene, sb_pos))
+                player.snowballs.append(OtherSnowball(self.scene, sb_pos))
                 player.snowballs[i].pos = sb_pos
                 player.snowballs[i].frame = sb_frame
                 player.snowballs[i].type = sb_type
-            for j in range(i + 1, len(sb_data)):
-                player.snowballs[j].kill()
-                player.snowballs.pop()
         elif player.snowballs:
             for snowball in player.snowballs:
                 snowball.kill()
