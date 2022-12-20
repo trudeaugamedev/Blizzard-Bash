@@ -12,7 +12,6 @@ from .snowflake import SnowFlake
 from .powerup import Powerup
 from .ground import Ground
 from .player import Player
-from .house import House
 from .scene import Scene
 
 class MainGame(Scene):
@@ -36,10 +35,6 @@ class MainGame(Scene):
             ground.generate_image() # Create a images only after all tiles have been created
 
         self.player = Player(self)
-
-        for _ in range(10):
-            ground = choice(list(Ground.instances.values()))
-            House(self, (ground.pos.x, ground.pos.y))
 
         self.snowflake_time = time.time()
         for _ in range(1000):
