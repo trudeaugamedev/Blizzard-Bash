@@ -150,7 +150,6 @@ class Player(VisibleSprite):
                 self.sb_vel = VEC() # 0 vector
         if MOUSEBUTTONUP in self.manager.events:
             if self.manager.events[MOUSEBUTTONUP].button == 1 and self.can_throw:
-                self.cooldown_time = time.time()
                 self.throwing = False
                 self.snowballs.append(Snowball(self.scene, self.sb_vel, assets.snowball_small if self.dig_iterations < 3 or self.powerup else assets.snowball_large))
                 self.dig_iterations = 0
@@ -179,7 +178,7 @@ class Player(VisibleSprite):
         if self.throwing:
             self.flip = self.sb_vel.x < 0
 
-        if self.idle:
+        if self.idle and not self.throwing and self.frame_group not in {assets.player_throw_l, assets.player_throw_s}:
             self.frame_group = assets.player_idle
             if self.can_throw and self.dig_iterations < 3:
                 self.frame_group = assets.player_idle_s
