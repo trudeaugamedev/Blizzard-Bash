@@ -31,6 +31,8 @@ class Client:
                 self.thread_data["ready"] = True
             case "el": # Eliminate a player
                 self.thread_data["eliminate"] = True
+            case "tm": # Game time
+                self.thread_data["time"] = (int(parsed[1]), int(parsed[2]))
             case "cl": # Client data signal
                 self.manager.parse(message)
 

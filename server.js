@@ -55,7 +55,7 @@ wss.on("connection", (socket) => {
 		broadcast(`dc ${client.id}`);
 	});
 	socket.on("message", (msg) => {
-		if (started && Date.now() - game_start > (30000 - (Date.now() - game_start)) / total_players) {
+		if (started && Date.now() - game_start > 300000 / total_players) {
 			broadcast(`el`); // Eliminate
 			return;
 		}
@@ -67,6 +67,10 @@ wss.on("connection", (socket) => {
 			total_players = clients.size;
 			console.log(`Everyone is ready!`);
 			broadcast("rd");
+		}
+
+		if (started) {
+			broadcast(`tm ${parseInt(300 - (Date.now() - game_start) / 1000)} ${parseInt((300 - (Date.now() - game_start) / 1000) % (300 / total_players))}`);
 		}
 
 		xbroadcast(client.id, `cl ${client.id} ${msg}`);
