@@ -48,6 +48,7 @@ class MainGame(Scene):
 
         self.score = 0
         self.lost = False
+        self.started = False
 
     def update(self) -> None:
         super().update()
@@ -87,3 +88,11 @@ class MainGame(Scene):
         self.manager.screen.fill((169, 192, 203))
         super().draw()
         self.manager.screen.blit(FONT[56].render(f"Score: {self.score}", True, (0, 0, 0)), (10, 10))
+        if "ready" not in self.client.thread_data:
+            text = FONT[70].render("Waiting for Players to get Ready...", True, (0, 0, 0))
+            self.manager.screen.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 - text.get_height() // 2))
+            if not self.manager.ready:
+                text = FONT[40].render("Press Enter when you are Ready!", True, (0, 0, 0))
+            else:
+                text = FONT[40].render("You are ready!", True, (0, 0, 0))
+            self.manager.screen.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 + 50))

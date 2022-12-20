@@ -27,6 +27,8 @@ class Client:
                 del self.manager.other_players[int(parsed[1])]
             case "wd": # New wind speed
                 self.thread_data["wind"] = int(parsed[1])
+            case "rd": # Everyone ready, game starts
+                self.thread_data["ready"] = True
             case "el": # Eliminate a player
                 self.thread_data["eliminate"] = True
             case "cl": # Client data signal

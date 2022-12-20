@@ -66,6 +66,7 @@ wss.on("connection", (socket) => {
 			started = true;
 			total_players = clients.size;
 			console.log(`Everyone is ready!`);
+			broadcast("rd");
 		}
 
 		xbroadcast(client.id, `cl ${client.id} ${msg}`);
