@@ -5,6 +5,7 @@ if TYPE_CHECKING:
 
 from pygame.locals import SRCALPHA
 from math import atan2, degrees
+from random import randint
 import pygame
 
 from .constants import TILE_SIZE, VEC, PIXEL_SIZE, REAL_TILE_SIZE
@@ -26,9 +27,9 @@ class Ground(VisibleSprite):
     def generate_image(self) -> None:
         self.unsliced_image = pygame.Surface(self.size)
         self.image = pygame.Surface(self.size, SRCALPHA)
-        self.unsliced_image.blit(assets.ground_tiles[0], (0, 0))
+        self.unsliced_image.blit(assets.ground_tiles[0].subsurface(randint(0, TILE_SIZE), 0, TILE_SIZE, TILE_SIZE), (0, 0))
         for i in range(1, int(self.size.y // TILE_SIZE)):
-            self.unsliced_image.blit(assets.ground_tiles[1], (0, i * TILE_SIZE))
+            self.unsliced_image.blit(assets.ground_tiles[1].subsurface(randint(0, TILE_SIZE), 0, TILE_SIZE, TILE_SIZE), (0, i * TILE_SIZE))
 
         try:
             left_height = self.__class__.instances[int(self.pos.x - TILE_SIZE)].pos.y

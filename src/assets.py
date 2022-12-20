@@ -1,6 +1,6 @@
 import pygame
 
-from .constants import VEC, PIXEL_SIZE
+from .constants import VEC, PIXEL_SIZE, TILE_SIZE
 from .exe import pathof
 
 def load_img(file: str, factor: float = PIXEL_SIZE, alpha: bool = True):
@@ -19,8 +19,8 @@ for i in range(10):
     snowflakes.append(load_img(f"{TEXTURES}/snowflake/snowflake_{i}.png", 2))
 
 ground_tiles: list[pygame.Surface] = [
-    load_img(f"{TEXTURES}/ground/ground_0.png", alpha=False),
-    load_img(f"{TEXTURES}/ground/ground_1.png", alpha=False)
+    load_img(f"{TEXTURES}/ground/ground.png", alpha=False).subsurface(0, 0, TILE_SIZE * 2, TILE_SIZE),
+    load_img(f"{TEXTURES}/ground/ground.png", alpha=False).subsurface(0, TILE_SIZE, TILE_SIZE * 2, TILE_SIZE)
 ]
 
 powerup_icon = load_img(f"{TEXTURES}/misc/icon_rapidfire.png", alpha=False)
