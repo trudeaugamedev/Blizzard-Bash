@@ -96,6 +96,7 @@ class Player(VisibleSprite):
     def update_keys(self) -> None:
         keys = pygame.key.get_pressed()
 
+        print(self.can_move)
         self.acc = VEC(0, GRAVITY)
         self.idle = False
         if keys[K_a] and self.can_move: # Acceleration
@@ -170,7 +171,7 @@ class Player(VisibleSprite):
 
         self.pos.x, _ = clamp(self.pos.x, -2007, 2061)
 
-        self.can_move = self.frame_group != assets.player_dig
+        self.can_move = self.frame_group != assets.player_dig and not self.digging
 
     def update_image(self) -> None:
         if self.throwing:
