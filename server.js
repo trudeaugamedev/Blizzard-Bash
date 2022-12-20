@@ -11,6 +11,7 @@ const wss = new WebSocketServer({
 });
 
 const clients = new Map();
+const ready = new Map();
 
 function broadcast(msg) {
 	for (const client of clients.values()) {
@@ -30,6 +31,8 @@ function xbroadcast(xid, msg) {
 
 const seed = randint(0, 99999999)
 let game_start = Date.now();
+let started = false;
+let total_players = 0;
 
 let wind_time = Date.now();
 let wind_duration = randint(3000, 6000);
@@ -52,10 +55,17 @@ wss.on("connection", (socket) => {
 		broadcast(`dc ${client.id}`);
 	});
 	socket.on("message", (msg) => {
-		// if (Date.now() - game_start > 300000) { // 5 minutes
-		if (Date.now() - game_start > (300000 - (Date.now() - game_start)) / clients.size) {
+		if (started && Date.now() - game_start > (30000 - (Date.now() - game_start)) / total_players) {
 			broadcast(`el`); // Eliminate
 			return;
+		}
+
+		ready.set(client.id, parseInt(msg.toString()[msg.length - 1]));
+		if (Array.from(ready.values()).every(element => element === 1) && !started) {
+			game_start = Date.now();
+			started = true;
+			total_players = clients.size;
+			console.log(`Everyone is ready!`);
 		}
 
 		xbroadcast(client.id, `cl ${client.id} ${msg}`);

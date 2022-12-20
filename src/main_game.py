@@ -3,8 +3,9 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from manager import GameManager
 
-import opensimplex as noise
+from pygame.locals import K_RETURN, KEYDOWN
 from random import randint, choice
+import opensimplex as noise
 import time
 
 from .constants import TILE_SIZE, WIDTH, VEC, HEIGHT, FONT
@@ -78,6 +79,9 @@ class MainGame(Scene):
                     self.lost = True
                 self.manager.new_scene("EndMenu")
             del self.client.thread_data["eliminate"]
+
+        if KEYDOWN in self.manager.events and self.manager.events[KEYDOWN].key == K_RETURN:
+            self.manager.ready = True
 
     def draw(self) -> None:
         self.manager.screen.fill((169, 192, 203))

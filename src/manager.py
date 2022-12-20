@@ -33,6 +33,7 @@ class GameManager:
         self.events = []
         self.other_players = {}
         self.scene = MainGame(self, None)
+        self.ready = False
 
     def run(self) -> None:
         while self.scene.running:
@@ -117,6 +118,7 @@ class GameManager:
     def send(self) -> None:
         scene = self.scene.previous_scene if isinstance(self.scene, self.Scenes.EndMenu.value) else self.scene
 
+        ready = int(self.ready)
         score = scene.score
 
         p_pos = f"{int(scene.player.pos.x)},{int(scene.player.pos.y)}"
@@ -142,7 +144,7 @@ class GameManager:
             pw_pos = "_"
 
         try:
-            self.client.socket.send(f"{score} {p_data} {sb_data} {pw_pos}")
+            self.client.socket.send(f"{score} {p_data} {sb_data} {pw_pos} {ready}")
         except WebSocketConnectionClosedException:
             pass
 
