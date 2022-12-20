@@ -34,7 +34,7 @@ class MainGame(Scene):
         for ground in Ground.instances.values():
             ground.generate_image() # Create a images only after all tiles have been created
 
-        self.player = Player(self)
+        self.player = Player(self, self.client.thread_data["id"])
 
         self.snowflake_time = time.time()
         for _ in range(1000):
@@ -46,6 +46,7 @@ class MainGame(Scene):
         self.powerup = None
 
         self.score = 0
+        self.lost = False
 
     def update(self) -> None:
         super().update()
@@ -67,6 +68,16 @@ class MainGame(Scene):
         if time.time() - self.powerup_spawn_time > 30:
             self.powerup_spawn_time = time.time()
             self.powerup = Powerup(self, self.player.pos + (randint(-200, 200), -600))
+
+        if "eliminate" in self.client.thread_data:
+            for player in self.manager.other_players.values():
+                if self.score > player.score:
+                    break
+            else:
+                if self.manager.other_players:
+                    self.lost = True
+                self.manager.new_scene("EndMenu")
+            del self.client.thread_data["eliminate"]
 
     def draw(self) -> None:
         self.manager.screen.fill((169, 192, 203))

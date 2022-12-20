@@ -12,6 +12,7 @@ import sys
 from .others import OtherPlayer, OtherSnowball, OtherPowerup
 from .constants import WIDTH, HEIGHT, FPS, VEC
 from .main_game import MainGame
+from .end_menu import EndMenu
 from .scene import Scene
 from . import assets
 
@@ -114,17 +115,19 @@ class GameManager:
             player.powerup = None
 
     def send(self) -> None:
-        score = self.scene.score
+        scene = self.scene.previous_scene if isinstance(self.scene, self.Scenes.EndMenu.value) else self.scene
 
-        p_pos = f"{int(self.scene.player.pos.x)},{int(self.scene.player.pos.y)}"
-        p_rot = f"{int(self.scene.player.rotation)}"
-        p_flip = f"{int(self.scene.player.flip)}"
-        p_frame = f"{(assets.player.index(self.scene.player.orig_image))}"
+        score = scene.score
+
+        p_pos = f"{int(scene.player.pos.x)},{int(scene.player.pos.y)}"
+        p_rot = f"{int(scene.player.rotation)}"
+        p_flip = f"{int(scene.player.flip)}"
+        p_frame = f"{(assets.player.index(scene.player.orig_image))}"
         p_data = f"{p_pos};{p_rot};{p_flip};{p_frame}"
 
-        if self.scene.player.snowballs:
+        if scene.player.snowballs:
             sb_data = ""
-            for snowball in self.scene.player.snowballs:
+            for snowball in scene.player.snowballs:
                 sb_pos = f"{int(snowball.pos.x)},{int(snowball.pos.y)}"
                 sb_frame = snowball.frame
                 sb_type = 0 if snowball.type == assets.snowball_small else 1
@@ -133,8 +136,8 @@ class GameManager:
         else:
             sb_data = "_"
 
-        if self.scene.powerup:
-            pw_pos = f"{int(self.scene.powerup.pos.x)},{int(self.scene.powerup.pos.y)}"
+        if scene.powerup:
+            pw_pos = f"{int(scene.powerup.pos.x)},{int(scene.powerup.pos.y)}"
         else:
             pw_pos = "_"
 
@@ -161,3 +164,4 @@ class GameManager:
 
     class Scenes(Enum):
         MainGame = MainGame
+        EndMenu = EndMenu

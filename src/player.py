@@ -30,8 +30,9 @@ class Camera:
         self.offset = intvec(self.float_offset)
 
 class Player(VisibleSprite):
-    def __init__(self, scene: Scene) -> None:
+    def __init__(self, scene: Scene, i: int) -> None:
         super().__init__(scene, Layers.PLAYER)
+        self.id = i
         self.size = VEC(45, 60)
         self.pos = VEC(0, -100)
         self.vel = VEC(0, 0)

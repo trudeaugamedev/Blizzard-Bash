@@ -29,6 +29,8 @@ function xbroadcast(xid, msg) {
 }
 
 const seed = randint(0, 99999999)
+let game_start = Date.now();
+
 let wind_time = Date.now();
 let wind_duration = randint(3000, 6000);
 let wind_speed = [randint(-600, -200), randint(200, 600)][randint(0, 1)];
@@ -50,7 +52,14 @@ wss.on("connection", (socket) => {
 		broadcast(`dc ${client.id}`);
 	});
 	socket.on("message", (msg) => {
+		// if (Date.now() - game_start > 300000) { // 5 minutes
+		if (Date.now() - game_start > (300000 - (Date.now() - game_start)) / clients.size) {
+			broadcast(`el`); // Eliminate
+			return;
+		}
+
 		xbroadcast(client.id, `cl ${client.id} ${msg}`);
+
 		if (Date.now() - wind_time > wind_duration) {
 			wind_time = Date.now();
 			wind_duration = randint(3000, 6000);
@@ -59,5 +68,5 @@ wss.on("connection", (socket) => {
 		}
 	});
 
-	socket.send(`hi ${seed}`);
+	socket.send(`hi ${client.id} ${seed}`);
 });
