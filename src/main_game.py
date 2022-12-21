@@ -113,16 +113,16 @@ class MainGame(Scene):
             text_str = f"Time Left: {self.client.thread_data['time'][0] // 60}:{'0' if self.client.thread_data['time'][0] % 60 < 10 else ''}{self.client.thread_data['time'][0] % 60}"
             text = FONT[30].render(text_str, True, TEXT_COLOR)
             text.set_alpha(70)
-            self.manager.screen.blit(text, VEC(10, 72) + (3, 3))
+            self.manager.screen.blit(text, VEC(20, 72) + (3, 3))
             text = FONT[30].render(text_str, True, TEXT_COLOR)
-            self.manager.screen.blit(text, (10, 72))
+            self.manager.screen.blit(text, (20, 72))
             
             text_str = f"Next Elimination: {self.client.thread_data['time'][1] // 60}:{'0' if self.client.thread_data['time'][1] % 60 < 10 else ''}{self.client.thread_data['time'][1] % 60}"
             text = FONT[30].render(text_str, True, TEXT_COLOR)
             text.set_alpha(70)
-            self.manager.screen.blit(text, VEC(10, 118) + (3, 3))
+            self.manager.screen.blit(text, VEC(20, 112) + (3, 3))
             text = FONT[30].render(text_str, True, TEXT_COLOR)
-            self.manager.screen.blit(text, (10, 118))
+            self.manager.screen.blit(text, (20, 112))
 
         if "ready" not in self.client.thread_data:
             text = FONT[54].render("Waiting for Players to get Ready...", True, (0, 0, 0))
