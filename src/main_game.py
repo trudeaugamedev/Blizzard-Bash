@@ -15,6 +15,7 @@ from .powerup import Powerup
 from .ground import Ground
 from .player import Player
 from .scene import Scene
+from . import assets
 
 class MainGame(Scene):
     def setup(self) -> None:
@@ -92,12 +93,20 @@ class MainGame(Scene):
     def draw(self) -> None:
         self.manager.screen.fill((169, 192, 203))
         super().draw()
+
         self.manager.screen.blit(FONT[56].render(f"Score: {self.score}", True, (0, 0, 0)), (10, 10))
+
+        topleft = VEC(WIDTH - assets.player_idle[0].get_width() - 10, 10)
+        self.manager.screen.blit(assets.player_idle[0], topleft)
+        text = FONT[72].render(f"{len(self.manager.other_players)} x", True, (0, 0, 0))
+        self.manager.screen.blit(text, topleft - (text.get_width() + 10, 0))
+
         if "time" in self.client.thread_data:
             text = FONT[40].render(f"Time Left: {self.client.thread_data['time'][0] // 60}:{self.client.thread_data['time'][0] % 60}", True, (0, 0, 0))
-            self.manager.screen.blit(text, (WIDTH - text.get_width() - 10, 10))
+            self.manager.screen.blit(text, (10, 70))
             text = FONT[40].render(f"Next Elimination: {self.client.thread_data['time'][1] // 60}:{self.client.thread_data['time'][1] % 60}", True, (0, 0, 0))
-            self.manager.screen.blit(text, (WIDTH - text.get_width() - 10, 50))
+            self.manager.screen.blit(text, (10, 120))
+
         if "ready" not in self.client.thread_data:
             text = FONT[70].render("Waiting for Players to get Ready...", True, (0, 0, 0))
             self.manager.screen.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 - text.get_height() // 2))
