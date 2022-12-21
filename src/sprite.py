@@ -13,6 +13,7 @@ class Layers(Enum):
     SNOWBALL = auto()
     SNOWFLAKE = auto()
     POWERUP = auto()
+    ARROW = auto()
 
 class Sprite(AbstractClass):
     def __init__(self, scene: Scene, layer: int | Layers) -> None:

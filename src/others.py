@@ -5,7 +5,7 @@ if TYPE_CHECKING:
 
 import pygame
 
-from .constants import VEC, FONT, PIXEL_SIZE
+from .constants import VEC, FONT, PIXEL_SIZE, WIDTH
 from .sprite import VisibleSprite, Layers
 from . import assets
 
@@ -26,6 +26,7 @@ class OtherPlayer(VisibleSprite):
         self.flip = False
         self.score = 0
         self.powerup = None
+        self.arrow = OtherArrow(self.scene, self)
 
     def update(self) -> None:
         self.rect = self.image.get_rect(midbottom=self.pos)
@@ -40,6 +41,36 @@ class OtherPlayer(VisibleSprite):
         font_surf = FONT[24].render(f"{self.score}", True, (0, 0, 0))
         pos = VEC(self.rect.midtop) - (font_surf.get_width() // 2, font_surf.get_height())
         self.manager.screen.blit(font_surf, pos - self.scene.player.camera.offset)
+
+    def kill(self) -> None:
+        self.arrow.kill()
+        super().kill()
+
+class OtherArrow(VisibleSprite):
+    def __init__(self, scene: Scene, player: OtherPlayer) -> None:
+        super().__init__(scene, Layers.ARROW)
+        self.player = player
+
+    def update(self) -> None:
+        ...
+
+    def draw(self) -> None:
+        points = []
+        if self.player.rect.right - self.scene.player.camera.offset.x < 0:
+            points = [
+                VEC(5, self.player.rect.centery - self.scene.player.camera.offset.y),
+                VEC(25, self.player.rect.centery - 7 - self.scene.player.camera.offset.y),
+                VEC(25, self.player.rect.centery + 7 - self.scene.player.camera.offset.y)
+            ]
+        elif self.player.rect.left - self.scene.player.camera.offset.x > WIDTH:
+            points = [
+                VEC(WIDTH - 5, self.player.rect.centery - self.scene.player.camera.offset.y),
+                VEC(WIDTH - 25, self.player.rect.centery - 7 - self.scene.player.camera.offset.y),
+                VEC(WIDTH - 25, self.player.rect.centery + 7 - self.scene.player.camera.offset.y)
+            ]
+        if points:
+            pygame.draw.polygon(self.manager.screen, (71, 139, 161), points)
+            pygame.draw.polygon(self.manager.screen, (0, 0, 0), points, 3)
 
 class OtherSnowball(VisibleSprite):
     def __init__(self, scene: Scene, pos: tuple[int, int]) -> None:
