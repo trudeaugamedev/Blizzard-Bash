@@ -66,6 +66,8 @@ class Player(VisibleSprite):
         self.frame = 0
         self.frame_time = time.time()
 
+        self.first_start = True
+
         self.CONST_ACC = 500 # 500 pixels per second squared (physics :P)
         self.MAX_SPEED = 200
         self.JUMP_SPEED = -400
@@ -81,6 +83,9 @@ class Player(VisibleSprite):
         self.update_image()
         self.update_powerup()
         self.update_camera()
+        if self.first_start and "time" in self.manager.client.thread_data:
+            self.first_start = False
+            self.powerup = False
 
     def draw(self) -> None:
         self.manager.screen.blit(self.image, (*(VEC(self.rect.topleft) - self.camera.offset), *self.size))
