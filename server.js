@@ -29,7 +29,10 @@ function xbroadcast(xid, msg) {
 	}
 }
 
-const seed = randint(0, 99999999)
+const total_time = 300000;
+const total_time_s = total_time / 1000;
+
+let seed = randint(0, 99999999);
 let game_start = Date.now();
 let started = false;
 let total_players = 0;
@@ -43,25 +46,35 @@ wss.on("connection", (socket) => {
 		id: nextid++,
 		socket: socket
 	};
+
 	clients.set(client.id, client);
 	console.log(`Client ${client.id} connected`);
 	socket.on("error", (error) => {
 		console.error(error);
 	});
+
 	socket.on("close", (code) => {
 		clients.delete(client.id);
 		socket.close();
 		console.log(`Client ${client.id} disconnected, code ${code}`);
 		broadcast(`dc ${client.id}`);
 	});
+
 	socket.on("message", (msg) => {
-		if (started && Date.now() - game_start > 300000 / total_players) {
+		if (started && Date.now() - game_start > total_time / total_players) {
 			broadcast(`el`); // Eliminate
+			if (clients.size <= 1) {
+				seed = randint(0, 99999999);
+				started = false;
+				total_players = 0;
+				nextid = 0;
+				clients.clear();
+			}
 			return;
 		}
 
 		ready.set(client.id, parseInt(msg.toString()[msg.length - 1]));
-		if (Array.from(ready.values()).every(element => element === 1) && !started) {
+		if (Array.from(ready.values()).every(element => element === 1) && !started && clients.size > 1) {
 			game_start = Date.now();
 			started = true;
 			total_players = clients.size;
@@ -70,7 +83,7 @@ wss.on("connection", (socket) => {
 		}
 
 		if (started) {
-			broadcast(`tm ${parseInt(300 - (Date.now() - game_start) / 1000)} ${parseInt((300 - (Date.now() - game_start) / 1000) % (300 / total_players))}`);
+			broadcast(`tm ${parseInt(total_time_s - (Date.now() - game_start) / 1000)} ${parseInt((total_time_s - (Date.now() - game_start) / 1000) % (total_time_s / total_players))}`);
 		}
 
 		xbroadcast(client.id, `cl ${client.id} ${msg}`);
@@ -84,4 +97,8 @@ wss.on("connection", (socket) => {
 	});
 
 	socket.send(`hi ${client.id} ${seed}`);
+	if (started && clients.size > 0) {
+		socket.close();
+		console.log(`Client ${client.id} tried to join during a game.`);
+	}
 });

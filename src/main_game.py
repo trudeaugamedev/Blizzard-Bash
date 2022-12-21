@@ -5,6 +5,7 @@ if TYPE_CHECKING:
 
 from pygame.locals import K_RETURN, KEYDOWN
 from random import randint, choice
+from threading import Thread
 import opensimplex as noise
 import time
 
@@ -16,8 +17,11 @@ from .player import Player
 from .scene import Scene
 
 class MainGame(Scene):
-    def __init__(self, manager: GameManager, previous_scene: Scene) -> None:
-        super().__init__(manager, previous_scene)
+    def setup(self) -> None:
+        if self.previous_scene is not None:
+            self.client.socket_thread = Thread(target=self.client.socket.run_forever, daemon=True)
+            self.client.socket_thread.start()
+
         while "seed" not in self.client.thread_data:
             time.sleep(0.01)
         noise.seed(self.client.thread_data["seed"])

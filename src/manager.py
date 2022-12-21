@@ -5,6 +5,7 @@ if TYPE_CHECKING:
 
 from pygame.locals import HWSURFACE, DOUBLEBUF, RESIZABLE, SCALED, WINDOWRESIZED, WINDOWMOVED, QUIT
 from websocket._exceptions import WebSocketConnectionClosedException
+from threading import Thread
 from enum import Enum
 import pygame
 import sys
@@ -33,6 +34,7 @@ class GameManager:
         self.events = []
         self.other_players = {}
         self.scene = MainGame(self, None)
+        self.scene.setup()
         self.ready = False
 
     def run(self) -> None:
@@ -42,7 +44,9 @@ class GameManager:
                 self.scene.update()
                 self.scene.draw()
             except AbortScene:
-                pass
+                if isinstance(self.scene, self.Scenes.MainGame.value):
+                    self.client.socket_thread = Thread(target=self.client.socket.run_forever, daemon=True)
+                    self.client.socket_thread.start()
             self.send()
 
     def update(self) -> None:
@@ -156,6 +160,10 @@ class GameManager:
     def new_scene(self, scene_class: str) -> None:
         self.scene.running = False
         self.scene = self.Scenes[scene_class].value(self, self.scene)
+        try:
+            self.scene.setup()
+        except AttributeError:
+            pass
         raise AbortScene
 
     def switch_scene(self, scene: Scene) -> None:
