@@ -98,7 +98,6 @@ wss.on("connection", (socket) => {
 			wind_speed = [randint(-600, -200), randint(200, 600)][randint(0, 1)];
 			broadcast(`wd ${wind_speed}`);
 		}
-		console.log(ready);
 	});
 
 	socket.send(`hi ${client.id} ${seed}`);
