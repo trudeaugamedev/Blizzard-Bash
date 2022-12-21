@@ -29,7 +29,7 @@ class Ground(VisibleSprite):
         self.image = pygame.Surface(self.size, SRCALPHA)
         self.unsliced_image.blit(assets.ground_tiles[0].subsurface(randint(0, REAL_TILE_SIZE) * PIXEL_SIZE, 0, TILE_SIZE, TILE_SIZE), (0, 0))
         for i in range(1, int(self.size.y // TILE_SIZE)):
-            self.unsliced_image.blit(assets.ground_tiles[1].subsurface(randint(0, REAL_TILE_SIZE) * PIXEL_SIZE, 0, TILE_SIZE, TILE_SIZE), (0, i * TILE_SIZE))
+            self.unsliced_image.blit(pygame.transform.flip(assets.ground_tiles[1].subsurface(randint(0, REAL_TILE_SIZE) * PIXEL_SIZE, 0, TILE_SIZE, TILE_SIZE), bool(randint(0, 1)), False), (0, i * TILE_SIZE))
 
         try:
             left_height = self.__class__.instances[int(self.pos.x - TILE_SIZE)].pos.y
