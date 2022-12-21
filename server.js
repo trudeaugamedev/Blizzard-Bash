@@ -56,6 +56,7 @@ wss.on("connection", (socket) => {
 
 	socket.on("close", (code) => {
 		clients.delete(client.id);
+		ready.delete(client.id);
 		socket.close();
 		console.log(`Client ${client.id} disconnected, code ${code}`);
 		broadcast(`dc ${client.id}`);
@@ -97,6 +98,7 @@ wss.on("connection", (socket) => {
 			wind_speed = [randint(-600, -200), randint(200, 600)][randint(0, 1)];
 			broadcast(`wd ${wind_speed}`);
 		}
+		console.log(ready);
 	});
 
 	socket.send(`hi ${client.id} ${seed}`);
