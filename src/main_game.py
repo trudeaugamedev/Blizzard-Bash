@@ -76,12 +76,13 @@ class MainGame(Scene):
             self.powerup = Powerup(self, self.player.pos + (randint(-200, 200), -600))
 
         if "eliminate" in self.client.thread_data:
+            if not self.manager.other_players:
+                self.manager.new_scene("EndMenu")
             for player in self.manager.other_players.values():
                 if self.score > player.score:
                     break
             else:
-                if self.manager.other_players:
-                    self.lost = True
+                self.lost = True
                 self.manager.new_scene("EndMenu")
             del self.client.thread_data["eliminate"]
 

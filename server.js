@@ -29,13 +29,14 @@ function xbroadcast(xid, msg) {
 	}
 }
 
-const total_time = 300000;
+const total_time = 30000;
 const total_time_s = total_time / 1000;
 
 let seed = randint(0, 99999999);
 let game_start = Date.now();
 let started = false;
 let total_players = 0;
+let eliminations = 0;
 
 let wind_time = Date.now();
 let wind_duration = randint(3000, 6000);
@@ -61,11 +62,13 @@ wss.on("connection", (socket) => {
 	});
 
 	socket.on("message", (msg) => {
-		if (started && Date.now() - game_start > total_time / total_players) {
+		if ((started && Date.now() - game_start > total_time / total_players * (eliminations + 2)) || (started && clients.size == 1)) {
+			eliminations += 1;
 			broadcast(`el`); // Eliminate
 			if (clients.size <= 1) {
 				seed = randint(0, 99999999);
 				started = false;
+				eliminations = 0;
 				total_players = 0;
 				nextid = 0;
 				clients.clear();
@@ -83,7 +86,7 @@ wss.on("connection", (socket) => {
 		}
 
 		if (started) {
-			broadcast(`tm ${parseInt(total_time_s - (Date.now() - game_start) / 1000)} ${parseInt((total_time_s - (Date.now() - game_start) / 1000) % (total_time_s / total_players))}`);
+			broadcast(`tm ${parseInt(total_time_s - (Date.now() - game_start) / 1000)} ${parseInt((total_time / total_players * (eliminations + 2) - (Date.now() - game_start)) / 1000)}`);
 		}
 
 		xbroadcast(client.id, `cl ${client.id} ${msg}`);
