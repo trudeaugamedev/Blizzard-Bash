@@ -101,10 +101,7 @@ class GameManager:
                 sb_pos = VEC(tuple(map(int, data[0].split(","))))
                 sb_frame = int(data[1])
                 sb_type = assets.snowball_large if int(data[2]) else assets.snowball_small
-                player.snowballs.append(OtherSnowball(self.scene, sb_pos))
-                player.snowballs[i].pos = sb_pos
-                player.snowballs[i].frame = sb_frame
-                player.snowballs[i].type = sb_type
+                player.snowballs.append(OtherSnowball(self.scene, sb_pos, sb_frame, sb_type))
         elif player.snowballs:
             for snowball in player.snowballs:
                 snowball.kill()
