@@ -29,7 +29,7 @@ function xbroadcast(xid, msg) {
 	}
 }
 
-const total_time = 30000;
+const total_time = 300000;
 const total_time_s = total_time / 1000;
 
 let seed = randint(0, 99999999);
