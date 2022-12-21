@@ -4,10 +4,11 @@ if TYPE_CHECKING:
     from scene import Scene
 
 from pygame.locals import K_a, K_d, K_w, K_SPACE, MOUSEBUTTONUP, BLEND_RGB_SUB
+from math import sin, pi
 import pygame
 import time
 
-from .constants import VEC, SCR_DIM, GRAVITY, PIXEL_SIZE, TILE_SIZE
+from .constants import VEC, SCR_DIM, GRAVITY, PIXEL_SIZE, TILE_SIZE, TEXT_COLOR
 from .utils import intvec, snap, clamp, snap, sign, shadow
 from .sprite import VisibleSprite, Layers
 from .snowball import Snowball
@@ -66,6 +67,8 @@ class Player(VisibleSprite):
         self.frame = 0
         self.frame_time = time.time()
 
+        self.glow_time = time.time()
+
         self.first_start = True
 
         self.CONST_ACC = 500 # 500 pixels per second squared (physics :P)
@@ -88,7 +91,12 @@ class Player(VisibleSprite):
             self.powerup = False
 
     def draw(self) -> None:
-        self.manager.screen.blit(shadow(self.image), VEC(self.rect.topleft) - self.scene.player.camera.offset + (3, 3), special_flags=BLEND_RGB_SUB)
+        if self.dig_iterations > 2:
+            alpha = (sin((time.time() - self.glow_time) * pi * 1.75) * 0.5 + 0.5) * 255
+            mask = pygame.mask.from_surface(self.image)
+            self.manager.screen.blit(mask.scale(VEC(mask.get_size()) + (20, 14)).to_surface(setcolor=(140, 230, 255, alpha), unsetcolor=(0, 0, 0, 0)), VEC(self.rect.topleft) - (10, 7) - self.camera.offset)
+
+        self.manager.screen.blit(shadow(self.image), VEC(self.rect.topleft) - self.camera.offset + (3, 3), special_flags=BLEND_RGB_SUB)
         self.manager.screen.blit(self.image, (*(VEC(self.rect.topleft) - self.camera.offset), *self.size))
 
         if not self.throwing: return
