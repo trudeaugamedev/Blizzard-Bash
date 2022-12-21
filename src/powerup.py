@@ -3,12 +3,13 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from scene import Scene
 
-import pygame
+from pygame.locals import BLEND_RGB_SUB
 import time
 
 from .constants import VEC, GRAVITY, PIXEL_SIZE
 from .sprite import VisibleSprite, Layers
 from .ground import Ground
+from .utils import shadow
 from . import assets
 
 class Powerup(VisibleSprite):
@@ -47,6 +48,7 @@ class Powerup(VisibleSprite):
                 return
 
     def draw(self) -> None:
+        self.manager.screen.blit(shadow(self.image), self.pos - self.size // 2 - self.scene.player.camera.offset + (3, 3), special_flags=BLEND_RGB_SUB)
         self.manager.screen.blit(self.image, self.pos - self.size // 2 - self.scene.player.camera.offset)
 
     def kill(self) -> None:

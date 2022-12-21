@@ -4,6 +4,7 @@ if TYPE_CHECKING:
     from scene import Scene
     from player import Player
 
+from pygame.locals import BLEND_RGB_SUB
 from random import randint, choice
 import pygame
 import time
@@ -11,6 +12,7 @@ import time
 from .constants import VEC, GRAVITY, PIXEL_SIZE
 from .sprite import VisibleSprite, Layers
 from .ground import Ground
+from .utils import shadow
 from . import assets
 
 class Snowball(VisibleSprite):
@@ -78,7 +80,7 @@ class Snowball(VisibleSprite):
             self.kill()
 
     def draw(self) -> None:
-        # pygame.draw.circle(self.manager.screen, (255, 255, 255), self.pos - self.player.camera.offset, 5)
+        self.manager.screen.blit(shadow(self.image), VEC(self.rect.topleft) - self.scene.player.camera.offset + (3, 3), special_flags=BLEND_RGB_SUB)
         self.manager.screen.blit(self.image, VEC(self.rect.topleft) - self.player.camera.offset)
 
     def kill(self) -> None:

@@ -3,10 +3,12 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from scene import Scene
 
+from pygame.locals import BLEND_RGB_SUB
 import pygame
 
 from .constants import VEC, FONT, PIXEL_SIZE, WIDTH
 from .sprite import VisibleSprite, Layers
+from .utils import shadow
 from . import assets
 
 class OtherPlayer(VisibleSprite):
@@ -37,7 +39,11 @@ class OtherPlayer(VisibleSprite):
         self.image = pygame.transform.rotate(self.upright_image, self.rotation)
 
     def draw(self) -> None:
-        self.manager.screen.blit(self.image, (*(VEC(self.rect.topleft) - self.scene.player.camera.offset), *self.size))
+        if self.rect.right - self.scene.player.camera.offset.x < -20 or self.rect.left - self.scene.player.camera.offset.x > WIDTH + 20: return
+
+        self.manager.screen.blit(shadow(self.image), VEC(self.rect.topleft) - self.scene.player.camera.offset + (3, 3), special_flags=BLEND_RGB_SUB)
+        self.manager.screen.blit(self.image, VEC(self.rect.topleft) - self.scene.player.camera.offset)
+
         text = FONT[28].render(f"{self.score}", True, (0, 0, 0))
         pos = VEC(self.rect.midtop) - (text.get_width() // 2, text.get_height() + 5)
         text_shadow = FONT[28].render(f"{self.score}", True, (0, 0, 0))
@@ -89,6 +95,8 @@ class OtherSnowball(VisibleSprite):
         self.rect = self.image.get_rect(center=self.pos)
 
     def draw(self) -> None:
+        if self.rect.right - self.scene.player.camera.offset.x < -20 or self.rect.left - self.scene.player.camera.offset.x > WIDTH + 20: return
+        self.manager.screen.blit(shadow(self.image), VEC(self.rect.topleft) - self.scene.player.camera.offset + (3, 3), special_flags=BLEND_RGB_SUB)
         self.manager.screen.blit(self.image, VEC(self.rect.topleft) - self.scene.player.camera.offset)
 
 class OtherPowerup(VisibleSprite):
@@ -102,4 +110,6 @@ class OtherPowerup(VisibleSprite):
         ...
 
     def draw(self) -> None:
+        if self.pos.x - self.scene.player.camera.offset.x < -40 or self.pos.x - self.scene.player.camera.offset.x > WIDTH + 40: return
+        self.manager.screen.blit(shadow(self.image), self.pos - self.size // 2 - self.scene.player.camera.offset + (3, 3), special_flags=BLEND_RGB_SUB)
         self.manager.screen.blit(self.image, self.pos - self.size // 2 - self.scene.player.camera.offset)

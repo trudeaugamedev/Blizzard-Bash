@@ -3,12 +3,12 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from scene import Scene
 
-from pygame.locals import K_a, K_d, K_w, K_SPACE, MOUSEBUTTONUP, KEYDOWN
+from pygame.locals import K_a, K_d, K_w, K_SPACE, MOUSEBUTTONUP, BLEND_RGB_SUB
 import pygame
 import time
 
 from .constants import VEC, SCR_DIM, GRAVITY, PIXEL_SIZE, TILE_SIZE
-from .utils import intvec, snap, clamp, snap, sign
+from .utils import intvec, snap, clamp, snap, sign, shadow
 from .sprite import VisibleSprite, Layers
 from .snowball import Snowball
 from .ground import Ground
@@ -88,7 +88,9 @@ class Player(VisibleSprite):
             self.powerup = False
 
     def draw(self) -> None:
+        self.manager.screen.blit(shadow(self.image), VEC(self.rect.topleft) - self.scene.player.camera.offset + (3, 3), special_flags=BLEND_RGB_SUB)
         self.manager.screen.blit(self.image, (*(VEC(self.rect.topleft) - self.camera.offset), *self.size))
+
         if not self.throwing: return
         factor = 0.015 # Basically how accurate we want the calculation to be, the distance factor between two points
         pos = VEC(self.rect.topleft) + self.SB_OFFSET
