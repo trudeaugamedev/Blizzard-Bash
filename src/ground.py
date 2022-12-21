@@ -8,7 +8,7 @@ from math import atan2, degrees
 from random import randint
 import pygame
 
-from .constants import TILE_SIZE, VEC, PIXEL_SIZE, REAL_TILE_SIZE
+from .constants import TILE_SIZE, VEC, PIXEL_SIZE, REAL_TILE_SIZE, WIDTH
 from .sprite import VisibleSprite, Layers
 from . import assets
 
@@ -71,4 +71,5 @@ class Ground(VisibleSprite):
         ...
 
     def draw(self) -> None:
+        if self.rect.right - self.scene.player.camera.offset.x < 0 or self.rect.left - self.scene.player.camera.offset.x > WIDTH: return
         self.manager.screen.blit(self.image, self.pos - self.scene.player.camera.offset)

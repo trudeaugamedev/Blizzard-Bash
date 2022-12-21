@@ -7,7 +7,7 @@ if TYPE_CHECKING:
 from random import choices, uniform, randint
 import pygame
 
-from .constants import VEC, GRAVITY, PIXEL_SIZE
+from .constants import VEC, GRAVITY, PIXEL_SIZE, WIDTH
 from .sprite import VisibleSprite, Layers
 from .ground import Ground
 from . import assets
@@ -43,4 +43,5 @@ class SnowFlake(VisibleSprite):
             self.kill()
 
     def draw(self) -> None:
+        if self.rect.right - self.scene.player.camera.offset.x < 0 or self.rect.left - self.scene.player.camera.offset.x > WIDTH: return
         self.manager.screen.blit(self.image, self.rect.topleft - self.scene.player.camera.offset)
