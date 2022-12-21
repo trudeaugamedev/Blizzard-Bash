@@ -3,13 +3,13 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from manager import GameManager
 
-from pygame.locals import K_RETURN, KEYDOWN
+from pygame.locals import K_RETURN, KEYDOWN, BLEND_RGB_ADD
 from random import randint, choice
 from threading import Thread
 import opensimplex as noise
 import time
 
-from .constants import TILE_SIZE, WIDTH, VEC, HEIGHT, FONT
+from .constants import TILE_SIZE, WIDTH, VEC, HEIGHT, FONT, TEXT_COLOR
 from .snowflake import SnowFlake
 from .powerup import Powerup
 from .ground import Ground
@@ -94,24 +94,49 @@ class MainGame(Scene):
         self.manager.screen.fill((169, 192, 203))
         super().draw()
 
-        self.manager.screen.blit(FONT[56].render(f"Score: {self.score}", True, (0, 0, 0)), (10, 10))
+        self.manager.screen.blit(FONT[72].render(f"Score: {self.score}", True, TEXT_COLOR), (10, 0))
+        text = FONT[72].render(f"Score: {self.score}", True, TEXT_COLOR)
+        text.set_alpha(70)
+        self.manager.screen.blit(text, VEC(10, 0) + (3, 3))
 
         topleft = VEC(WIDTH - assets.player_idle[0].get_width() - 10, 10)
         self.manager.screen.blit(assets.player_idle[0], topleft)
-        text = FONT[72].render(f"{len(self.manager.other_players)} x", True, (0, 0, 0))
+        text = FONT[72].render(f"{len(self.manager.other_players)} x", True, TEXT_COLOR)
+        text.set_alpha(70)
+        self.manager.screen.blit(text, topleft - (text.get_width() + 10, 0) + (3, 3))
+        text = FONT[72].render(f"{len(self.manager.other_players)} x", True, TEXT_COLOR)
         self.manager.screen.blit(text, topleft - (text.get_width() + 10, 0))
 
         if "time" in self.client.thread_data:
-            text = FONT[40].render(f"Time Left: {self.client.thread_data['time'][0] // 60}:{self.client.thread_data['time'][0] % 60}", True, (0, 0, 0))
-            self.manager.screen.blit(text, (10, 70))
-            text = FONT[40].render(f"Next Elimination: {self.client.thread_data['time'][1] // 60}:{self.client.thread_data['time'][1] % 60}", True, (0, 0, 0))
-            self.manager.screen.blit(text, (10, 120))
+            text_str = f"Time Left: {self.client.thread_data['time'][0] // 60}:{self.client.thread_data['time'][0] % 60}"
+            text = FONT[40].render(text_str, True, TEXT_COLOR)
+            text.set_alpha(70)
+            self.manager.screen.blit(text, VEC(10, 72) + (3, 3))
+            text = FONT[40].render(text_str, True, TEXT_COLOR)
+            self.manager.screen.blit(text, (10, 72))
+            
+            text_str = f"Next Elimination: {self.client.thread_data['time'][1] // 60}:{self.client.thread_data['time'][1] % 60}"
+            text = FONT[40].render(text_str, True, TEXT_COLOR)
+            text.set_alpha(70)
+            self.manager.screen.blit(text, VEC(10, 118) + (3, 3))
+            text = FONT[40].render(text_str, True, TEXT_COLOR)
+            self.manager.screen.blit(text, (10, 118))
 
         if "ready" not in self.client.thread_data:
             text = FONT[70].render("Waiting for Players to get Ready...", True, (0, 0, 0))
             self.manager.screen.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 - text.get_height() // 2))
+            text = FONT[70].render("Waiting for Players to get Ready...", True, (0, 0, 0))
+            text.set_alpha(70)
+            self.manager.screen.blit(text, VEC(WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 - text.get_height() // 2) + (3, 3))
             if not self.manager.ready:
                 text = FONT[40].render("Press Enter when you are Ready!", True, (0, 0, 0))
+                self.manager.screen.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 + 50))
+                text = FONT[40].render("Press Enter when you are Ready!", True, (0, 0, 0))
+                text.set_alpha(70)
+                self.manager.screen.blit(text, VEC(WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 + 50) + (3, 3))
             else:
                 text = FONT[40].render("You are ready!", True, (0, 0, 0))
-            self.manager.screen.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 + 50))
+                self.manager.screen.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 + 50))
+                text = FONT[40].render("You are ready!", True, (0, 0, 0))
+                text.set_alpha(70)
+                self.manager.screen.blit(text, VEC(WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 + 50) + (3, 3))

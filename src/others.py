@@ -38,9 +38,9 @@ class OtherPlayer(VisibleSprite):
 
     def draw(self) -> None:
         self.manager.screen.blit(self.image, (*(VEC(self.rect.topleft) - self.scene.player.camera.offset), *self.size))
-        font_surf = FONT[24].render(f"{self.score}", True, (0, 0, 0))
-        pos = VEC(self.rect.midtop) - (font_surf.get_width() // 2, font_surf.get_height())
-        self.manager.screen.blit(font_surf, pos - self.scene.player.camera.offset)
+        text = FONT[32].render(f"{self.score}", True, (0, 0, 0))
+        pos = VEC(self.rect.midtop) - (text.get_width() // 2, text.get_height()) + (0, 5)
+        self.manager.screen.blit(text, pos - self.scene.player.camera.offset)
 
     def kill(self) -> None:
         self.arrow.kill()
