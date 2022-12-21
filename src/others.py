@@ -38,8 +38,11 @@ class OtherPlayer(VisibleSprite):
 
     def draw(self) -> None:
         self.manager.screen.blit(self.image, (*(VEC(self.rect.topleft) - self.scene.player.camera.offset), *self.size))
-        text = FONT[32].render(f"{self.score}", True, (0, 0, 0))
-        pos = VEC(self.rect.midtop) - (text.get_width() // 2, text.get_height()) + (0, 5)
+        text = FONT[28].render(f"{self.score}", True, (0, 0, 0))
+        pos = VEC(self.rect.midtop) - (text.get_width() // 2, text.get_height() + 5)
+        text_shadow = FONT[30].render(f"{self.score}", True, (0, 0, 0))
+        text_shadow.set_alpha(70)
+        self.manager.screen.blit(text_shadow, pos + (3, 3) - self.scene.player.camera.offset)
         self.manager.screen.blit(text, pos - self.scene.player.camera.offset)
 
     def kill(self) -> None:
