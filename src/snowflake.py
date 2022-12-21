@@ -4,7 +4,7 @@ if TYPE_CHECKING:
     from scene import Scene
     from player import Player
 
-from random import choices, uniform
+from random import choices, uniform, randint
 import pygame
 
 from .constants import VEC, GRAVITY, PIXEL_SIZE
@@ -20,7 +20,7 @@ class SnowFlake(VisibleSprite):
         self.vel = VEC(0, 0)
         self.resistance = uniform(0.85, 0.98)
 
-        self.image = choices(assets.snowflakes, [10, 9, 8, 7, 3, 3, 2, 2, 1, 2])[0]
+        self.image = pygame.transform.rotate(choices(assets.snowflakes, [10, 9, 8, 7, 3, 3, 2, 2, 1, 2])[0], randint(0, 359))
         self.size = VEC(self.image.get_size())
         self.rect = pygame.Rect(self.pos, self.size)
 
@@ -30,11 +30,11 @@ class SnowFlake(VisibleSprite):
         self.vel *= self.resistance
         self.pos += self.vel * self.manager.dt
 
-        self.rect.topleft = self.pos
+        self.rect.center = self.pos
 
         # Fast solution instead of looping through every single ground object
         try:
-            if self.pos.y + self.size.y > Ground.height_map[self.pos.x // PIXEL_SIZE * PIXEL_SIZE]:
+            if self.rect.bottom > Ground.height_map[self.pos.x // PIXEL_SIZE * PIXEL_SIZE]:
                 self.kill()
                 return
         except KeyError:
