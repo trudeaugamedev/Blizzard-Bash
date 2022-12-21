@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from scene import Scene
 
-from pygame.locals import SRCALPHA
+from pygame.locals import SRCALPHA, BLEND_RGB_SUB
 from math import atan2, degrees
 from random import randint
 import pygame
@@ -30,6 +30,8 @@ class Ground(VisibleSprite):
         self.unsliced_image.blit(assets.ground_tiles[0].subsurface(randint(0, REAL_TILE_SIZE) * PIXEL_SIZE, 0, TILE_SIZE, TILE_SIZE), (0, 0))
         for i in range(1, int(self.size.y // TILE_SIZE)):
             self.unsliced_image.blit(pygame.transform.flip(assets.ground_tiles[1].subsurface(randint(0, REAL_TILE_SIZE) * PIXEL_SIZE, 0, TILE_SIZE, TILE_SIZE), bool(randint(0, 1)), False), (0, i * TILE_SIZE))
+
+        self.unsliced_image.blit(assets.gradient, (0, 0), special_flags=BLEND_RGB_SUB)
 
         try:
             left_height = self.__class__.instances[int(self.pos.x - TILE_SIZE)].pos.y
