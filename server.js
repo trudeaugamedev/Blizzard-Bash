@@ -100,6 +100,7 @@ wss.on("connection", (socket) => {
 	});
 
 	socket.send(`hi ${client.id} ${seed}`);
+	ready.set(client.id, 0)
 	if (started && clients.size > 0) {
 		socket.close();
 		console.log(`Client ${client.id} tried to join during a game.`);
