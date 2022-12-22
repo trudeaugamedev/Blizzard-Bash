@@ -71,6 +71,8 @@ class Snowball(VisibleSprite):
 
         for player in self.manager.other_players.values():
             if player.real_rect.colliderect(self.real_rect):
+                self.scene.hit = True
+                self.scene.hit_pos = self.pos
                 self.kill()
                 if "ready" in self.manager.client.thread_data:
                     self.scene.score += self.score

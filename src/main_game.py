@@ -14,6 +14,7 @@ from .snowflake import SnowFlake
 from .powerup import Powerup
 from .ground import Ground
 from .player import Player
+from .utils import clamp
 from .scene import Scene
 from . import assets
 
@@ -56,6 +57,9 @@ class MainGame(Scene):
         self.score = 0
         self.lost = False
         self.started = False
+        self.hit = False
+        self.hit_alpha = 255
+        self.hit_pos = None
 
     def update(self) -> None:
         super().update()
@@ -108,6 +112,21 @@ class MainGame(Scene):
         self.manager.screen.blit(text, topleft - (text.get_width() + 20, 5) + (3, 3))
         text = FONT[54].render(f"{len(self.manager.other_players)} x", True, TEXT_COLOR)
         self.manager.screen.blit(text, topleft - (text.get_width() + 20, 5))
+
+        if self.hit:
+            self.hit_alpha -= 250 * self.manager.dt
+            if self.hit_alpha < 0:
+                self.hit_alpha = 255
+                self.hit = False
+            else:
+                pos = VEC(self.hit_pos - self.player.camera.offset)
+                text = FONT[32].render("HIT!", True, TEXT_COLOR)
+                text.set_alpha(self.hit_alpha)
+                pos.x, _ = clamp(pos.x, text.get_width() // 2 + 10, WIDTH - text.get_width() // 2 - 10)
+                text_shadow = FONT[32].render("HIT!", True, TEXT_COLOR)
+                text_shadow.set_alpha(70)
+                self.manager.screen.blit(text_shadow, pos - (text.get_width() // 2, 0) + (3, 3))
+                self.manager.screen.blit(text, pos - (text.get_width() // 2, 0))
 
         if "time" in self.client.thread_data:
             text_str = f"Time Left: {self.client.thread_data['time'][0] // 60}:{'0' if self.client.thread_data['time'][0] % 60 < 10 else ''}{self.client.thread_data['time'][0] % 60}"
