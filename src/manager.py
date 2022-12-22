@@ -57,7 +57,7 @@ class GameManager:
             self.dt = 0
             self.window_changing = False
 
-        pygame.display.set_caption(f"Winter Game | FPS: {round(self.clock.get_fps())}")
+        pygame.display.set_caption(f"Avalaunch | FPS: {round(self.clock.get_fps())}")
 
         self.events = {event.type: event for event in pygame.event.get()}
 
