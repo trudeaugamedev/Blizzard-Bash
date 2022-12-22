@@ -56,6 +56,7 @@ class Player(VisibleSprite):
 
         self.powerup = False
         self.powerup_time = time.time()
+        self.powerup_flash_time = time.time()
 
         self.throwing = False
         self.can_throw = True
@@ -66,7 +67,6 @@ class Player(VisibleSprite):
         self.frame = 0
         self.frame_time = time.time()
 
-        self.glow_time = time.time()
 
         self.first_start = True
 
@@ -90,8 +90,8 @@ class Player(VisibleSprite):
             self.powerup = False
 
     def draw(self) -> None:
-        if self.dig_iterations > 2:
-            alpha = (sin((time.time() - self.glow_time) * pi * 1.75) * 0.5 + 0.5) * 255
+        if self.powerup:
+            alpha = (sin((time.time() - self.powerup_flash_time) * pi * 3) * 0.5 + 0.5) * 255
             mask = pygame.mask.from_surface(self.image)
             self.manager.screen.blit(mask.scale(VEC(mask.get_size()) + (20, 14)).to_surface(setcolor=(140, 230, 255, alpha), unsetcolor=(0, 0, 0, 0)), VEC(self.rect.topleft) - (10, 7) - self.camera.offset)
 
