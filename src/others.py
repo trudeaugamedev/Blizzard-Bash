@@ -53,6 +53,10 @@ class OtherPlayer(VisibleSprite):
 
     def kill(self) -> None:
         self.arrow.kill()
+        for snowball in self.snowballs:
+            snowball.kill()
+        if self.powerup:
+            self.powerup.kill()
         super().kill()
 
 class OtherArrow(VisibleSprite):
