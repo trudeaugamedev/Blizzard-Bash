@@ -25,6 +25,7 @@ ground_tiles: list[pygame.Surface] = [
 
 powerup_icon = load_img(f"{TEXTURES}/misc/icon_rapidfire.png", alpha=False)
 gradient = pygame.transform.scale((load_img(f"{TEXTURES}/misc/gradient.png", factor=1)), (TILE_SIZE, 800))
+background = load_img(f"{TEXTURES}/misc/background.png", alpha=False)
 
 class Frames:
     def __init__(self, path: str, prefix: str) -> None:
