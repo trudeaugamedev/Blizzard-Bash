@@ -16,16 +16,15 @@ from .ground import Ground
 from . import assets
 
 class Camera:
-    def __init__(self, master: VisibleSprite, extra_offset: tuple[int, int], follow: int):
-        self.master = master
-        self.manager = self.master.manager
+    def __init__(self, scene: Scene, pos: tuple[int, int], extra_offset: tuple[int, int], follow: int):
+        self.manager = scene.manager
         self.extra_offset = VEC(extra_offset)
         self.follow = follow
-        self.float_offset = self.master.pos - SCR_DIM // 2 - extra_offset + self.master.size / 2
+        self.float_offset = VEC(pos) - SCR_DIM // 2 - extra_offset
         self.offset = intvec(self.float_offset)
 
-    def update(self):
-        tick_offset = self.master.pos - self.offset - SCR_DIM // 2 - self.extra_offset + self.master.size / 2
+    def update(self, pos: tuple[int, int]):
+        tick_offset = pos - self.offset - SCR_DIM // 2 - self.extra_offset
         tick_offset = snap(tick_offset, VEC(), VEC(1, 1))
         self.float_offset += tick_offset * self.follow * self.manager.dt
         self.offset = intvec(self.float_offset)
@@ -77,7 +76,7 @@ class Player(VisibleSprite):
         self.THROW_SPEED = 900
         self.SB_OFFSET = self.size // 2 - (0, 10)
 
-        self.camera = Camera(self, (0, 100), 5)
+        self.camera = Camera(self.scene, self.pos, (0, 100), 5)
 
     def update(self) -> None:
         self.update_keys()
@@ -272,16 +271,14 @@ class Player(VisibleSprite):
                 self.powerup = True
 
     def update_camera(self) -> None:
-        if self.snowballs and not self.powerup:
-            self.camera.master = self.snowballs[-1]
-            self.camera.follow = 2.5
-            self.camera.extra_offset = VEC(0, 0)
+        if self.snowballs:
+            self.camera.follow = 1.5
+            self.camera.extra_offset = VEC((self.snowballs[-1].pos - self.pos) * 0.25)
+            self.camera.update(self.snowballs[-1].pos)
         else:
-            self.camera.master = self
-            self.camera.follow = 4
+            self.camera.follow = 3
             if self.throwing:
-                self.camera.extra_offset = -VEC(self.sb_vel.x * 0.3, self.sb_vel.y * 0.05)
+                self.camera.extra_offset = -VEC(self.sb_vel.x * 0.15, 0)
             else:
-                self.camera.extra_offset = VEC(0, 200)
-
-        self.camera.update()
+                self.camera.extra_offset = VEC(0, 100)
+            self.camera.update(self.pos - (0, 100))
