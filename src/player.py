@@ -24,9 +24,9 @@ class Camera:
         self.offset = intvec(self.float_offset)
 
     def update(self, pos: tuple[int, int]):
-        tick_offset = pos - self.offset - SCR_DIM // 2 - self.extra_offset
-        tick_offset = snap(tick_offset, VEC(), VEC(1, 1))
-        self.float_offset += tick_offset * self.follow * self.manager.dt
+        self.tick_offset = pos - self.offset - SCR_DIM // 2 - self.extra_offset
+        self.tick_offset = snap(self.tick_offset, VEC(), VEC(1, 1))
+        self.float_offset += self.tick_offset * self.follow * self.manager.dt
         self.offset = intvec(self.float_offset)
 
 class Player(VisibleSprite):
@@ -274,6 +274,7 @@ class Player(VisibleSprite):
         if self.snowballs:
             self.camera.follow = 1.5
             self.camera.extra_offset = VEC((self.snowballs[-1].pos - self.pos) * self.snowballs[-1].pos.distance_to(self.pos) / 2500)
+            self.camera.extra_offset.x -= self.vel.x * 2 if sign(self.camera.tick_offset.x) == -sign(self.vel.x) else 0
             self.camera.update(self.snowballs[-1].pos)
         else:
             self.camera.follow = 3
