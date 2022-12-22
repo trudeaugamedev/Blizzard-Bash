@@ -8,7 +8,7 @@ from math import sin, pi
 import pygame
 import time
 
-from .constants import VEC, SCR_DIM, GRAVITY, PIXEL_SIZE, TILE_SIZE, TEXT_COLOR
+from .constants import VEC, SCR_DIM, GRAVITY, PIXEL_SIZE, TILE_SIZE, WIDTH
 from .utils import intvec, snap, clamp, snap, sign, shadow
 from .sprite import VisibleSprite, Layers
 from .snowball import Snowball
@@ -273,7 +273,7 @@ class Player(VisibleSprite):
     def update_camera(self) -> None:
         if self.snowballs:
             self.camera.follow = 1.5
-            self.camera.extra_offset = VEC((self.snowballs[-1].pos - self.pos) * 0.25)
+            self.camera.extra_offset = VEC((self.snowballs[-1].pos - self.pos) * self.snowballs[-1].pos.distance_to(self.pos) / 2500)
             self.camera.update(self.snowballs[-1].pos)
         else:
             self.camera.follow = 3
