@@ -4,24 +4,29 @@ function randint(min, max) {
 }
 
 function broadcast(msg) {
-	for (const client of players.values()) {
-		client.socket.send(msg);
+	for (const player of players.values()) {
+		player.socket.send(msg);
 	}
 }
 
-// Exclusive broadcast
-function xbroadcast(xid, msg) {
-	for (const [id, client] of players) {
-		if (id == xid) continue;
-		client.socket.send(msg);
+function broadcastPlayerData() {
+	for (const [id, player] of players) {
+		let xplayers = new Map(players);
+		xplayers.delete(id);
+		let dataArray = Array.from(xplayers.values()).map(player => player.data);
+		player.socket.send(JSON.stringify(dataArray));
 	}
+}
+
+WebSocket.WebSocket.prototype.send_obj = function send_obj (obj) {
+	this.send(JSON.stringify(obj));
 }
 
 class Player {
 	constructor (client) {
 		this.id = client.id;
 		this.socket = client.socket;
-		this.data = "";
+		this.data = null;
 	}
 }
 
@@ -40,7 +45,7 @@ wss.on("connection", (socket) => {
 
 	players.set(client.id, new Player(client));
 	console.log(`Client ${client.id} connected`);
-    socket.send(`hi ${client.id}`);
+    socket.send_obj({"id": client.id});
 
 	socket.on("error", (error) => {
 		console.error(error);
@@ -53,7 +58,9 @@ wss.on("connection", (socket) => {
 	});
 
 	socket.on("message", (msg) => {
-		console.log(`Client ${client.id}: ${msg.toString()}`);
+		const data = JSON.parse(msg.toString());
+		players.get(client.id).data = data;
+		console.log(`Client ${client.id}: ${JSON.stringify(players.get(client.id).data)}`);
 	});
 });
 
@@ -61,5 +68,5 @@ wss.on("connection", (socket) => {
 setInterval(main, 3000);
 
 function main() {
-	broadcast("Hello from the server!");
+	broadcastPlayerData();
 }

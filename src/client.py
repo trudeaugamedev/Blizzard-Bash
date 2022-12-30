@@ -1,47 +1,82 @@
-import websockets.client as ws_client
-from threading import Thread
-import websockets
-import asyncio
-import time
-import sys
+from __future__ import annotations
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .manager import GameManager
 
-from .manager import GameManager
+from websockets.exceptions import ConnectionClosedError, ConnectionClosedOK
+import websockets.client as ws_client
+from traceback import print_exc
+from queue import Queue
+import asyncio
+import json
+
+class ManualExit(Exception):
+    def __str__(self) -> str:
+        return super().__str__()
 
 class Client:
-    def __init__(self) -> None:
-        self.thread = Thread(target=self.async_thread, daemon=True)
-        self.thread_data = {}
+    def __init__(self, manager: GameManager) -> None:
+        self.manager = manager
+        self.thread_data = Queue()
+        self.running = True # Modify this attribute to stop client
+        self.exited = False # Indicates whether the client has really exited
 
-    def async_thread(self) -> None:
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
+    async def recv_wrapper(self) -> None:
+        print("Coroutine 'recv' started")
         try:
-            loop.run_until_complete(self.receive())
-        except websockets.exceptions.ConnectionClosedOK:
-            # Not sure why this can't be catched along with
-            # websockets.exceptions.ConnectionClosedError
-            # in main.py but I guess we're catching it here
-            pass
-        loop.close()
+            while self.socket.open:
+                await self.recv()
+                if not self.running:
+                    raise ManualExit
+        except asyncio.CancelledError as error:
+            print("Exiting 'recv' coroutine")
+            raise error
 
-    async def receive(self) -> None:
+    async def send_wrapper(self) -> None:
+        print("Coroutine 'send' started")
+        try:
+            while self.socket.open:
+                await self.send()
+                if not self.running:
+                    raise ManualExit
+        except asyncio.CancelledError as error:
+            print("Exiting 'send' coroutine")
+            raise error
+
+    async def recv(self) -> None:
+        data = json.loads(await self.socket.recv())
+        print(data)
+        self.thread_data.put_nowait(data)
+
+    async def send(self) -> None:
+        await asyncio.sleep(3)
+        await self.socket.send(json.dumps({"name": "DaNub"}))
+
+    async def connect(self) -> None:
+        print("Coroutine 'connect' started")
         self.socket = await ws_client.connect("ws://localhost:3000")
-        while self.socket.open:
-            data = await self.socket.recv()
-            print(data)
+        print("Coroutine 'connect' exited")
 
-    async def run(self) -> None:
-        self.thread.start()
-        # Temporary replacement for Manager.run
-        while True:
-            time.sleep(3)
-            # Any error that happen here will actually occur now, where previously it was silently getting catched by the framework
-            await self.socket.send("Hi :D")
+    async def main(self) -> None:
+        try:
+            await asyncio.create_task(self.connect())
+            await asyncio.gather(self.send_wrapper(), self.recv_wrapper())
+        except ConnectionClosedError:
+            print("Connection to the server was forcibly closed!")
+        except ConnectionClosedOK:
+            print("Cleanly disconnected from the server")
+        except ManualExit:
+            print("MANUAL EXIT")
+        except:
+            print_exc()
+        finally:
+            await self.quit()
+
+    def run(self) -> None:
+        asyncio.run(self.main())
 
     async def quit(self) -> None:
-        print("\t--===<<<\t QUITTING \t>>>===--")
-        try:
+        print("QUITTING")
+        if self.socket.open:
             await self.socket.close()
-        except ValueError: # If it could not perform a closing handshake, meaning that the connection was foribly ended
-            pass
-        sys.exit()
+        self.exited = True

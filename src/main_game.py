@@ -19,37 +19,38 @@ from .scene import Scene
 from . import assets
 
 class MainGame(Scene):
-    def setup(self) -> None:
-        if self.previous_scene is not None:
-            self.client.socket_thread = Thread(target=self.client.socket.run_forever, daemon=True)
-            self.client.socket_thread.start()
+    def __init__(self, manager: GameManager, previous_scene: Scene) -> None:
+        super().__init__(manager, previous_scene)
+        # while "seed" not in self.client.thread_data:
+        #     time.sleep(0.01)
+        # noise.seed(self.client.thread_data["seed"])
 
-        while "seed" not in self.client.thread_data:
-            time.sleep(0.01)
-        noise.seed(self.client.thread_data["seed"])
-
+        # for x in range(-42, 43):
+        #     # Horizontal stretch and vertical stretch (essentially)
+        #     y = noise.noise2(x * 0.1, 0) * 200
+        #     Ground(self, (x * TILE_SIZE, y), (TILE_SIZE, 800))
+        # Ground(self, (-43 * TILE_SIZE, noise.noise2(-43 * 0.1, 0) * 200 - 250), (TILE_SIZE, 2000))
+        # Ground(self, (43 * TILE_SIZE, noise.noise2(43 * 0.1, 0) * 200 - 250), (TILE_SIZE, 2000))
+        # for x in range(-63, -43):
+        #     y = noise.noise2(x * 0.1, 0) * 200 - 400
+        #     Ground(self, (x * TILE_SIZE, y), (TILE_SIZE, 2000))
+        # for x in range(44, 64):
+        #     y = noise.noise2(x * 0.1, 0) * 200 - 400
+        #     Ground(self, (x * TILE_SIZE, y), (TILE_SIZE, 2000))
         for x in range(-42, 43):
-            # Horizontal stretch and vertical stretch (essentially)
-            y = noise.noise2(x * 0.1, 0) * 200
-            Ground(self, (x * TILE_SIZE, y), (TILE_SIZE, 800))
-        Ground(self, (-43 * TILE_SIZE, noise.noise2(-43 * 0.1, 0) * 200 - 250), (TILE_SIZE, 2000))
-        Ground(self, (43 * TILE_SIZE, noise.noise2(43 * 0.1, 0) * 200 - 250), (TILE_SIZE, 2000))
-        for x in range(-63, -43):
-            y = noise.noise2(x * 0.1, 0) * 200 - 400
-            Ground(self, (x * TILE_SIZE, y), (TILE_SIZE, 2000))
-        for x in range(44, 64):
-            y = noise.noise2(x * 0.1, 0) * 200 - 400
-            Ground(self, (x * TILE_SIZE, y), (TILE_SIZE, 2000))
+            Ground(self, (x * TILE_SIZE, 0), (TILE_SIZE, 800))
         for ground in Ground.instances.values():
             ground.generate_image() # Create a images only after all tiles have been created
 
-        self.player = Player(self, self.client.thread_data["id"])
+        self.player = Player(self, 1)
+        # self.player = Player(self, self.client.thread_data["id"])
 
         self.snowflake_time = time.time()
         for _ in range(1000):
             SnowFlake(self, VEC(randint(0 - 1000, WIDTH + 1000), randint(-400, HEIGHT)) + self.player.camera.offset)
 
-        self.wind_vel = VEC((self.client.thread_data["wind"] if "wind" in self.client.thread_data else 0), 0)
+        # self.wind_vel = VEC((self.client.thread_data["wind"] if "wind" in self.client.thread_data else 0), 0)
+        self.wind_vel = VEC(0, 0)
 
         self.powerup_spawn_time = time.time()
         self.powerup = None
@@ -64,7 +65,7 @@ class MainGame(Scene):
     def update(self) -> None:
         super().update()
 
-        self.wind_vel = VEC((self.client.thread_data["wind"] if "wind" in self.client.thread_data else 0), 0)
+        # self.wind_vel = VEC((self.client.thread_data["wind"] if "wind" in self.client.thread_data else 0), 0)
 
         if time.time() - self.snowflake_time > 0.05:
             self.snowflake_time = time.time()
@@ -82,16 +83,16 @@ class MainGame(Scene):
             self.powerup_spawn_time = time.time()
             self.powerup = Powerup(self, self.player.pos + (randint(-200, 200), -600))
 
-        if "eliminate" in self.client.thread_data:
-            if not self.manager.other_players:
-                self.manager.new_scene("EndMenu")
-            for player in self.manager.other_players.values():
-                if self.score > player.score:
-                    break
-            else:
-                self.lost = True
-                self.manager.new_scene("EndMenu")
-            del self.client.thread_data["eliminate"]
+        # if "eliminate" in self.client.thread_data:
+        #     if not self.manager.other_players:
+        #         self.manager.new_scene("EndMenu")
+        #     for player in self.manager.other_players.values():
+        #         if self.score > player.score:
+        #             break
+        #     else:
+        #         self.lost = True
+        #         self.manager.new_scene("EndMenu")
+        #     del self.client.thread_data["eliminate"]
 
         if KEYDOWN in self.manager.events and self.manager.events[KEYDOWN].key == K_RETURN:
             self.manager.ready = True
@@ -128,36 +129,36 @@ class MainGame(Scene):
                 self.manager.screen.blit(text_shadow, pos - (text.get_width() // 2, 0) + (3, 3))
                 self.manager.screen.blit(text, pos - (text.get_width() // 2, 0))
 
-        if "time" in self.client.thread_data:
-            text_str = f"Time Left: {self.client.thread_data['time'][0] // 60}:{'0' if self.client.thread_data['time'][0] % 60 < 10 else ''}{self.client.thread_data['time'][0] % 60}"
-            text = FONT[30].render(text_str, True, TEXT_COLOR)
-            text.set_alpha(70)
-            self.manager.screen.blit(text, VEC(20, 72) + (3, 3))
-            text = FONT[30].render(text_str, True, TEXT_COLOR)
-            self.manager.screen.blit(text, (20, 72))
+        # if "time" in self.client.thread_data:
+        #     text_str = f"Time Left: {self.client.thread_data['time'][0] // 60}:{'0' if self.client.thread_data['time'][0] % 60 < 10 else ''}{self.client.thread_data['time'][0] % 60}"
+        #     text = FONT[30].render(text_str, True, TEXT_COLOR)
+        #     text.set_alpha(70)
+        #     self.manager.screen.blit(text, VEC(20, 72) + (3, 3))
+        #     text = FONT[30].render(text_str, True, TEXT_COLOR)
+        #     self.manager.screen.blit(text, (20, 72))
             
-            text_str = f"Next Elimination: {self.client.thread_data['time'][1] // 60}:{'0' if self.client.thread_data['time'][1] % 60 < 10 else ''}{self.client.thread_data['time'][1] % 60}"
-            text = FONT[30].render(text_str, True, TEXT_COLOR)
-            text.set_alpha(70)
-            self.manager.screen.blit(text, VEC(20, 112) + (3, 3))
-            text = FONT[30].render(text_str, True, TEXT_COLOR)
-            self.manager.screen.blit(text, (20, 112))
+        #     text_str = f"Next Elimination: {self.client.thread_data['time'][1] // 60}:{'0' if self.client.thread_data['time'][1] % 60 < 10 else ''}{self.client.thread_data['time'][1] % 60}"
+        #     text = FONT[30].render(text_str, True, TEXT_COLOR)
+        #     text.set_alpha(70)
+        #     self.manager.screen.blit(text, VEC(20, 112) + (3, 3))
+        #     text = FONT[30].render(text_str, True, TEXT_COLOR)
+        #     self.manager.screen.blit(text, (20, 112))
 
-        if "ready" not in self.client.thread_data:
-            text = FONT[54].render("Waiting for Players to get Ready...", True, (0, 0, 0))
-            self.manager.screen.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 - text.get_height() // 2 - 20))
-            text = FONT[54].render("Waiting for Players to get Ready...", True, (0, 0, 0))
-            text.set_alpha(70)
-            self.manager.screen.blit(text, VEC(WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 - text.get_height() // 2 - 20) + (3, 3))
-            if not self.manager.ready:
-                text = FONT[30].render("Press Enter when you are Ready!", True, (0, 0, 0))
-                self.manager.screen.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 + 30))
-                text = FONT[30].render("Press Enter when you are Ready!", True, (0, 0, 0))
-                text.set_alpha(70)
-                self.manager.screen.blit(text, VEC(WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 + 30) + (3, 3))
-            else:
-                text = FONT[30].render("You are ready!", True, (0, 0, 0))
-                self.manager.screen.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 + 30))
-                text = FONT[30].render("You are ready!", True, (0, 0, 0))
-                text.set_alpha(70)
-                self.manager.screen.blit(text, VEC(WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 + 30) + (3, 3))
+        # if "ready" not in self.client.thread_data:
+        #     text = FONT[54].render("Waiting for Players to get Ready...", True, (0, 0, 0))
+        #     self.manager.screen.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 - text.get_height() // 2 - 20))
+        #     text = FONT[54].render("Waiting for Players to get Ready...", True, (0, 0, 0))
+        #     text.set_alpha(70)
+        #     self.manager.screen.blit(text, VEC(WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 - text.get_height() // 2 - 20) + (3, 3))
+        #     if not self.manager.ready:
+        #         text = FONT[30].render("Press Enter when you are Ready!", True, (0, 0, 0))
+        #         self.manager.screen.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 + 30))
+        #         text = FONT[30].render("Press Enter when you are Ready!", True, (0, 0, 0))
+        #         text.set_alpha(70)
+        #         self.manager.screen.blit(text, VEC(WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 + 30) + (3, 3))
+        #     else:
+        #         text = FONT[30].render("You are ready!", True, (0, 0, 0))
+        #         self.manager.screen.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 + 30))
+        #         text = FONT[30].render("You are ready!", True, (0, 0, 0))
+        #         text.set_alpha(70)
+        #         self.manager.screen.blit(text, VEC(WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 + 30) + (3, 3))

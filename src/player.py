@@ -85,9 +85,11 @@ class Player(VisibleSprite):
         self.update_image()
         self.update_powerup()
         self.update_camera()
-        if self.first_start and "time" in self.manager.client.thread_data:
-            self.first_start = False
-            self.powerup = False
+        # if self.first_start and "time" in self.manager.client.thread_data:
+        #     self.first_start = False
+        #     self.powerup = False
+        self.first_start = False
+        self.powerup = False
 
     def draw(self) -> None:
         if self.powerup:

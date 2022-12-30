@@ -22,7 +22,7 @@ class EndMenu(Scene):
 
         if KEYDOWN in self.manager.events and self.manager.events[KEYDOWN].key == K_RETURN:
             self.manager.ready = False
-            self.client.thread_data = {}
+            # self.client.thread_data = {}
 
             self.manager.new_scene("MainGame")
 
