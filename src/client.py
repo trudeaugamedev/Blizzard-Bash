@@ -1,47 +1,91 @@
-from websocket import WebSocketApp
+# import websockets.client as ws_client
+# from multiprocessing import Process
+# from traceback import print_exc
+# import websockets
+# import asyncio
+# import time
+
+# from .manager import GameManager
+
+# class Client:
+#     def __init__(self) -> None:
+#         self.process = Process(target=self.async_process)
+#         self.thread_data = {}
+
+#     def async_process(self) -> None:
+#         loop = asyncio.new_event_loop()
+#         asyncio.set_event_loop(loop)
+#         loop.run_until_complete(self.receive())
+#         loop.close()
+
+#     async def receive(self) -> None:
+#         self.socket = await ws_client.connect("ws://localhost:3000")
+#         try:
+#             while self.socket.open:
+#                 data = await self.socket.recv()
+#                 print(self.socket, data)
+#         except websockets.exceptions.ConnectionClosedError:
+#             print("Server unexpectedly closed the connection!")
+#         except Exception as e:
+#             print("Exception:", e, "\n")
+#             print("TRACEBACK:\n")
+#             print_exc()
+#         finally:
+#             await self.socket.close()
+#             self.process.close()
+
+#     def run(self) -> None:
+#         self.process.start()
+#         # self.manager = GameManager(self)
+#         # self.manager.run()
+#         while True:
+#             time.sleep(5)
+#             self.socket.send("Hi :D")
+
+import websockets.client as ws_client
 from threading import Thread
+import websockets
+import asyncio
+import time
+import sys
 
 from .manager import GameManager
 
 class Client:
     def __init__(self) -> None:
-        # self.socket = WebSocketApp("ws://localhost:3000", on_message=self.on_message, on_error=self.on_error)
-        self.socket = WebSocketApp("wss://trudeaugamedev-winter.herokuapp.com", on_message=self.on_message)
-        self.socket_thread = Thread(target=self.socket.run_forever, daemon=True)
+        self.thread = Thread(target=self.async_thread, daemon=True)
         self.thread_data = {}
 
-    def run(self) -> None:
-        self.socket_thread.start()
-        self.run_game()
+    def async_thread(self) -> None:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            loop.run_until_complete(self.receive())
+        except websockets.exceptions.ConnectionClosedOK:
+            # Not sure why this can't be catched along with
+            # websockets.exceptions.ConnectionClosedError
+            # in main.py but I guess we're catching it here
+            pass
+        loop.close()
 
-    def on_message(self, ws, message: str) -> None:
-        parsed = message.split()
-        match parsed[0]:
-            case "hi": # Connection signal
-                print("Connected to server!")
-                self.thread_data["id"] = int(parsed[1])
-                self.thread_data["seed"] = int(parsed[2])
-            case "dc": # Disconnection signal
-                print(f"Client {parsed[1]} disconnected!")
-                self.manager.other_players[int(parsed[1])].kill()
-                del self.manager.other_players[int(parsed[1])]
-            case "wd": # New wind speed
-                self.thread_data["wind"] = int(parsed[1])
-            case "rd": # Everyone ready, game starts
-                self.thread_data["ready"] = True
-            case "el": # Eliminate a player
-                self.thread_data["eliminate"] = True
-            case "tm": # Game time
-                self.thread_data["time"] = (int(parsed[1]), int(parsed[2]))
-            case "cl": # Client data signal
-                self.manager.parse(message)
+    async def receive(self) -> None:
+        self.socket = await ws_client.connect("ws://localhost:3000")
+        while self.socket.open:
+            data = await self.socket.recv()
+            print(data)
 
-    def on_error(self, ws, error):
-        print(error)
+    async def run(self) -> None:
+        self.thread.start()
+        # Temporary replacement for Manager.run
+        while True:
+            time.sleep(3)
+            # Any error that happen here will actually occur now, where previously it was silently getting catched by the framework
+            await self.socket.send("Hi :D")
 
-    def run_game(self) -> None:
-        self.manager = GameManager(self)
-        self.manager.run()
-
-    def quit(self) -> None:
-        self.socket.close()
+    async def quit(self) -> None:
+        print("\t--===<<<\t QUITTING \t>>>===--")
+        try:
+            await self.socket.close()
+        except ValueError: # If it could not perform a closing handshake, meaning that the connection was foribly ended
+            pass
+        sys.exit()
