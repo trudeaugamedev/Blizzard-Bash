@@ -6,6 +6,7 @@ if TYPE_CHECKING:
 from websockets.exceptions import ConnectionClosedError, ConnectionClosedOK
 import websockets.client as ws_client
 from traceback import print_exc
+from random import randint
 from queue import Queue
 import asyncio
 import json
@@ -50,7 +51,7 @@ class Client:
 
     async def send(self) -> None:
         await asyncio.sleep(3)
-        await self.socket.send(json.dumps({"name": "DaNub"}))
+        await self.socket.send(json.dumps({"client": "player", "name": f"DaNub_{randint(0, 2 ** 32)}"}))
 
     async def connect(self) -> None:
         print("Coroutine 'connect' started")

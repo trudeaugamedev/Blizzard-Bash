@@ -1,0 +1,15 @@
+<head>
+    <title>Blizzard Bash Server Control Panel</title>
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <h1>Blizzard Bash Control Panel</h1>
+    <p id="connectionStatus">Connecting to server...</p>
+    <input id="commandPrompt"/>
+    <button id="sendCommand" onclick="sendCommand()">SEND</button>
+    <div style="width: 40%; margin-top: 10px;">
+        <div id="commands"></div>
+        <div id="received"></div>
+    </div>
+    <script src="admin.js"></script>
+</body>

@@ -1,0 +1,15 @@
+#commands {
+    width: 45%;
+    height: 50%;
+    float: left;
+    border: 2px solid black;
+    overflow-y: scroll;
+}
+
+#received {
+    width: 50%;
+    height: 50%;
+    margin-left: calc(45% + 10px);
+    border: 2px solid black;
+    overflow-y: scroll;
+}

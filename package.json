@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "bufferutil": "^4.0.7",
+    "cli-interact": "^0.1.9",
     "utf-8-validate": "^5.0.10",
     "ws": "^8.11.0"
   }

@@ -1,4 +1,5 @@
 const WebSocket = require("ws");
+
 function randint(min, max) {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -54,19 +55,37 @@ wss.on("connection", (socket) => {
 	socket.on("close", (code) => {
 		players.delete(client.id);
 		socket.close();
-		console.log(`Client ${client.id} disconnected, code ${code}`);
+		if (client.id === -1) console.log(`Admin has disconnected, code ${code}`);
+		else console.log(`Client ${client.id} disconnected, code ${code}`);
 	});
 
 	socket.on("message", (msg) => {
-		const data = JSON.parse(msg.toString());
-		players.get(client.id).data = data;
-		console.log(`Client ${client.id}: ${JSON.stringify(players.get(client.id).data)}`);
+		if (msg.toString() === "admin") {
+			console.log("Admin has connected");
+			// Move the admin player object to -1
+			players.set(-1, players.get(client.id));
+			players.delete(client.id);
+			// Change IDs
+			players.get(-1).id = -1;
+			client.id = -1;
+			nextId--;
+			return;
+		}
+		if (client.id != -1) {
+			const data = JSON.parse(msg.toString());
+			players.get(client.id).data = data;
+			console.log(`Client ${client.id}: ${JSON.stringify(players.get(client.id).data)}`);
+		} else {
+			const command = msg.toString();
+			broadcast(command);
+			console.log(`Admin sent the command "${command}"`);
+		}
 	});
 });
 
-// setInterval(main, 16);
-setInterval(main, 3000);
-
-function main() {
+function game() {
 	broadcastPlayerData();
 }
+
+// setInterval(game, 16);
+setInterval(game, 2000);
