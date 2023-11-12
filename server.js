@@ -15,7 +15,7 @@ function broadcastPlayerData() {
 		let xplayers = new Map(players);
 		xplayers.delete(id);
 		let dataArray = Array.from(xplayers.values()).map(player => player.data);
-		player.socket.send(JSON.stringify(dataArray));
+		player.socket.send(JSON.stringify({"type": "cl", "players": dataArray}));
 	}
 }
 
@@ -46,7 +46,7 @@ wss.on("connection", (socket) => {
 
 	players.set(client.id, new Player(client));
 	console.log(`Client ${client.id} connected`);
-    socket.send_obj({"id": client.id});
+    socket.send_obj({"type": "hi", "id": client.id});
 
 	socket.on("error", (error) => {
 		console.error(error);
@@ -61,31 +61,40 @@ wss.on("connection", (socket) => {
 
 	socket.on("message", (msg) => {
 		if (msg.toString() === "admin") {
-			console.log("Admin has connected");
-			// Move the admin player object to -1
-			players.set(-1, players.get(client.id));
-			players.delete(client.id);
-			// Change IDs
-			players.get(-1).id = -1;
-			client.id = -1;
-			nextId--;
+			handleAdminConnect(client);
 			return;
 		}
-		if (client.id != -1) {
-			const data = JSON.parse(msg.toString());
-			players.get(client.id).data = data;
-			console.log(`Client ${client.id}: ${JSON.stringify(players.get(client.id).data)}`);
-		} else {
-			const command = msg.toString();
-			broadcast(command);
-			console.log(`Admin sent the command "${command}"`);
+
+		if (client.id == -1) {
+			handleAdminMessage(msg);
+			return;
 		}
+
+		const data = JSON.parse(msg.toString());
+		players.get(client.id).data = data;
+		// console.log(`Client ${client.id}: ${JSON.stringify(players.get(client.id).data)}`);
 	});
 });
+
+function handleAdminConnect(client) {
+	console.log("Admin has connected");
+	// Move the admin player object to -1, since it was added as a normal player on connection
+	players.set(-1, players.get(client.id));
+	players.delete(client.id);
+	// Change IDs
+	players.get(-1).id = -1;
+	client.id = -1;
+	nextId--;
+}
+
+function handleAdminMessage(msg) {
+	const command = msg.toString();
+	broadcast(command);
+	console.log(`Admin sent the command "${command}"`);
+}
 
 function game() {
 	broadcastPlayerData();
 }
 
-// setInterval(game, 16);
-setInterval(game, 2000);
+setInterval(game, 16);

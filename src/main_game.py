@@ -7,6 +7,7 @@ from pygame.locals import K_RETURN, KEYDOWN, BLEND_RGB_ADD
 from random import randint, choice
 from threading import Thread
 import opensimplex as noise
+import pygame
 import time
 
 from .constants import TILE_SIZE, WIDTH, VEC, HEIGHT, FONT, TEXT_COLOR
@@ -61,6 +62,8 @@ class MainGame(Scene):
         self.hit = False
         self.hit_alpha = 255
         self.hit_pos = None
+
+        self.pos = VEC(0, 0)
 
     def update(self) -> None:
         super().update()
@@ -128,6 +131,8 @@ class MainGame(Scene):
                 text_shadow.set_alpha(70)
                 self.manager.screen.blit(text_shadow, pos - (text.get_width() // 2, 0) + (3, 3))
                 self.manager.screen.blit(text, pos - (text.get_width() // 2, 0))
+
+        pygame.draw.circle(self.manager.screen, (255, 0, 0), self.pos - self.player.camera.offset, 10)
 
         # if "time" in self.client.thread_data:
         #     text_str = f"Time Left: {self.client.thread_data['time'][0] // 60}:{'0' if self.client.thread_data['time'][0] % 60 < 10 else ''}{self.client.thread_data['time'][0] % 60}"

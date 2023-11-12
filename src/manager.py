@@ -24,8 +24,6 @@ class GameManager:
         pygame.init()
 
         self.client = Client(self)
-        self.client_thread = Thread(target=self.client.run, daemon=True)
-        self.client_thread.start()
 
         self.flags = HWSURFACE | DOUBLEBUF | RESIZABLE | SCALED
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT), self.flags)
@@ -36,6 +34,10 @@ class GameManager:
         self.other_players = {}
         self.scene = MainGame(self, None)
         self.ready = False
+        self.id = -1
+
+        self.client_thread = Thread(target=self.client.run, daemon=True)
+        self.client_thread.start()
 
     def run(self) -> None:
         while self.scene.running:
