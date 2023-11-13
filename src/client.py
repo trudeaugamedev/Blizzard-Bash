@@ -22,9 +22,15 @@ class ManualExit(Exception):
 class Client:
     def __init__(self, manager: GameManager) -> None:
         self.manager = manager
-        self.parser = Parser(manager)
+        self.parser = Parser(self)
         self.running = True # Modify this attribute to stop client
         self.exited = False # Indicates whether the client has really exited
+        self.id = -1
+        self.data = {
+            "pos": (0, 0),
+            "rot": 0,
+            "flip": True,
+        }
 
     async def recv_wrapper(self) -> None:
         print("Coroutine 'recv' started")
@@ -50,11 +56,14 @@ class Client:
 
     async def recv(self) -> None:
         data = json.loads(await self.socket.recv())
-        self.parser.parse(data)
+        try:
+            self.parser.parse(data)
+        except AttributeError:
+            pass
 
     async def send(self) -> None:
-        await asyncio.sleep(0.016)
-        await self.socket.send(json.dumps({"pos": inttup(self.manager.scene.player.pos)}))
+        await asyncio.sleep(0.014) # Slightly higher than 60 FPS
+        await self.socket.send(json.dumps(self.data | {"id": self.id}))
 
     async def connect(self) -> None:
         print("Coroutine 'connect' started")

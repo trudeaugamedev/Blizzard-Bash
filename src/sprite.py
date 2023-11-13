@@ -20,6 +20,7 @@ class Sprite(AbstractClass):
         self._layer = Layers(layer)
         self.scene = scene
         self.manager = scene.manager
+        self.client = self.manager.client
 
     @abstractmethod
     def update(self) -> None:

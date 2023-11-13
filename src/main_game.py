@@ -12,18 +12,18 @@ import time
 
 from .constants import TILE_SIZE, WIDTH, VEC, HEIGHT, FONT, TEXT_COLOR
 from .snowflake import SnowFlake
+from .utils import clamp, inttup
 from .powerup import Powerup
 from .ground import Ground
 from .player import Player
-from .utils import clamp
 from .scene import Scene
 from . import assets
 
 class MainGame(Scene):
     def __init__(self, manager: GameManager, previous_scene: Scene) -> None:
         super().__init__(manager, previous_scene)
-        # while "seed" not in self.client.thread_data:
-        #     time.sleep(0.01)
+        while self.client.id == -1:
+            time.sleep(0.01)
         # noise.seed(self.client.thread_data["seed"])
 
         # for x in range(-42, 43):
@@ -62,8 +62,6 @@ class MainGame(Scene):
         self.hit = False
         self.hit_alpha = 255
         self.hit_pos = None
-
-        self.pos = VEC(0, 0)
 
     def update(self) -> None:
         super().update()
@@ -131,8 +129,6 @@ class MainGame(Scene):
                 text_shadow.set_alpha(70)
                 self.manager.screen.blit(text_shadow, pos - (text.get_width() // 2, 0) + (3, 3))
                 self.manager.screen.blit(text, pos - (text.get_width() // 2, 0))
-
-        pygame.draw.circle(self.manager.screen, (255, 0, 0), self.pos - self.player.camera.offset, 10)
 
         # if "time" in self.client.thread_data:
         #     text_str = f"Time Left: {self.client.thread_data['time'][0] // 60}:{'0' if self.client.thread_data['time'][0] % 60 < 10 else ''}{self.client.thread_data['time'][0] % 60}"

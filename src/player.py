@@ -9,7 +9,7 @@ import pygame
 import time
 
 from .constants import VEC, SCR_DIM, GRAVITY, PIXEL_SIZE, TILE_SIZE, WIDTH
-from .utils import intvec, snap, clamp, snap, sign, shadow
+from .utils import intvec, snap, clamp, snap, sign, shadow, inttup
 from .sprite import VisibleSprite, Layers
 from .snowball import Snowball
 from .ground import Ground
@@ -90,6 +90,11 @@ class Player(VisibleSprite):
         #     self.powerup = False
         self.first_start = False
         self.powerup = False
+        # print("hi")
+
+        self.client.data["pos"] = inttup(self.pos)
+        self.client.data["rot"] = self.rotation
+        self.client.data["flip"] = self.flip
 
     def draw(self) -> None:
         if self.powerup:
