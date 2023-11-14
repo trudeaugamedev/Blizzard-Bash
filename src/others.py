@@ -103,18 +103,3 @@ class OtherSnowball(VisibleSprite):
         if self.rect.right - self.scene.player.camera.offset.x < -20 or self.rect.left - self.scene.player.camera.offset.x > WIDTH + 20: return
         self.manager.screen.blit(shadow(self.image), VEC(self.rect.topleft) - self.scene.player.camera.offset + (3, 3), special_flags=BLEND_RGB_SUB)
         self.manager.screen.blit(self.image, VEC(self.rect.topleft) - self.scene.player.camera.offset)
-
-class OtherPowerup(VisibleSprite):
-    def __init__(self, scene: Scene, pos: tuple[int, int]) -> None:
-        super().__init__(scene, Layers.POWERUP)
-        self.image = assets.powerup_icon
-        self.size = VEC(self.image.get_size())
-        self.pos = VEC(pos)
-
-    def update(self) -> None:
-        ...
-
-    def draw(self) -> None:
-        if self.pos.x - self.scene.player.camera.offset.x < -40 or self.pos.x - self.scene.player.camera.offset.x > WIDTH + 40: return
-        self.manager.screen.blit(shadow(self.image), self.pos - self.size // 2 - self.scene.player.camera.offset + (3, 3), special_flags=BLEND_RGB_SUB)
-        self.manager.screen.blit(self.image, self.pos - self.size // 2 - self.scene.player.camera.offset)
