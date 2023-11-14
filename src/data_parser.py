@@ -21,10 +21,16 @@ class Parser:
     def client_data(self, data: dict) -> None:
         for player in data["players"]:
             if not player: continue
+
+            # Parse data of player itself
             if player["id"] in self.manager.other_players:
                 other = self.manager.other_players[player["id"]]
                 other.pos = player["pos"]
                 other.rotation = player["rot"]
                 other.flip = player["flip"]
+                other.frame = player["frame"]
             else:
                 self.manager.other_players[player["id"]] = OtherPlayer(self.manager.scene, player["pos"])
+
+            # Parse data of snowballs
+            

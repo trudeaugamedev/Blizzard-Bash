@@ -4,6 +4,7 @@ if TYPE_CHECKING:
     from scene import Scene
 
 from pygame.locals import BLEND_RGB_SUB
+from uuid import uuid4, UUID
 import pygame
 
 from .constants import VEC, FONT, PIXEL_SIZE, WIDTH

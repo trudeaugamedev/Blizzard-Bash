@@ -61,7 +61,7 @@ class Player(VisibleSprite):
         self.throwing = False
         self.can_throw = True
         self.sb_vel = VEC(0, 0)
-        self.snowballs = []
+        self.snowballs: list[Snowball] = []
 
         self.frame_group = assets.player_idle
         self.frame = 0
@@ -85,16 +85,27 @@ class Player(VisibleSprite):
         self.update_image()
         self.update_powerup()
         self.update_camera()
+        self.sync_data()
         # if self.first_start and "time" in self.manager.client.thread_data:
         #     self.first_start = False
         #     self.powerup = False
         self.first_start = False
         self.powerup = False
-        # print("hi")
 
+    def sync_data(self) -> None:
         self.client.data["pos"] = inttup(self.pos)
         self.client.data["rot"] = self.rotation
         self.client.data["flip"] = self.flip
+        self.client.data["frame"] = assets.player.index(self.orig_image)
+
+        snowballs = self.client.data["snowballs"] = []
+        for snowball in self.snowballs:
+            data = {
+                "pos": inttup(snowball.pos),
+                "frame": snowball.frame,
+                "type": int(snowball.type == assets.snowball_large),
+            }
+            snowballs.append(data)
 
     def draw(self) -> None:
         if self.powerup:
