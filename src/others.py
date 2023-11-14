@@ -87,11 +87,11 @@ class OtherArrow(VisibleSprite):
             pygame.draw.polygon(self.manager.screen, (0, 0, 0), points, 3)
 
 class OtherSnowball(VisibleSprite):
-    def __init__(self, scene: Scene, pos: tuple[int, int], frame: int, sb_type) -> None:
+    def __init__(self, scene: Scene, pos: tuple[int, int], frame: int, _type: int) -> None:
         super().__init__(scene, Layers.SNOWBALL)
         self.pos = VEC(pos)
         self.frame = frame
-        self.type = sb_type
+        self.type = assets.snowball_large if _type else assets.snowball_small
         self.image = self.type[self.frame]
         self.rect = self.image.get_rect(center=self.pos)
 
