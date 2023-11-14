@@ -97,4 +97,4 @@ function game() {
 	broadcastPlayerData();
 }
 
-setInterval(game, 16);
+setInterval(game, 12);

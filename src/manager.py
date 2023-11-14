@@ -7,7 +7,7 @@ import pygame
 import time
 import sys
 
-from .others import OtherPlayer, OtherSnowball, OtherPowerup
+from .others import OtherPlayer, OtherSnowball
 from .constants import WIDTH, HEIGHT, FPS, VEC
 from .client import Client, ManualExit
 from .main_game import MainGame
