@@ -30,6 +30,7 @@ class Parser:
                 other.rotation = player_data["rot"]
                 other.flip = player_data["flip"]
                 other.frame = player_data["frame"]
+                other.score = player_data["score"]
             else:
                 other = self.manager.other_players[player_data["id"]] = OtherPlayer(self.manager.scene, player_data["pos"])
 

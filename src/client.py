@@ -31,7 +31,8 @@ class Client:
             "rot": 0,
             "flip": True,
             "frame": 0,
-            "snowballs": []
+            "snowballs": [],
+            "score": 0,
         }
 
     async def recv_wrapper(self) -> None:

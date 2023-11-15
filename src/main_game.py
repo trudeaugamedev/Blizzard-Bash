@@ -43,8 +43,7 @@ class MainGame(Scene):
         for ground in Ground.instances.values():
             ground.generate_image() # Create a images only after all tiles have been created
 
-        self.player = Player(self, 1)
-        # self.player = Player(self, self.client.thread_data["id"])
+        self.player = Player(self)
 
         self.snowflake_time = time.time()
         for _ in range(1000):
