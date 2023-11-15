@@ -39,6 +39,10 @@ const players = new Map();
 let seed = randint(0, 99999999);
 let nextId = 0;
 
+let wind_time = Date.now();
+let wind_duration = randint(3000, 6000);
+let wind_speed = [randint(-600, -200), randint(200, 600)][randint(0, 1)];
+
 wss.on("connection", (socket) => {
     const client = {
 		id: nextId++,
@@ -96,6 +100,13 @@ function handleAdminMessage(msg) {
 
 function game() {
 	broadcastPlayerData();
+
+	if (Date.now() - wind_time > wind_duration) {
+		wind_time = Date.now();
+		wind_duration = randint(3000, 6000);
+		wind_speed = [randint(-600, -200), randint(200, 600)][randint(0, 1)];
+		broadcast(JSON.stringify({"type": "wd", "speed": wind_speed}));
+	}
 }
 
 setInterval(game, 12);

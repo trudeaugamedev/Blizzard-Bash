@@ -13,11 +13,13 @@ class Parser:
 
     def parse(self, data: dict) -> None:
         match data["type"]:
-            case "hi":
+            case "hi": # Initial
                 self.client.id = data["id"]
                 self.manager.scene.seed = data["seed"]
-            case "cl":
+            case "cl": # Client data
                 self.client_data(data)
+            case "wd": # Wind
+                self.manager.scene.wind_vel = VEC(data["speed"], 0)
 
     def client_data(self, data: dict) -> None:
         for player_data in data["players"]:
