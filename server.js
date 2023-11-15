@@ -36,6 +36,7 @@ const wss = new WebSocket.Server({
 });
 const players = new Map();
 
+let seed = randint(0, 99999999);
 let nextId = 0;
 
 wss.on("connection", (socket) => {
@@ -46,7 +47,7 @@ wss.on("connection", (socket) => {
 
 	players.set(client.id, new Player(client));
 	console.log(`Client ${client.id} connected`);
-    socket.send_obj({"type": "hi", "id": client.id});
+    socket.send_obj({"type": "hi", "id": client.id, "seed": seed});
 
 	socket.on("error", (error) => {
 		console.error(error);

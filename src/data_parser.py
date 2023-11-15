@@ -15,6 +15,7 @@ class Parser:
         match data["type"]:
             case "hi":
                 self.client.id = data["id"]
+                self.manager.scene.seed = data["seed"]
             case "cl":
                 self.client_data(data)
 
