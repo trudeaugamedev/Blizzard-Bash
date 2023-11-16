@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from scene import Scene
 
-from pygame.locals import K_a, K_d, K_w, K_s, K_SPACE, MOUSEBUTTONUP, BLEND_RGB_SUB
+from pygame.locals import *
 from math import sin, pi
 import pygame
 import time
@@ -55,6 +55,8 @@ class Player(VisibleSprite):
         self.can_move = True # Actually means if the player is digging
         self.dig_iterations = 0
 
+        self.jump_time = time.time()
+        
         self.powerup = False
         self.powerup_time = time.time()
         self.powerup_flash_time = time.time()
@@ -73,7 +75,7 @@ class Player(VisibleSprite):
         self.CONST_ACC = 500 # 500 pixels per second squared (physics :P)
         self.MAX_SPEED = 200
         self.SMALL_MAX_SPEED = 30
-        self.JUMP_SPEED = -400
+        self.JUMP_SPEED = -300
         self.THROW_SPEED = 900
         self.SB_OFFSET = self.size // 2 - (0, 10)
 
@@ -159,7 +161,9 @@ class Player(VisibleSprite):
             self.acc.x = -sign(self.vel.x) * self.CONST_ACC
             self.idle = True
 
-        if self.keys[K_w] and self.on_ground and self.can_move:
+        if KEYDOWN in self.manager.events and self.manager.events[KEYDOWN].key == K_w:
+            self.jump_time = time.time()
+        if self.keys[K_w] and time.time() - self.jump_time < 0.17 and self.can_move:
             self.vel.y = self.JUMP_SPEED
             self.jumping = True
 
