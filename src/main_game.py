@@ -22,6 +22,8 @@ from . import assets
 class MainGame(Scene):
     def __init__(self, manager: GameManager, previous_scene: Scene) -> None:
         super().__init__(manager, previous_scene)
+
+        self.manager.client_thread.start()
         self.seed = -1
         while self.client.id == -1:
             time.sleep(0.01)
@@ -64,8 +66,6 @@ class MainGame(Scene):
 
     def update(self) -> None:
         super().update()
-
-        # self.wind_vel = VEC((self.client.thread_data["wind"] if "wind" in self.client.thread_data else 0), 0)
 
         if time.time() - self.snowflake_time > 0.05:
             self.snowflake_time = time.time()

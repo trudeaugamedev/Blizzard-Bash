@@ -14,6 +14,7 @@ class Layers(Enum):
     SNOWFLAKE = auto()
     POWERUP = auto()
     ARROW = auto()
+    GUI = auto()
 
 class Sprite(AbstractClass):
     def __init__(self, scene: Scene, layer: int | Layers) -> None:

@@ -10,6 +10,7 @@ import sys
 from .others import OtherPlayer, OtherSnowball
 from .constants import WIDTH, HEIGHT, FPS, VEC
 from .client import Client, ManualExit
+from .start_menu import StartMenu
 from .main_game import MainGame
 from .end_menu import EndMenu
 from .scene import Scene
@@ -25,7 +26,6 @@ class GameManager:
 
         self.client = Client(self)
         self.client_thread = Thread(target=self.client.run, daemon=True)
-        self.client_thread.start()
 
         self.flags = HWSURFACE | DOUBLEBUF | RESIZABLE | SCALED
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT), self.flags)
@@ -34,7 +34,7 @@ class GameManager:
         self.window_changing = False
         self.events = []
         self.other_players = {}
-        self.scene = MainGame(self, None)
+        self.scene = StartMenu(self, None)
         self.ready = False
         self.id = -1
 
@@ -72,8 +72,8 @@ class GameManager:
         print("Quitting Pygame")
         pygame.quit()
         print("Waiting for client to exit")
-        while not self.client.exited:
-            time.sleep(0.1)
+        # while not self.client.exited:
+        #     time.sleep(0.1)
         print("Client has exited")
         sys.exit()
 
@@ -89,5 +89,6 @@ class GameManager:
         raise AbortScene
 
     class Scenes(Enum):
+        StartMenu = StartMenu
         MainGame = MainGame
         EndMenu = EndMenu
