@@ -33,7 +33,7 @@ class MainGame(Scene):
 
         for x in range(-42, 43):
             # Horizontal stretch and vertical stretch (essentially)
-            y = noise.noise2(x * 0.1, 0) * 200
+            y = noise.noise2(x * 0.1, 0) * 150
             Ground(self, (x * TILE_SIZE, y), (TILE_SIZE, 800))
         Ground(self, (-43 * TILE_SIZE, noise.noise2(-43 * 0.1, 0) * 200 - 250), (TILE_SIZE, 2000))
         Ground(self, (43 * TILE_SIZE, noise.noise2(43 * 0.1, 0) * 200 - 250), (TILE_SIZE, 2000))
@@ -48,7 +48,7 @@ class MainGame(Scene):
 
         for x in range(-42, 43):
             # Horizontal stretch and vertical stretch (essentially)
-            y = noise.noise2(x * 0.1 + 10000, 0) * 200 - 120
+            y = noise.noise2(x * 0.1 + 10000, 0) * 250 - 100
             Ground2(self, (x * TILE_SIZE, y), (TILE_SIZE, 800))
         Ground2(self, (-43 * TILE_SIZE, noise.noise2(-43 * 0.1, 0) * 200 - 250), (TILE_SIZE, 2000))
         Ground2(self, (43 * TILE_SIZE, noise.noise2(43 * 0.1, 0) * 200 - 250), (TILE_SIZE, 2000))
