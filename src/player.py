@@ -52,7 +52,7 @@ class Player(VisibleSprite):
         self.idle = True
 
         self.digging = False
-        self.can_move = True
+        self.can_move = True # Actually means if the player is digging
         self.dig_iterations = 0
 
         self.powerup = False
@@ -72,6 +72,7 @@ class Player(VisibleSprite):
 
         self.CONST_ACC = 500 # 500 pixels per second squared (physics :P)
         self.MAX_SPEED = 200
+        self.SMALL_MAX_SPEED = 30
         self.JUMP_SPEED = -400
         self.THROW_SPEED = 900
         self.SB_OFFSET = self.size // 2 - (0, 10)
@@ -128,27 +129,29 @@ class Player(VisibleSprite):
         self.keys = pygame.key.get_pressed()
 
         self.acc = VEC(0, GRAVITY)
-        if self.keys[K_a] and self.can_move: # Acceleration
+        if self.keys[K_a]: # Acceleration
             self.acc.x -= self.CONST_ACC
             self.flip = True
-            self.frame_group = assets.player_run
-            if self.can_throw and self.dig_iterations < 3:
-                self.frame_group = assets.player_run_s
-            elif self.can_throw:
-                self.frame_group = assets.player_run_l
-            self.idle = False
+            if self.can_move:
+                self.frame_group = assets.player_run
+                if self.can_throw and self.dig_iterations < 3:
+                    self.frame_group = assets.player_run_s
+                elif self.can_throw:
+                    self.frame_group = assets.player_run_l
+                self.idle = False
         elif self.vel.x < 0: # Deceleration
             self.acc.x += self.CONST_ACC
             self.idle = True
-        if self.keys[K_d] and self.can_move:
+        if self.keys[K_d]:
             self.acc.x += self.CONST_ACC
             self.flip = False
-            self.frame_group = assets.player_run
-            if self.can_throw and self.dig_iterations < 3:
-                self.frame_group = assets.player_run_s
-            elif self.can_throw:
-                self.frame_group = assets.player_run_l
-            self.idle = False
+            if self.can_move:
+                self.frame_group = assets.player_run
+                if self.can_throw and self.dig_iterations < 3:
+                    self.frame_group = assets.player_run_s
+                elif self.can_throw:
+                    self.frame_group = assets.player_run_l
+                self.idle = False
         elif self.vel.x > 0:
             self.acc.x -= self.CONST_ACC
             self.idle = True
@@ -192,7 +195,11 @@ class Player(VisibleSprite):
         self.vel += self.acc * self.manager.dt
         # _ to catch the successful clamp return value
         # Baiscally if it clamped to the left it would be -1, right would be 1, if it didn't clamp (value is in range), it's 0
-        self.vel.x, _ = clamp(self.vel.x, -self.MAX_SPEED, self.MAX_SPEED)
+        if self.can_move:
+            self.vel.x, _ = clamp(self.vel.x, -self.MAX_SPEED, self.MAX_SPEED)
+        else:
+            print(self.vel.x)
+            self.vel.x, _ = clamp(self.vel.x, -self.SMALL_MAX_SPEED, self.SMALL_MAX_SPEED)
         # If the absolute value of x vel is less than the constant acceleration, snap to 0 so that deceleration doesn't overshoot
         self.vel.x = snap(self.vel.x, 0, self.CONST_ACC * self.manager.dt)
         self.pos += self.vel * self.manager.dt
