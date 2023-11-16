@@ -12,6 +12,7 @@ socket.addEventListener("open", (event) => {
     socket.send("admin");
 });
 socket.addEventListener("message", (event) => {
+    if (JSON.parse(event.data.toString()).type === "cl") return;
     document.getElementById("received").innerHTML = event.data + "<br>" + document.getElementById("received").innerHTML;
 });
 socket.addEventListener("close", (event) => {
