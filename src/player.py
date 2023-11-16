@@ -161,7 +161,7 @@ class Player(VisibleSprite):
             self.acc.x = -sign(self.vel.x) * self.CONST_ACC
             self.idle = True
 
-        if KEYDOWN in self.manager.events and self.manager.events[KEYDOWN].key == K_w and self.on_ground or self.on_ground:
+        if self.on_ground:
             self.jump_time = time.time()
         if self.keys[K_w] and time.time() - self.jump_time < 0.17 and self.can_move:
             self.vel.y = self.JUMP_SPEED
