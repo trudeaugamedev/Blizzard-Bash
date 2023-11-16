@@ -204,6 +204,8 @@ class Player(VisibleSprite):
             self.ground_level = min(Ground, Ground2, key=lambda g: g.height_map[centerx])
         elif self.pos.y > y2 + 15:
             self.ground_level = Ground
+        if y1 < y2:
+            self.ground_level = Ground
 
         self.on_ground = False
         ground_y = self.ground_level.height_map[centerx]
