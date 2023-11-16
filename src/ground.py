@@ -16,8 +16,8 @@ class Ground(VisibleSprite):
     instances = {}
     height_map = {}
 
-    def __init__(self, scene: Scene, pos: tuple[int, int], size: tuple[int, int]) -> None:
-        super().__init__(scene, Layers.MAP)
+    def __init__(self, scene: Scene, pos: tuple[int, int], size: tuple[int, int], layer: Layers = Layers.MAP) -> None:
+        super().__init__(scene, layer)
         self.size = VEC(size)
         self.pos = VEC(pos)
         self.rect = pygame.Rect(self.pos, self.size)
@@ -73,3 +73,16 @@ class Ground(VisibleSprite):
     def draw(self) -> None:
         if self.rect.right - self.scene.player.camera.offset.x < 0 or self.rect.left - self.scene.player.camera.offset.x > WIDTH: return
         self.manager.screen.blit(self.image, self.pos - self.scene.player.camera.offset)
+
+class Ground2(Ground):
+    instances = {}
+    height_map = {}
+
+    def __init__(self, scene: Scene, pos: tuple[int, int], size: tuple[int, int]) -> None:
+        super().__init__(scene, pos, size, Layers.MAP2)
+
+    def generate_image(self) -> None:
+        super().generate_image()
+        trans_surf = pygame.Surface(self.image.get_size())
+        trans_surf.fill((30, 30, 30))
+        self.image.blit(trans_surf, (0, 0), special_flags=BLEND_RGB_SUB)

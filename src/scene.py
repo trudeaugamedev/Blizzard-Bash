@@ -13,6 +13,9 @@ class Scene:
         self.sprite_manager = SpriteManager(self)
         self.running = True
 
+    def setup(self) -> None:
+        pass
+
     def update(self) -> None:
         self.sprite_manager.update()
 

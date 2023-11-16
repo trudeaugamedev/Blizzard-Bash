@@ -11,10 +11,10 @@ import pygame
 import time
 
 from .constants import TILE_SIZE, WIDTH, VEC, HEIGHT, FONT, TEXT_COLOR
+from .ground import Ground, Ground2
 from .snowflake import SnowFlake
 from .utils import clamp, inttup
 from .powerup import Powerup
-from .ground import Ground
 from .player import Player
 from .scene import Scene
 from . import assets
@@ -23,6 +23,7 @@ class MainGame(Scene):
     def __init__(self, manager: GameManager, previous_scene: Scene) -> None:
         super().__init__(manager, previous_scene)
 
+    def setup(self) -> None:
         self.waiting = True
         self.manager.client_thread.start()
         self.seed = -1
@@ -43,6 +44,21 @@ class MainGame(Scene):
             y = noise.noise2(x * 0.1, 0) * 200 - 400
             Ground(self, (x * TILE_SIZE, y), (TILE_SIZE, 2000))
         for ground in Ground.instances.values():
+            ground.generate_image() # Create a images only after all tiles have been created
+
+        for x in range(-42, 43):
+            # Horizontal stretch and vertical stretch (essentially)
+            y = noise.noise2(x * 0.1 + 10000, 0) * 200 - 120
+            Ground2(self, (x * TILE_SIZE, y), (TILE_SIZE, 800))
+        Ground2(self, (-43 * TILE_SIZE, noise.noise2(-43 * 0.1, 0) * 200 - 250), (TILE_SIZE, 2000))
+        Ground2(self, (43 * TILE_SIZE, noise.noise2(43 * 0.1, 0) * 200 - 250), (TILE_SIZE, 2000))
+        for x in range(-63, -43):
+            y = noise.noise2(x * 0.1, 0) * 200 - 400
+            Ground2(self, (x * TILE_SIZE, y), (TILE_SIZE, 2000))
+        for x in range(44, 64):
+            y = noise.noise2(x * 0.1, 0) * 200 - 400
+            Ground2(self, (x * TILE_SIZE, y), (TILE_SIZE, 2000))
+        for ground in Ground2.instances.values():
             ground.generate_image() # Create a images only after all tiles have been created
 
         self.player = Player(self)

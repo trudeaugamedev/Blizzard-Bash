@@ -80,6 +80,7 @@ class GameManager:
     def new_scene(self, scene_class: str) -> None:
         self.scene.running = False
         self.scene = self.Scenes[scene_class].value(self, self.scene)
+        self.scene.setup()
         raise AbortScene
 
     def switch_scene(self, scene: Scene) -> None:

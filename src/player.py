@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from scene import Scene
 
-from pygame.locals import K_a, K_d, K_w, K_SPACE, MOUSEBUTTONUP, BLEND_RGB_SUB
+from pygame.locals import K_a, K_d, K_w, K_s, K_SPACE, MOUSEBUTTONUP, BLEND_RGB_SUB
 from math import sin, pi
 import pygame
 import time
@@ -11,8 +11,8 @@ import time
 from .constants import VEC, SCR_DIM, GRAVITY, PIXEL_SIZE, TILE_SIZE, WIDTH
 from .utils import intvec, snap, clamp, snap, sign, shadow, inttup
 from .sprite import VisibleSprite, Layers
+from .ground import Ground, Ground2
 from .snowball import Snowball
-from .ground import Ground
 from . import assets
 
 class Camera:
@@ -43,8 +43,10 @@ class Player(VisibleSprite):
         self.rect = pygame.Rect(self.pos, self.size)
         self.real_rect = self.rect.copy()
         self.real_rect.size = (10 * PIXEL_SIZE, 20 * PIXEL_SIZE)
-        self.on_ground = False
-        self.ground = Ground.instances[int(self.pos.x // TILE_SIZE * TILE_SIZE)]
+        self.on_ground = False # on_ground is not stable
+        self.jumping = True # which is why jumping needs to exist
+        self.ground_level = Ground
+        self.ground = self.ground_level.instances[int(self.pos.x // TILE_SIZE * TILE_SIZE)]
         self.flip = False
         self.rotation = 30
         self.idle = True
@@ -66,7 +68,6 @@ class Player(VisibleSprite):
         self.frame = 0
         self.frame_time = time.time()
 
-
         self.first_start = True
 
         self.CONST_ACC = 500 # 500 pixels per second squared (physics :P)
@@ -85,9 +86,6 @@ class Player(VisibleSprite):
         self.update_powerup()
         self.update_camera()
         self.sync_data()
-        # if self.first_start and "time" in self.manager.client.thread_data:
-        #     self.first_start = False
-        #     self.powerup = False
         self.first_start = False
         self.powerup = False
 
@@ -160,6 +158,10 @@ class Player(VisibleSprite):
 
         if self.keys[K_w] and self.on_ground and self.can_move:
             self.vel.y = self.JUMP_SPEED
+            self.jumping = True
+
+        if self.keys[K_s] and not self.jumping and self.ground_level is Ground2:
+            self.pos.y += 10
 
         if self.keys[K_SPACE]:
             self.digging = True
@@ -195,12 +197,21 @@ class Player(VisibleSprite):
         self.vel.x = snap(self.vel.x, 0, self.CONST_ACC * self.manager.dt)
         self.pos += self.vel * self.manager.dt
 
+        centerx = int(self.rect.centerx // PIXEL_SIZE * PIXEL_SIZE)
+        y1 = Ground.height_map[centerx]
+        y2 = Ground2.height_map[centerx]
+        if self.jumping and self.pos.y < y2 + 5:
+            self.ground_level = min(Ground, Ground2, key=lambda g: g.height_map[centerx])
+        elif self.pos.y > y2 + 15:
+            self.ground_level = Ground
+
         self.on_ground = False
-        ground_y = Ground.height_map[int(self.rect.centerx // PIXEL_SIZE * PIXEL_SIZE)]
+        ground_y = self.ground_level.height_map[centerx]
         if self.pos.y > ground_y + 5:
             self.pos.y = ground_y + 5
             self.vel.y = 0
             self.on_ground = True
+            self.jumping = False
 
         self.pos.x, _ = clamp(self.pos.x, -2007, 2061)
 
@@ -218,7 +229,7 @@ class Player(VisibleSprite):
                 self.frame_group = assets.player_idle_l
 
         try:
-            self.ground = Ground.instances[int(self.rect.centerx // TILE_SIZE * TILE_SIZE)]
+            self.ground = self.ground_level.instances[int(self.rect.centerx // TILE_SIZE * TILE_SIZE)]
         except KeyError:
             pass
         self.rotation += (self.ground.incline - self.rotation) * 8 * self.manager.dt
