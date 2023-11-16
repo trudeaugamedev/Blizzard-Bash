@@ -23,11 +23,11 @@ class MainGame(Scene):
     def __init__(self, manager: GameManager, previous_scene: Scene) -> None:
         super().__init__(manager, previous_scene)
 
+        self.waiting = True
         self.manager.client_thread.start()
         self.seed = -1
         while self.client.id == -1:
             time.sleep(0.01)
-        time.sleep(0.01)
         noise.seed(self.seed)
 
         for x in range(-42, 43):
@@ -51,7 +51,6 @@ class MainGame(Scene):
         for _ in range(1000):
             SnowFlake(self, VEC(randint(0 - 1000, WIDTH + 1000), randint(-400, HEIGHT)) + self.player.camera.offset)
 
-        # self.wind_vel = VEC((self.client.thread_data["wind"] if "wind" in self.client.thread_data else 0), 0)
         self.wind_vel = VEC(0, 0)
 
         self.powerup_spawn_time = time.time()
@@ -144,21 +143,9 @@ class MainGame(Scene):
         #     text = FONT[30].render(text_str, True, TEXT_COLOR)
         #     self.manager.screen.blit(text, (20, 112))
 
-        # if "ready" not in self.client.thread_data:
-        #     text = FONT[54].render("Waiting for Players to get Ready...", True, (0, 0, 0))
-        #     self.manager.screen.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 - text.get_height() // 2 - 20))
-        #     text = FONT[54].render("Waiting for Players to get Ready...", True, (0, 0, 0))
-        #     text.set_alpha(70)
-        #     self.manager.screen.blit(text, VEC(WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 - text.get_height() // 2 - 20) + (3, 3))
-        #     if not self.manager.ready:
-        #         text = FONT[30].render("Press Enter when you are Ready!", True, (0, 0, 0))
-        #         self.manager.screen.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 + 30))
-        #         text = FONT[30].render("Press Enter when you are Ready!", True, (0, 0, 0))
-        #         text.set_alpha(70)
-        #         self.manager.screen.blit(text, VEC(WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 + 30) + (3, 3))
-        #     else:
-        #         text = FONT[30].render("You are ready!", True, (0, 0, 0))
-        #         self.manager.screen.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 + 30))
-        #         text = FONT[30].render("You are ready!", True, (0, 0, 0))
-        #         text.set_alpha(70)
-        #         self.manager.screen.blit(text, VEC(WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 + 30) + (3, 3))
+        if self.waiting:
+            self.draw_waiting_text()
+
+    def draw_waiting_text(self) -> None:
+        text = FONT[54].render("Waiting for game to start...", True, (0, 0, 0))
+        self.manager.screen.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 - text.get_height() // 2))

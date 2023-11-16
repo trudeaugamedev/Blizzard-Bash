@@ -94,7 +94,7 @@ function handleAdminConnect(client) {
 
 function handleAdminMessage(msg) {
 	const command = msg.toString();
-	broadcast(command);
+	broadcast(JSON.stringify({"type": "ad", "command": command}));
 	console.log(`Admin sent the command "${command}"`);
 }
 

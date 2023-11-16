@@ -18,6 +18,9 @@ class Parser:
                 self.manager.scene.seed = data["seed"]
             case "cl": # Client data
                 self.client_data(data)
+            case "ad": # Admin command
+                if data["command"] == "start":
+                    self.manager.scene.waiting = False
             case "wd": # Wind
                 self.manager.scene.wind_vel = VEC(data["speed"], 0)
 
