@@ -24,14 +24,17 @@ class Ground(VisibleSprite):
 
         self.__class__.instances[int(self.pos.x)] = self
 
-    def generate_image(self) -> None:
+    def generate_unsliced_image(self) -> None:
         self.unsliced_image = pygame.Surface(self.size)
         self.image = pygame.Surface(self.size, SRCALPHA)
         self.unsliced_image.blit(assets.ground_tiles[0].subsurface(randint(0, REAL_TILE_SIZE) * PIXEL_SIZE, 0, TILE_SIZE, TILE_SIZE), (0, 0))
         for i in range(1, int(self.size.y // TILE_SIZE)):
             self.unsliced_image.blit(pygame.transform.flip(assets.ground_tiles[1].subsurface(randint(0, REAL_TILE_SIZE) * PIXEL_SIZE, 0, TILE_SIZE, TILE_SIZE), bool(randint(0, 1)), False), (0, i * TILE_SIZE))
 
+    def apply_gradient(self) -> None:
         self.unsliced_image.blit(assets.gradient, (0, 0), special_flags=BLEND_RGB_SUB)
+
+    def slice_image(self) -> None:
         if self.size.y > 800:
             pygame.draw.rect(self.unsliced_image, (0, 0, 0), (0, 800, TILE_SIZE, 2000))
 
@@ -67,6 +70,11 @@ class Ground(VisibleSprite):
 
         self.incline = degrees(atan2(-interval, PIXEL_SIZE))
 
+    def generate_image(self) -> None:
+        self.generate_unsliced_image()
+        self.apply_gradient()
+        self.slice_image()
+
     def update(self) -> None:
         ...
 
@@ -82,7 +90,13 @@ class Ground2(Ground):
         super().__init__(scene, pos, size, Layers.MAP2)
 
     def generate_image(self) -> None:
-        super().generate_image()
+        self.generate_unsliced_image()
+        trans_surf = pygame.Surface(assets.gradient.get_size())
+        trans_surf.fill((50, 50, 50))
+        gradient = assets.gradient.copy()
+        gradient.blit(trans_surf, (0, 0), special_flags=BLEND_RGB_SUB)
+        self.unsliced_image.blit(gradient, (0, 0), special_flags=BLEND_RGB_SUB)
+        self.slice_image()
         trans_surf = pygame.Surface(self.image.get_size())
-        trans_surf.fill((30, 30, 30))
+        trans_surf.fill((35, 35, 35))
         self.image.blit(trans_surf, (0, 0), special_flags=BLEND_RGB_SUB)
