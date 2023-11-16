@@ -79,6 +79,11 @@ wss.on("connection", (socket) => {
 		}
 
 		const data = JSON.parse(msg.toString());
+		if (data.type === "ir") {
+			if (data.hit) {
+				players.get(data.id).socket.send(JSON.stringify(data));
+			}
+		}
 		players.get(client.id).data = data;
 		// console.log(`Client ${client.id}: ${JSON.stringify(players.get(client.id).data)}`);
 	});

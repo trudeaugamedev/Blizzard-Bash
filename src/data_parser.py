@@ -18,6 +18,8 @@ class Parser:
                 self.manager.scene.seed = data["seed"]
             case "cl": # Client data
                 self.client_data(data)
+            case "ir": # Irregular client data
+                self.irregular_client_data(data)
             case "ad": # Admin command
                 if data["command"] == "start":
                     self.manager.scene.waiting = False
@@ -45,7 +47,7 @@ class Parser:
                 other.frame = player_data["frame"]
                 other.score = player_data["score"]
             else:
-                other = self.manager.other_players[player_data["id"]] = OtherPlayer(self.manager.scene, player_data["pos"])
+                other = self.manager.other_players[player_data["id"]] = OtherPlayer(self.manager.scene, player_data["id"], player_data["pos"])
 
             # Parse data of snowballs
             for snowball in other.snowballs:
@@ -58,6 +60,9 @@ class Parser:
 
         # Remove disconnected players
         for _id in all_ids:
-            print(_id)
             player = self.manager.other_players.pop(_id)
             player.kill()
+
+    def irregular_client_data(self, data: dict) -> None:
+        if "hit" in data:
+            self.manager.scene.player.hit_strength = data["hit"]

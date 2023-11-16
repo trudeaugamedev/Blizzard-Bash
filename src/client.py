@@ -26,7 +26,7 @@ class Client:
         self.running = True # Modify this attribute to stop client
         self.exited = False # Indicates whether the client has really exited
         self.id = -1
-        self.data = {
+        self.pers_data = { # Persistent data
             "pos": (0, 0),
             "rot": 0,
             "flip": True,
@@ -34,6 +34,7 @@ class Client:
             "snowballs": [],
             "score": 0,
         }
+        self.irreg_data = Queue() # Occasional data
 
     async def recv_wrapper(self) -> None:
         print("Coroutine 'recv' started")
@@ -66,12 +67,15 @@ class Client:
 
     async def send(self) -> None:
         await asyncio.sleep(0.014) # Slightly higher than 60 FPS
-        await self.socket.send(json.dumps(self.data | {"id": self.id}))
+        await self.socket.send(json.dumps(self.pers_data | {"id": self.id}))
+        while self.irreg_data.qsize() > 0:
+            item = {"type": "ir"} | self.irreg_data.get()
+            await self.socket.send(json.dumps(item))
 
     async def connect(self) -> None:
         print("Coroutine 'connect' started")
-        # self.socket = await ws_client.connect("ws://localhost:3000")
-        self.socket = await ws_client.connect("wss://trudeaugamedev-winter.herokuapp.com")
+        self.socket = await ws_client.connect("ws://localhost:3000")
+        # self.socket = await ws_client.connect("wss://trudeaugamedev-winter.herokuapp.com")
         print("Coroutine 'connect' completed")
 
     async def main(self) -> None:

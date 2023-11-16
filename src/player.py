@@ -71,6 +71,7 @@ class Player(VisibleSprite):
         self.frame_time = time.time()
 
         self.first_start = True
+        self.hit_strength = 0 # The strength another player's snowball hit the player
 
         self.CONST_ACC = 500 # 500 pixels per second squared (physics :P)
         self.MAX_SPEED = 200
@@ -93,12 +94,12 @@ class Player(VisibleSprite):
         self.powerup = False
 
     def sync_data(self) -> None:
-        self.client.data["pos"] = inttup(self.pos)
-        self.client.data["rot"] = self.rotation
-        self.client.data["flip"] = self.flip
-        self.client.data["frame"] = assets.player.index(self.orig_image)
+        self.client.pers_data["pos"] = inttup(self.pos)
+        self.client.pers_data["rot"] = self.rotation
+        self.client.pers_data["flip"] = self.flip
+        self.client.pers_data["frame"] = assets.player.index(self.orig_image)
 
-        snowballs = self.client.data["snowballs"] = []
+        snowballs = self.client.pers_data["snowballs"] = []
         for snowball in self.snowballs:
             data = {
                 "pos": inttup(snowball.pos),
@@ -225,6 +226,10 @@ class Player(VisibleSprite):
             self.vel.y = 0
             self.on_ground = True
             self.jumping = False
+
+        if self.hit_strength != 0:
+            self.vel.x = self.hit_strength * 130
+            self.hit_strength = 0
 
         self.pos.x, _ = clamp(self.pos.x, -2007, 2061)
 

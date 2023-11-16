@@ -11,8 +11,8 @@ import time
 
 from .constants import VEC, GRAVITY, PIXEL_SIZE
 from .sprite import VisibleSprite, Layers
+from .utils import shadow, sign
 from .ground import Ground
-from .utils import shadow
 from . import assets
 
 class Snowball(VisibleSprite):
@@ -76,7 +76,8 @@ class Snowball(VisibleSprite):
                 self.kill()
                 if not self.scene.waiting:
                     self.scene.score += self.score
-                    self.client.data["score"] = self.scene.score
+                    self.client.pers_data["score"] = self.scene.score
+                self.client.irreg_data.put({"hit": self.score * sign(self.vel.x), "id": player.id})
                 return
 
         if self.pos.y > 1000:

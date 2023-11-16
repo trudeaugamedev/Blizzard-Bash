@@ -13,8 +13,9 @@ from .utils import shadow
 from . import assets
 
 class OtherPlayer(VisibleSprite):
-    def __init__(self, scene: Scene, pos: tuple[int, int]) -> None:
+    def __init__(self, scene: Scene, _id: int, pos: tuple[int, int]) -> None:
         super().__init__(scene, Layers.PLAYER)
+        self.id = _id
         self.size = VEC(45, 60)
         self.pos = VEC(pos)
         self.frame = 0
