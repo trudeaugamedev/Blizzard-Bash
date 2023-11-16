@@ -74,8 +74,9 @@ class Snowball(VisibleSprite):
                 self.scene.hit = True
                 self.scene.hit_pos = self.pos
                 self.kill()
-                self.scene.score += self.score
-                self.client.data["score"] = self.scene.score
+                if not self.scene.waiting:
+                    self.scene.score += self.score
+                    self.client.data["score"] = self.scene.score
                 return
 
         if self.pos.y > 1000:
