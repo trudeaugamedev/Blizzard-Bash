@@ -22,6 +22,8 @@ class Parser:
                 self.manager.scene.wind_vel = VEC(data["speed"], 0)
 
     def client_data(self, data: dict) -> None:
+        if not isinstance(self.manager.scene, self.manager.Scenes.MainGame.value): return
+
         for player_data in data["players"]:
             if not player_data: continue
 
