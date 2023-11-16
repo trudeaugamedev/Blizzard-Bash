@@ -29,8 +29,12 @@ class Parser:
     def client_data(self, data: dict) -> None:
         if not isinstance(self.manager.scene, self.manager.Scenes.MainGame.value): return
 
+        all_ids = set(self.manager.other_players.keys())
         for player_data in data["players"]:
             if not player_data: continue
+
+            if player_data["id"] in all_ids:
+                all_ids.remove(player_data["id"])
 
             # Parse data of player itself
             if player_data["id"] in self.manager.other_players:
@@ -51,3 +55,9 @@ class Parser:
                 other.snowballs.append(
                     OtherSnowball(self.manager.scene, data["pos"], data["frame"], data["type"])
                 )
+
+        # Remove disconnected players
+        for _id in all_ids:
+            print(_id)
+            player = self.manager.other_players.pop(_id)
+            player.kill()
