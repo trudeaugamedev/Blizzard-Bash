@@ -52,6 +52,7 @@ class MainGame(Scene):
             SnowFlake(self, VEC(randint(0 - 1000, WIDTH + 1000), randint(-400, HEIGHT)) + self.player.camera.offset)
 
         self.wind_vel = VEC(0, 0)
+        self.time_left = -1
 
         self.powerup_spawn_time = time.time()
         self.powerup = None
@@ -128,20 +129,20 @@ class MainGame(Scene):
                 self.manager.screen.blit(text_shadow, pos - (text.get_width() // 2, 0) + (3, 3))
                 self.manager.screen.blit(text, pos - (text.get_width() // 2, 0))
 
-        # if "time" in self.client.thread_data:
-        #     text_str = f"Time Left: {self.client.thread_data['time'][0] // 60}:{'0' if self.client.thread_data['time'][0] % 60 < 10 else ''}{self.client.thread_data['time'][0] % 60}"
-        #     text = FONT[30].render(text_str, True, TEXT_COLOR)
-        #     text.set_alpha(70)
-        #     self.manager.screen.blit(text, VEC(20, 72) + (3, 3))
-        #     text = FONT[30].render(text_str, True, TEXT_COLOR)
-        #     self.manager.screen.blit(text, (20, 72))
+        if self.time_left >= 0:
+            text_str = f"Time Left: {self.time_left // 60}:{'0' if self.time_left % 60 < 10 else ''}{self.time_left % 60}"
+            text = FONT[30].render(text_str, True, TEXT_COLOR)
+            text.set_alpha(70)
+            self.manager.screen.blit(text, VEC(20, 72) + (3, 3))
+            text = FONT[30].render(text_str, True, TEXT_COLOR)
+            self.manager.screen.blit(text, (20, 72))
             
-        #     text_str = f"Next Elimination: {self.client.thread_data['time'][1] // 60}:{'0' if self.client.thread_data['time'][1] % 60 < 10 else ''}{self.client.thread_data['time'][1] % 60}"
-        #     text = FONT[30].render(text_str, True, TEXT_COLOR)
-        #     text.set_alpha(70)
-        #     self.manager.screen.blit(text, VEC(20, 112) + (3, 3))
-        #     text = FONT[30].render(text_str, True, TEXT_COLOR)
-        #     self.manager.screen.blit(text, (20, 112))
+            # text_str = f"Next Elimination: {self.client.thread_data['time'][1] // 60}:{'0' if self.client.thread_data['time'][1] % 60 < 10 else ''}{self.client.thread_data['time'][1] % 60}"
+            # text = FONT[30].render(text_str, True, TEXT_COLOR)
+            # text.set_alpha(70)
+            # self.manager.screen.blit(text, VEC(20, 112) + (3, 3))
+            # text = FONT[30].render(text_str, True, TEXT_COLOR)
+            # self.manager.screen.blit(text, (20, 112))
 
         if self.waiting:
             self.draw_waiting_text()

@@ -23,6 +23,8 @@ class Parser:
                     self.manager.scene.waiting = False
             case "wd": # Wind
                 self.manager.scene.wind_vel = VEC(data["speed"], 0)
+            case "tm": # Time
+                self.manager.scene.time_left = data["seconds"]
 
     def client_data(self, data: dict) -> None:
         if not isinstance(self.manager.scene, self.manager.Scenes.MainGame.value): return

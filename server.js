@@ -38,10 +38,13 @@ const players = new Map();
 
 let seed = randint(0, 99999999);
 let nextId = 0;
+let waiting = true;
 
 let wind_time = Date.now();
 let wind_duration = randint(3000, 6000);
 let wind_speed = [randint(-600, -200), randint(200, 600)][randint(0, 1)];
+
+let start_time, timer_time;
 
 wss.on("connection", (socket) => {
     const client = {
@@ -94,6 +97,11 @@ function handleAdminConnect(client) {
 
 function handleAdminMessage(msg) {
 	const command = msg.toString();
+	if (command === "start") {
+		waiting = false;
+		timer_time = Date.now();
+		start_time = Date.now();
+	}
 	broadcast(JSON.stringify({"type": "ad", "command": command}));
 	console.log(`Admin sent the command "${command}"`);
 }
@@ -106,6 +114,11 @@ function game() {
 		wind_duration = randint(3000, 6000);
 		wind_speed = [randint(-600, -200), randint(200, 600)][randint(0, 1)];
 		broadcast(JSON.stringify({"type": "wd", "speed": wind_speed}));
+	}
+
+	if (Date.now() - timer_time > 1000) {
+		timer_time = Date.now();
+		broadcast(JSON.stringify({"type": "tm", "seconds": Math.floor((300000 - (Date.now() - start_time)) / 1000)}));
 	}
 }
 
