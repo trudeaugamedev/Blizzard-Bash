@@ -12,7 +12,7 @@ class StartMenu(Scene):
     def __init__(self, manager: GameManager, previous_scene: Scene) -> None:
         super().__init__(manager, previous_scene)
         self.start_button = Button(
-            self, (WIDTH // 2, HEIGHT // 2), (200, 80),
+            self, (WIDTH // 2, HEIGHT // 2), (300, 80), "JOIN GAME",
             lambda: self.manager.new_scene("MainGame"), centered=True
         )
 

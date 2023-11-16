@@ -1,5 +1,5 @@
+from .constants import VEC, FONT, TEXT_COLOR
 from .sprite import Layers, VisibleSprite
-from .constants import VEC
 from .scene import Scene
 
 from pygame.locals import *
@@ -11,7 +11,7 @@ class Button(VisibleSprite):
     mouse_down_in = None
     mouse_up_in = None
 
-    def __init__(self, scene: Scene, pos: tuple[int, int], size: tuple[int, int], command: Callable, centered: bool = False) -> None:
+    def __init__(self, scene: Scene, pos: tuple[int, int], size: tuple[int, int], text: str, command: Callable, centered: bool = False) -> None:
         super().__init__(scene, Layers.GUI)
         self.size = VEC(size)
         self.pos = VEC(pos)
@@ -19,6 +19,9 @@ class Button(VisibleSprite):
             self.pos = self.pos - self.size // 2
         self.rect = pygame.Rect(self.pos, self.size)
         self.color = (196, 230, 255)
+        self.text = text
+        self.text_surf = FONT[36].render(self.text, True, TEXT_COLOR)
+        self.text_size = VEC(self.text_surf.get_size())
         self.command = command
 
     def update(self) -> None:
@@ -40,3 +43,4 @@ class Button(VisibleSprite):
 
     def draw(self) -> None:
         pygame.draw.rect(self.manager.screen, self.color, (*self.pos, *self.size))
+        self.manager.screen.blit(self.text_surf, self.pos + self.size // 2 - (self.text_size.x // 2, self.text_size.y // 2 * 1.1))
