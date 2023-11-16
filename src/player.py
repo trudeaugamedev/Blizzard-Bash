@@ -181,7 +181,7 @@ class Player(VisibleSprite):
                 self.frame_group = assets.player_throw_l
             # Use camera offset to convert screen-space pos to in-world pos
             try:
-                self.sb_vel = -((m_pos - self.SB_OFFSET + self.camera.offset) - self.pos) * 8
+                self.sb_vel = ((m_pos - self.SB_OFFSET + self.camera.offset) - self.pos) * 8
                 if self.sb_vel.length() > self.THROW_SPEED:
                     self.sb_vel.scale_to_length(self.THROW_SPEED)
             except ValueError:
