@@ -168,6 +168,7 @@ class Player(VisibleSprite):
 
         if self.keys[K_SPACE]:
             self.digging = True
+            self.idle = False
 
     def update_throw(self) -> None:
         self.can_throw = True if self.powerup else not self.snowballs and self.can_move and self.dig_iterations
@@ -198,7 +199,6 @@ class Player(VisibleSprite):
         if self.can_move:
             self.vel.x, _ = clamp(self.vel.x, -self.MAX_SPEED, self.MAX_SPEED)
         else:
-            print(self.vel.x)
             self.vel.x, _ = clamp(self.vel.x, -self.SMALL_MAX_SPEED, self.SMALL_MAX_SPEED)
         # If the absolute value of x vel is less than the constant acceleration, snap to 0 so that deceleration doesn't overshoot
         self.vel.x = snap(self.vel.x, 0, self.CONST_ACC * self.manager.dt)
