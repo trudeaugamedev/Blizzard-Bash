@@ -41,7 +41,7 @@ let nextId = 0;
 let waiting = true;
 
 let wind_time = Date.now();
-let wind_duration = randint(3000, 6000);
+let wind_duration = randint(4000, 8000);
 let wind_speed = [randint(-600, -200), randint(200, 600)][randint(0, 1)];
 
 let start_time, timer_time;
