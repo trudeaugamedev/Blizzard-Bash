@@ -14,8 +14,15 @@ function broadcastPlayerData() {
 	for (const [id, player] of players) {
 		let xplayers = new Map(players);
 		xplayers.delete(id);
-		let dataArray = Array.from(xplayers.values()).map(player => player.data);
-		player.socket.send(JSON.stringify({"type": "cl", "players": dataArray}));
+		let playerDataArray = Array.from(xplayers.values()).map(player => player.data);
+
+		let powerupDataArray = Array.from(powerups.values()).map(powerup => ({"id": powerup.id, "pos": powerup.pos}));
+
+		player.socket.send(JSON.stringify({
+			"type": "cl",
+			"players": playerDataArray,
+			"powerups": powerupDataArray,
+		}));
 	}
 }
 
@@ -31,24 +38,53 @@ class Player {
 	}
 }
 
+class Powerup {
+	constructor (id) {
+		this.id = id;
+		powerupId++;
+		this.vel = [0, 0]
+		// this.pos = [randint(-1800, 1800), -800];
+		this.pos = [0, -800];
+		this.startTime = Date.now();
+	}
+
+	update() {
+		// self.vel.y += GRAVITY * self.manager.dt
+		// self.vel += self.scene.wind_vel * 2 * self.manager.dt
+		// self.vel *= 0.99
+		this.vel[1] += 0.01;
+		this.pos[1] += this.vel[1];
+		this.pos[0] += windSpeed * 0.0015;
+		if (Date.now() - this.startTime > 10000) {
+			powerups.delete(this.id);
+		}
+	}
+}
+
 const wss = new WebSocket.Server({
 	port: parseInt(process.env.PORT, 10) || 3000
 });
 const players = new Map();
+const powerups = new Map();
 
 let seed = randint(0, 99999999);
-let nextId = 0;
+let playerId = 0;
+let powerupId = 0;
 let waiting = true;
 
-let wind_time = Date.now();
-let wind_duration = randint(4000, 8000);
-let wind_speed = [randint(-600, -200), randint(200, 600)][randint(0, 1)];
+let windTime = Date.now();
+let windDuration = randint(4000, 8000);
+let windSpeed = [randint(-600, -200), randint(200, 600)][randint(0, 1)];
 
-let start_time, timer_time;
+powerupTime = Date.now();
+powerupDuration = 10000;
+// powerupDuration = randint(15000, 25000);
+
+let startTime, timerTime;
 
 wss.on("connection", (socket) => {
     const client = {
-		id: nextId++,
+		id: playerId++,
 		socket: socket
 	};
 
@@ -78,11 +114,15 @@ wss.on("connection", (socket) => {
 			return;
 		}
 
-		const data = JSON.parse(msg.toString());
+		const strMsg = msg.toString();
+		const data = JSON.parse(strMsg);
 		if (data.type === "ir") {
 			if (data.hit) {
-				players.get(data.id).socket.send(JSON.stringify(data));
+				players.get(data.id).socket.send(strMsg);
+			} else if (data.powerup) {
+				powerups.delete(data.id);
 			}
+			return;
 		}
 		players.get(client.id).data = data;
 		// console.log(`Client ${client.id}: ${JSON.stringify(players.get(client.id).data)}`);
@@ -97,15 +137,15 @@ function handleAdminConnect(client) {
 	// Change IDs
 	players.get(-1).id = -1;
 	client.id = -1;
-	nextId--;
+	playerId--;
 }
 
 function handleAdminMessage(msg) {
 	const command = msg.toString();
 	if (command === "start") {
 		waiting = false;
-		timer_time = Date.now();
-		start_time = Date.now();
+		timerTime = Date.now();
+		startTime = Date.now();
 	}
 	broadcast(JSON.stringify({"type": "ad", "command": command}));
 	console.log(`Admin sent the command "${command}"`);
@@ -114,16 +154,27 @@ function handleAdminMessage(msg) {
 function game() {
 	broadcastPlayerData();
 
-	if (Date.now() - wind_time > wind_duration) {
-		wind_time = Date.now();
-		wind_duration = randint(3000, 6000);
-		wind_speed = [randint(-600, -200), randint(200, 600)][randint(0, 1)];
-		broadcast(JSON.stringify({"type": "wd", "speed": wind_speed}));
+	if (Date.now() - windTime > windDuration) {
+		windTime = Date.now();
+		windDuration = randint(3000, 6000);
+		windSpeed = [randint(-600, -200), randint(200, 600)][randint(0, 1)];
+		broadcast(JSON.stringify({"type": "wd", "speed": windSpeed}));
 	}
 
-	if (Date.now() - timer_time > 1000) {
-		timer_time = Date.now();
-		broadcast(JSON.stringify({"type": "tm", "seconds": Math.floor((300000 - (Date.now() - start_time)) / 1000)}));
+	if (Date.now() - powerupTime > powerupDuration) {
+		powerupTime = Date.now();
+		powerupDuration = randint(15000, 25000);
+		// powerup_pos = [randint(-1800, 1800), -800];
+		powerups.set(powerupId, new Powerup(powerupId));
+		// broadcast(JSON.stringify({"type": "pw", "id": powerupId++, "pos": powerupPos}));
+	}
+	for (const [id, powerup] of powerups) {
+		powerup.update();
+	}
+
+	if (Date.now() - timerTime > 1000) {
+		timerTime = Date.now();
+		broadcast(JSON.stringify({"type": "tm", "seconds": Math.floor((300000 - (Date.now() - startTime)) / 1000)}));
 	}
 }
 

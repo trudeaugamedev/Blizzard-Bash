@@ -91,7 +91,6 @@ class Player(VisibleSprite):
         self.update_camera()
         self.sync_data()
         self.first_start = False
-        self.powerup = False
 
     def sync_data(self) -> None:
         self.client.pers_data["pos"] = inttup(self.pos)
@@ -309,12 +308,6 @@ class Player(VisibleSprite):
         if time.time() - self.powerup_time > 4 and self.powerup:
             self.powerup = False
             self.throwing = False
-
-        for player in self.manager.other_players.values():
-            if not player.powerup: continue
-            if player.powerup.pos.distance_to(VEC(self.real_rect.center)) < 60:
-                self.powerup_time = time.time()
-                self.powerup = True
 
     def update_camera(self) -> None:
         if self.snowballs:

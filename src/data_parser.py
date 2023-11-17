@@ -4,6 +4,7 @@ if TYPE_CHECKING:
     from .client import Client
 
 from src.others import OtherPlayer, OtherSnowball
+from src.powerup import Powerup
 from src.constants import VEC
 
 class Parser:
@@ -25,6 +26,8 @@ class Parser:
                     self.manager.scene.waiting = False
             case "wd": # Wind
                 self.manager.scene.wind_vel = VEC(data["speed"], 0)
+            case "pw": # Powerup
+                Powerup(self.manager.scene, data["id"], data["pos"])
             case "tm": # Time
                 self.manager.scene.time_left = data["seconds"]
 
@@ -60,8 +63,23 @@ class Parser:
 
         # Remove disconnected players
         for _id in all_ids:
-            player = self.manager.other_players.pop(_id)
-            player.kill()
+            self.manager.other_players.pop(_id).kill()
+
+        all_ids = set(Powerup.instances.keys())
+        # Parse powerup position
+        if "powerups" not in data: return
+        for powerup_data in data["powerups"]:
+            if powerup_data["id"] in all_ids:
+                all_ids.remove(powerup_data["id"])
+
+            if powerup_data["id"] in Powerup.instances:
+                powerup = Powerup.instances[powerup_data["id"]]
+                powerup.recv_pos = VEC(powerup_data["pos"])
+            else:
+                Powerup.instances[powerup_data["id"]] = Powerup(self.manager.scene, powerup_data["id"], powerup_data["pos"])
+
+        for _id in all_ids:
+            Powerup.instances.pop(_id).kill()
 
     def irregular_client_data(self, data: dict) -> None:
         if "hit" in data:

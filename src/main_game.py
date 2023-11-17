@@ -95,10 +95,6 @@ class MainGame(Scene):
                 ])
                 SnowFlake(self, pos + self.player.camera.offset)
 
-        if time.time() - self.powerup_spawn_time > 30:
-            self.powerup_spawn_time = time.time()
-            self.powerup = Powerup(self, self.player.pos + (randint(-200, 200), -600))
-
         # if "eliminate" in self.client.thread_data:
         #     if not self.manager.other_players:
         #         self.manager.new_scene("EndMenu")
