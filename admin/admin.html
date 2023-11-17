@@ -4,10 +4,17 @@
 </head>
 <body>
     <h1>Blizzard Bash Control Panel</h1>
+    <table id="info">
+        <caption></caption>
+        <tr><th style="width: 25%">Command</th><th>Description</th></tr>
+        <tr><td>start</td><td>Start the game</td></tr>
+        <tr><td>elimination</td><td>Switch game mode to elimination</td></tr>
+        <tr><td>infinite</td><td>Switch game mode to infinite</td></tr>
+    </table>
     <p id="connectionStatus">Connecting to server...</p>
     <input id="commandPrompt"/>
     <button id="sendCommand" onclick="sendCommand()">Send</button>
-    <div>
+    <div style="margin-top: 50px">
         <div id="commands"></div>
         <div id="received"></div>
     </div>
