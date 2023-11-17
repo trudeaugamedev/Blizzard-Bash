@@ -94,7 +94,7 @@ class Player(VisibleSprite):
 
     def sync_data(self) -> None:
         self.client.pers_data["pos"] = inttup(self.pos)
-        self.client.pers_data["rot"] = self.rotation
+        self.client.pers_data["rot"] = int(self.rotation)
         self.client.pers_data["flip"] = self.flip
         self.client.pers_data["frame"] = assets.player.index(self.orig_image)
 

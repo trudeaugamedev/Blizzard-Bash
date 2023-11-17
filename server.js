@@ -16,7 +16,10 @@ function broadcastPlayerData() {
 		xplayers.delete(id);
 		let playerDataArray = Array.from(xplayers.values()).map(player => player.data);
 
-		let powerupDataArray = Array.from(powerups.values()).map(powerup => ({"id": powerup.id, "pos": powerup.pos}));
+		let powerupDataArray = Array.from(powerups.values()).map(powerup => ({
+			"id": powerup.id,
+			"pos": [Math.floor(powerup.pos[0]), Math.floor(powerup.pos[1])],
+		}));
 
 		player.socket.send(JSON.stringify({
 			"type": "cl",
