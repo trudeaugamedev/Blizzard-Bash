@@ -54,7 +54,7 @@ class Powerup {
 		this.vel[1] += 0.01;
 		this.pos[1] += this.vel[1];
 		this.pos[0] += windSpeed * 0.0015;
-		if (Date.now() - this.startTime > 10000) {
+		if (Date.now() - this.startTime > 15000) {
 			powerups.delete(this.id);
 		}
 	}
@@ -79,7 +79,7 @@ let windSpeed = [randint(-600, -200), randint(200, 600)][randint(0, 1)];
 let powerupTime = Date.now();
 let powerupDuration = randint(15000, 25000);
 
-const totalTime = 300000;
+const totalTime = 10000;
 let startTime, timerTime;
 let timeLeft = totalTime;
 
@@ -105,8 +105,8 @@ wss.on("connection", (socket) => {
 	});
 
 	socket.on("message", (msg) => {
-		// Right when game had ended, this would still run despite all players being deleted
-		if (players.size == 0) return;
+		// Right when game had ended, this would still run despite all players being deleted (admin being the only one left)
+		if (players.size == 1 && players.has(-1)) return;
 
 		if (msg.toString() === "admin") {
 			handleAdminConnect(client);
@@ -163,7 +163,11 @@ function handleAdminMessage(msg) {
 
 function restart() {
 	startTime = Date.now();
-	players.clear();
+	if (players.has(-1)) {
+		let admin = players.get(-1);
+		players.clear();
+		players.set(-1, admin);
+	}
 	powerups.clear();
 	waiting = true;
 }

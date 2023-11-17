@@ -13,13 +13,22 @@ socket.addEventListener("open", (event) => {
     socket.send("admin");
 });
 socket.addEventListener("message", (event) => {
-    if (JSON.parse(event.data.toString()).type === "cl") return;
-    document.getElementById("received").innerHTML = event.data + "<br>" + document.getElementById("received").innerHTML;
+    // document.getElementById("received").innerHTML = event.data + "<br>" + document.getElementById("received").innerHTML;
+    let parsed = JSON.parse(event.data.toString());
+    if (parsed.type === "cl") {
+        console.log("yes");
+        displayGameState(parsed);
+    }
 });
 socket.addEventListener("close", (event) => {
     document.getElementById("connectionStatus").textContent = "Disconnected, refresh to reconnect.";
     console.log("Websocket closed");
 });
+
+function displayGameState(data) {
+    data = JSON.stringify(data, null, 3);
+    document.getElementById("received").innerHTML = data;
+}
 
 function sendCommand() {
     let command = document.getElementById("commandPrompt").value;
