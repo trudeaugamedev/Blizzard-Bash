@@ -76,7 +76,9 @@ let windSpeed = [randint(-600, -200), randint(200, 600)][randint(0, 1)];
 let powerupTime = Date.now();
 let powerupDuration = randint(15000, 25000);
 
+const totalTime = 10000;
 let startTime, timerTime;
+let timeLeft = totalTime;
 
 wss.on("connection", (socket) => {
     const client = {
@@ -100,6 +102,9 @@ wss.on("connection", (socket) => {
 	});
 
 	socket.on("message", (msg) => {
+		// Right when game had ended, this would still run despite all players being deleted
+		if (players.size == 0) return;
+
 		if (msg.toString() === "admin") {
 			handleAdminConnect(client);
 			return;
@@ -171,9 +176,16 @@ function game() {
 		powerup.update();
 	}
 
-	if (mode === "elimination" && Date.now() - timerTime > 1000) {
+	if (!waiting && mode === "elimination" && Date.now() - timerTime > 1000) {
 		timerTime = Date.now();
-		broadcast(JSON.stringify({"type": "tm", "seconds": Math.floor((300000 - (Date.now() - startTime)) / 1000)}));
+		timeLeft = Math.floor((totalTime - (Date.now() - startTime)) / 1000);
+		broadcast(JSON.stringify({"type": "tm", "seconds": timeLeft}));
+		if (timeLeft < 0) {
+			startTime = Date.now();
+			players.clear();
+			powerups.clear();
+			waiting = true;
+		}
 	}
 }
 

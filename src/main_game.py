@@ -22,10 +22,11 @@ from . import assets
 class MainGame(Scene):
     def __init__(self, manager: GameManager, previous_scene: Scene) -> None:
         super().__init__(manager, previous_scene)
+        # MainGame object must exist before initialization or sprites might get added to the previous scene (StartMenu)
 
     def setup(self) -> None:
         self.waiting = True
-        self.manager.client_thread.start()
+        self.client.restart()
         self.seed = -1
         while self.client.id == -1:
             time.sleep(0.01)

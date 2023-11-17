@@ -6,6 +6,7 @@ if TYPE_CHECKING:
 from websockets.exceptions import ConnectionClosedError, ConnectionClosedOK
 import websockets.client as ws_client
 from traceback import print_exc
+from threading import Thread
 from random import randint
 from queue import Queue
 from uuid import uuid4
@@ -22,6 +23,10 @@ class ManualExit(Exception):
 class Client:
     def __init__(self, manager: GameManager) -> None:
         self.manager = manager
+        self.reset()
+
+    def reset(self) -> None:
+        self.thread = Thread(target=self.run, daemon=True)
         self.parser = Parser(self)
         self.running = True # Modify this attribute to stop client
         self.exited = False # Indicates whether the client has really exited
@@ -35,6 +40,10 @@ class Client:
             "score": 0,
         }
         self.irreg_data = Queue() # Occasional data
+
+    def restart(self) -> None:
+        self.reset()
+        self.thread.start()
 
     async def recv_wrapper(self) -> None:
         print("Coroutine 'recv' started")

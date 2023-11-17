@@ -4,7 +4,6 @@ if TYPE_CHECKING:
     from manager import GameManager
 
 from pygame.locals import SRCALPHA, KEYDOWN, K_RETURN
-import asyncio
 import pygame
 
 from .constants import WIDTH, HEIGHT, FONT
@@ -20,6 +19,8 @@ class EndMenu(Scene):
 
     def update(self) -> None:
         super().update()
+        if KEYDOWN in self.manager.events and self.manager.events[KEYDOWN].key == K_RETURN:
+            self.manager.new_scene("StartMenu")
 
     def draw(self) -> None:
         self.manager.screen.blit(self.background, (0, 0))

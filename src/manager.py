@@ -25,7 +25,6 @@ class GameManager:
         pygame.init()
 
         self.client = Client(self)
-        self.client_thread = Thread(target=self.client.run, daemon=True)
 
         self.flags = HWSURFACE | DOUBLEBUF | RESIZABLE | SCALED
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT), self.flags)
