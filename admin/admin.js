@@ -16,7 +16,6 @@ socket.addEventListener("message", (event) => {
     // document.getElementById("received").innerHTML = event.data + "<br>" + document.getElementById("received").innerHTML;
     let parsed = JSON.parse(event.data.toString());
     if (parsed.type === "cl") {
-        console.log("yes");
         displayGameState(parsed);
     }
 });
