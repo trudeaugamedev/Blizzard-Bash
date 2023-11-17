@@ -143,6 +143,8 @@ function handleAdminConnect(client) {
 
 function handleAdminMessage(msg) {
 	const command = msg.toString();
+	broadcast(JSON.stringify({"type": "ad", "command": command}));
+	console.log(`Admin sent the command "${command}"`);
 	if (command === "start") {
 		waiting = false;
 		timerTime = Date.now();
@@ -151,9 +153,16 @@ function handleAdminMessage(msg) {
 		mode = "elimination";
 	} else if (command === "infinite") {
 		mode = "infinite";
+	} else if (command === "stop") {
+		restart();
 	}
-	broadcast(JSON.stringify({"type": "ad", "command": command}));
-	console.log(`Admin sent the command "${command}"`);
+}
+
+function restart() {
+	startTime = Date.now();
+	players.clear();
+	powerups.clear();
+	waiting = true;
 }
 
 function game() {
@@ -181,10 +190,7 @@ function game() {
 		timeLeft = Math.floor((totalTime - (Date.now() - startTime)) / 1000);
 		broadcast(JSON.stringify({"type": "tm", "seconds": timeLeft}));
 		if (timeLeft < 0) {
-			startTime = Date.now();
-			players.clear();
-			powerups.clear();
-			waiting = true;
+			restart();
 		}
 	}
 }

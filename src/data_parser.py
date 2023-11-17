@@ -24,6 +24,8 @@ class Parser:
             case "ad": # Admin command
                 if data["command"] == "start":
                     self.manager.scene.waiting = False
+                elif data["command"] == "stop":
+                    self.manager.scene.time_left = -1
             case "wd": # Wind
                 self.manager.scene.wind_vel = VEC(data["speed"], 0)
             case "pw": # Powerup
