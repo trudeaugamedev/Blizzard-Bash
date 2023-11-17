@@ -43,15 +43,11 @@ class Powerup {
 		this.id = id;
 		powerupId++;
 		this.vel = [0, 0]
-		// this.pos = [randint(-1800, 1800), -800];
-		this.pos = [0, -800];
+		this.pos = [randint(-1800, 1800), -800];
 		this.startTime = Date.now();
 	}
 
 	update() {
-		// self.vel.y += GRAVITY * self.manager.dt
-		// self.vel += self.scene.wind_vel * 2 * self.manager.dt
-		// self.vel *= 0.99
 		this.vel[1] += 0.01;
 		this.pos[1] += this.vel[1];
 		this.pos[0] += windSpeed * 0.0015;
@@ -77,8 +73,7 @@ let windDuration = randint(4000, 8000);
 let windSpeed = [randint(-600, -200), randint(200, 600)][randint(0, 1)];
 
 powerupTime = Date.now();
-powerupDuration = 10000;
-// powerupDuration = randint(15000, 25000);
+powerupDuration = randint(15000, 25000);
 
 let startTime, timerTime;
 
@@ -164,7 +159,7 @@ function game() {
 	if (Date.now() - powerupTime > powerupDuration) {
 		powerupTime = Date.now();
 		powerupDuration = randint(15000, 25000);
-		// powerup_pos = [randint(-1800, 1800), -800];
+		powerup_pos = [randint(-1800, 1800), -800];
 		powerups.set(powerupId, new Powerup(powerupId));
 		// broadcast(JSON.stringify({"type": "pw", "id": powerupId++, "pos": powerupPos}));
 	}
