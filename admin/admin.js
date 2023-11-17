@@ -1,7 +1,7 @@
 "use strict";
 
-// const WSS_URL = "ws://localhost:3000";
-const WSS_URL = "wss://trudeaugamedev-winter.herokuapp.com";
+const WSS_URL = "ws://localhost:3000";
+// const WSS_URL = "wss://trudeaugamedev-winter.herokuapp.com";
 
 const socket = new WebSocket(WSS_URL);
 socket.addEventListener("error", (event) => {
@@ -26,3 +26,10 @@ function sendCommand() {
     socket.send(command);
     document.getElementById("commands").innerHTML = command + "<br>" + document.getElementById("commands").innerHTML;
 }
+
+let commandPrompt = document.getElementById("commandPrompt");
+commandPrompt.addEventListener("keypress", (event) => {
+    if (event.key === "Enter") {
+        document.getElementById("sendCommand").click();
+    }
+});
