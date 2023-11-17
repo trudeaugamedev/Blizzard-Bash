@@ -17,6 +17,7 @@ class Parser:
             case "hi": # Initial
                 self.client.id = data["id"]
                 self.manager.scene.seed = data["seed"]
+                self.manager.scene.waiting = data["waiting"]
             case "cl": # Client data
                 self.client_data(data)
             case "ir": # Irregular client data

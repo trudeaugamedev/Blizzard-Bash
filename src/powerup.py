@@ -49,6 +49,7 @@ class Powerup(VisibleSprite):
             self.client.irreg_data.put({"id": self.id, "powerup": 1}) # powerup key to distinguish the message
 
     def draw(self) -> None:
+        if not hasattr(self, "initialized"): return
         self.manager.screen.blit(shadow(self.image), self.pos - self.size // 2 - self.scene.player.camera.offset + (3, 3), special_flags=BLEND_RGB_SUB)
         self.manager.screen.blit(self.image, self.pos - self.size // 2 - self.scene.player.camera.offset)
 
