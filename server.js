@@ -64,6 +64,7 @@ const players = new Map();
 const powerups = new Map();
 
 let seed = randint(0, 99999999);
+let mode = "elimination";
 let playerId = 0;
 let powerupId = 0;
 let waiting = true;
@@ -72,8 +73,8 @@ let windTime = Date.now();
 let windDuration = randint(4000, 8000);
 let windSpeed = [randint(-600, -200), randint(200, 600)][randint(0, 1)];
 
-powerupTime = Date.now();
-powerupDuration = randint(15000, 25000);
+let powerupTime = Date.now();
+let powerupDuration = randint(15000, 25000);
 
 let startTime, timerTime;
 
@@ -141,6 +142,10 @@ function handleAdminMessage(msg) {
 		waiting = false;
 		timerTime = Date.now();
 		startTime = Date.now();
+	} else if (command === "elimination") {
+		mode = "elimination";
+	} else if (command === "infinite") {
+		mode = "infinite";
 	}
 	broadcast(JSON.stringify({"type": "ad", "command": command}));
 	console.log(`Admin sent the command "${command}"`);
@@ -161,13 +166,12 @@ function game() {
 		powerupDuration = randint(15000, 25000);
 		powerup_pos = [randint(-1800, 1800), -800];
 		powerups.set(powerupId, new Powerup(powerupId));
-		// broadcast(JSON.stringify({"type": "pw", "id": powerupId++, "pos": powerupPos}));
 	}
 	for (const [id, powerup] of powerups) {
 		powerup.update();
 	}
 
-	if (Date.now() - timerTime > 1000) {
+	if (mode === "elimination" && Date.now() - timerTime > 1000) {
 		timerTime = Date.now();
 		broadcast(JSON.stringify({"type": "tm", "seconds": Math.floor((300000 - (Date.now() - startTime)) / 1000)}));
 	}
