@@ -46,12 +46,11 @@ class Powerup(VisibleSprite):
             self.pos.y = ground_y - self.size.y // 2
             self.vel.x *= 0.85
 
+        self.rect = pygame.Rect(self.pos - (12, 12), self.size + (24, 24))
         if self.rect.colliderect(self.scene.player.real_rect):
             self.scene.player.powerup = self.type
             self.scene.player.powerup_time = time.time()
             self.client.irreg_data.put({"id": self.id, "powerup": 1}) # powerup key to uniquify the message
-
-        self.rect = pygame.Rect(self.pos - (12, 12), self.size + (24, 24))
 
     def draw(self) -> None:
         if not hasattr(self, "initialized"): return
