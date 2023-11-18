@@ -53,7 +53,7 @@ class Powerup {
 		this.id = id;
 		powerupId++;
 		this.vel = [0, 0]
-		this.pos = [randint(-1800, 1800), -800];
+		this.pos = [randint(-1800, 1800), -1200];
 		this.type = ["rapidfire", "strength", "clustershot"][randint(0, 2)]
 		this.startTime = Date.now();
 	}
@@ -62,7 +62,7 @@ class Powerup {
 		this.vel[1] += 0.01;
 		this.pos[1] += this.vel[1];
 		this.pos[0] += windSpeed * 0.0015;
-		if (Date.now() - this.startTime > 15000) {
+		if (Date.now() - this.startTime > 20000) {
 			powerups.delete(this.id);
 		}
 	}
