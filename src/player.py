@@ -77,7 +77,9 @@ class Player(VisibleSprite):
         self.CONST_ACC = 500 # 500 pixels per second squared (physics :P)
         self.MAX_SPEED = 200
         self.SMALL_MAX_SPEED = 30
-        self.JUMP_SPEED = -300
+        self.JUMP_SPEED1 = -400
+        self.JUMP_SPEED2 = -320
+        self.JUMP_SPEED3 = -210
         self.THROW_SPEED = 900
         self.SB_OFFSET = self.size // 2 - (0, 10)
 
@@ -166,8 +168,13 @@ class Player(VisibleSprite):
 
         if self.on_ground:
             self.jump_time = time.time()
-        if self.keys[K_w] and time.time() - self.jump_time < 0.17 and self.can_move:
-            self.vel.y = self.JUMP_SPEED
+        if self.keys[K_w] and self.can_move:
+            if time.time() - self.jump_time < 0.2:
+                self.vel.y = self.JUMP_SPEED1
+            elif time.time() - self.jump_time < 0.3:
+                self.vel.y = self.JUMP_SPEED2
+            elif time.time() - self.jump_time < 0.36:
+                self.vel.y = self.JUMP_SPEED3
             self.jumping = True
 
         if self.keys[K_s] and not self.jumping and self.ground_level is Ground2:
