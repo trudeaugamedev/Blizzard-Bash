@@ -185,6 +185,7 @@ class Player(VisibleSprite):
         if self.keys[K_SPACE]:
             self.digging = True
             self.idle = False
+            self.throwing = False
 
     def update_throw(self) -> None:
         self.can_throw = True if self.powerup else not self.snowballs and self.can_move and self.dig_iterations
