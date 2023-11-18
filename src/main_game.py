@@ -86,9 +86,6 @@ class MainGame(Scene):
         self.wind_vel = VEC(0, 0)
         self.time_left = None
 
-        self.powerup_spawn_time = time.time()
-        self.powerup = None
-
         self.score = 0
         self.lost = False
         self.started = False

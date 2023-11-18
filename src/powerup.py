@@ -21,12 +21,6 @@ class Powerup(VisibleSprite):
         self.id = _id
         self.type = _type
         self.__class__.instances[self.id] = self
-        if self.scene.powerup:
-            try:
-                self.scene.powerup.kill()
-            except ValueError:
-                pass
-            self.scene.powerup = None
         self.image = assets.powerup_icons[self.type]
         self.size = VEC(self.image.get_size())
         self.pos = VEC(pos)
