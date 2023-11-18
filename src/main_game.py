@@ -111,17 +111,6 @@ class MainGame(Scene):
         if self.time_left is not None and self.time_left <= 0:
             self.manager.new_scene("EndMenu")
 
-        # if "eliminate" in self.client.thread_data:
-        #     if not self.manager.other_players:
-        #         self.manager.new_scene("EndMenu")
-        #     for player in self.manager.other_players.values():
-        #         if self.score > player.score:
-        #             break
-        #     else:
-        #         self.lost = True
-        #         self.manager.new_scene("EndMenu")
-        #     del self.client.thread_data["eliminate"]
-
         if KEYDOWN in self.manager.events and self.manager.events[KEYDOWN].key == K_RETURN:
             self.manager.ready = True
 
@@ -166,13 +155,6 @@ class MainGame(Scene):
             self.manager.screen.blit(text, VEC(20, 72) + (3, 3))
             text = FONT[30].render(text_str, True, TEXT_COLOR)
             self.manager.screen.blit(text, (20, 72))
-            
-            # text_str = f"Next Elimination: {self.client.thread_data['time'][1] // 60}:{'0' if self.client.thread_data['time'][1] % 60 < 10 else ''}{self.client.thread_data['time'][1] % 60}"
-            # text = FONT[30].render(text_str, True, TEXT_COLOR)
-            # text.set_alpha(70)
-            # self.manager.screen.blit(text, VEC(20, 112) + (3, 3))
-            # text = FONT[30].render(text_str, True, TEXT_COLOR)
-            # self.manager.screen.blit(text, (20, 112))
 
         if self.waiting:
             self.draw_waiting_text()

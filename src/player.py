@@ -258,7 +258,7 @@ class Player(VisibleSprite):
             middle = min(grounds, key=lambda g: g.height_map[centerx])
             grounds.remove(middle)
             lowest = grounds[0]
-            highest_y, middle_y, lowest_y = highest.height_map[centerx], middle.height_map[centerx], lowest.height_map[centerx]
+            highest_y, middle_y, _lowest_y = highest.height_map[centerx], middle.height_map[centerx], lowest.height_map[centerx]
             above = lowest # Closest ground it is above
             if self.pos.y <= highest_y + 12:
                 above = highest
