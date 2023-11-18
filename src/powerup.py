@@ -46,7 +46,7 @@ class Powerup(VisibleSprite):
             self.pos.y = ground_y - self.size.y // 2
             self.vel.x *= 0.85
 
-        if self.pos.distance_to(VEC(self.scene.player.real_rect.center)) < 60:
+        if self.rect.colliderect(self.scene.player.real_rect):
             self.scene.player.powerup = self.type
             self.scene.player.powerup_time = time.time()
             self.client.irreg_data.put({"id": self.id, "powerup": 1}) # powerup key to uniquify the message
