@@ -10,8 +10,8 @@ import time
 
 from .constants import VEC, SCR_DIM, GRAVITY, PIXEL_SIZE, TILE_SIZE, WIDTH
 from .utils import intvec, snap, clamp, snap, sign, shadow, inttup
+from .ground import Ground, Ground2, Ground3
 from .sprite import VisibleSprite, Layers
-from .ground import Ground, Ground2
 from .snowball import Snowball
 from . import assets
 
@@ -177,7 +177,7 @@ class Player(VisibleSprite):
                 self.vel.y = self.JUMP_SPEED3
             self.jumping = True
 
-        if self.keys[K_s] and not self.jumping and self.ground_level is Ground2:
+        if self.keys[K_s] and not self.jumping and self.on_ground:
             self.pos.y += 10
 
         if self.keys[K_SPACE]:
@@ -221,12 +221,17 @@ class Player(VisibleSprite):
         centerx = int(self.rect.centerx // PIXEL_SIZE * PIXEL_SIZE)
         y1 = Ground.height_map[centerx]
         y2 = Ground2.height_map[centerx]
-        if self.jumping and self.pos.y < y2 + 5:
-            self.ground_level = min(Ground, Ground2, key=lambda g: g.height_map[centerx])
+        y3 = Ground3.height_map[centerx]
+        if self.jumping and self.pos.y < y3 + 5:
+            self.ground_level = min([Ground, Ground2, Ground3], key=lambda g: g.height_map[centerx])
+        elif y3 + 15 < self.pos.y < y2 + 5:
+            self.ground_level = min([Ground, Ground2], key=lambda g: g.height_map[centerx])
         elif self.pos.y > y2 + 15:
             self.ground_level = Ground
-        if y1 < y2:
-            self.ground_level = Ground
+        if y2 < y3:
+            self.ground_level = Ground2
+            if y1 < y2:
+                self.ground_level = Ground
 
         self.on_ground = False
         ground_y = self.ground_level.height_map[centerx]
