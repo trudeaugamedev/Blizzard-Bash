@@ -65,6 +65,7 @@ class Player(VisibleSprite):
         self.can_throw = True
         self.sb_vel = VEC(0, 0)
         self.snowballs: list[Snowball] = []
+        self.rapidfire_time = time.time()
 
         self.frame_group = assets.player_idle
         self.frame = 0
@@ -188,7 +189,11 @@ class Player(VisibleSprite):
             self.throwing = False
 
     def update_throw(self) -> None:
-        self.can_throw = True if self.powerup else not self.snowballs and self.can_move and self.dig_iterations
+        if not self.powerup:
+            self.can_throw = self.can_move and self.dig_iterations > 0
+        elif time.time() - self.rapidfire_time > 0.25:
+            self.rapidfire_time = time.time()
+            self.can_throw = True
         if pygame.mouse.get_pressed()[0] and self.can_throw:
             m_pos = VEC(pygame.mouse.get_pos())
             self.throwing = True
@@ -208,6 +213,7 @@ class Player(VisibleSprite):
                 self.throwing = False
                 self.snowballs.append(Snowball(self.scene, self.sb_vel, assets.snowball_small if self.dig_iterations < 3 or self.powerup else assets.snowball_large))
                 self.dig_iterations = 0
+                self.can_throw = False
 
     def update_position(self) -> None:
         self.vel += self.acc * self.manager.dt
