@@ -8,6 +8,7 @@ from abc import abstractmethod
 from enum import Enum, auto
 
 class Layers(Enum):
+    MAP3 = auto()
     MAP2 = auto()
     PLAYER = auto()
     MAP = auto()
