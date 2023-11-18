@@ -4,7 +4,7 @@ if TYPE_CHECKING:
     from scene import Scene
     from player import Player
 
-from random import choices, uniform, randint
+from random import choices, uniform, randint, choice
 import pygame
 
 from .constants import VEC, GRAVITY, PIXEL_SIZE, WIDTH
@@ -14,7 +14,7 @@ from . import assets
 
 class SnowFlake(VisibleSprite):
     def __init__(self, scene: Scene, pos: tuple[int, int]) -> None:
-        super().__init__(scene, Layers.SNOWFLAKE)
+        super().__init__(scene, choice([Layers.SNOWFLAKE, Layers.SNOWFLAKE2, Layers.SNOWFLAKE3]))
         
         self.pos = VEC(pos)
         self.vel = VEC(0, 0)

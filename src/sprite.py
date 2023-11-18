@@ -9,13 +9,15 @@ from enum import Enum, auto
 
 class Layers(Enum):
     PLAYER3 = auto()
+    SNOWFLAKE3 = auto()
     GROUND3 = auto()
     PLAYER2 = auto()
+    SNOWFLAKE2 = auto()
     GROUND2 = auto()
     PLAYER = auto()
+    SNOWFLAKE = auto()
     GROUND = auto()
     SNOWBALL = auto()
-    SNOWFLAKE = auto()
     POWERUP = auto()
     ARROW = auto()
     GUI = auto()
