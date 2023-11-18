@@ -5,6 +5,7 @@ if TYPE_CHECKING:
 
 from math import sin, pi, sqrt
 from pygame.locals import *
+from random import uniform
 import pygame
 import time
 
@@ -215,7 +216,13 @@ class Player(VisibleSprite):
         if MOUSEBUTTONUP in self.manager.events:
             if self.manager.events[MOUSEBUTTONUP].button == 1 and self.can_throw:
                 self.throwing = False
-                self.snowballs.append(Snowball(self.scene, self.sb_vel, assets.snowball_small if self.dig_iterations < 3 or self.powerup == "rapidfire" else assets.snowball_large))
+                if self.powerup == "clustershot":
+                    for _ in range(3 if self.dig_iterations < 3 else 7):
+                        self.snowballs.append(Snowball(self.scene, self.sb_vel + VEC(uniform(-150, 150), uniform(-150, 150)), assets.snowball_small))
+                    for _ in range(2 if self.dig_iterations < 3 else 5):
+                        self.snowballs.append(Snowball(self.scene, self.sb_vel + VEC(uniform(-150, 150), uniform(-150, 150)), assets.snowball_large))
+                else:
+                    self.snowballs.append(Snowball(self.scene, self.sb_vel, assets.snowball_small if self.dig_iterations < 3 or self.powerup == "rapidfire" else assets.snowball_large))
                 self.dig_iterations = 0
                 self.can_throw = False
 
@@ -339,7 +346,9 @@ class Player(VisibleSprite):
         if self.powerup == "rapidfire" and time.time() - self.powerup_time > 4:
             self.powerup = None
             self.throwing = False
-        if time.time() - self.powerup_time > 20:
+        if self.powerup == "strength" and time.time() - self.powerup_time > 20:
+            self.powerup = None
+        if self.powerup == "clustershot" and time.time() - self.powerup_time > 20:
             self.powerup = None
 
     def update_camera(self) -> None:

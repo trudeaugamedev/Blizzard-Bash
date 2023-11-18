@@ -20,13 +20,16 @@ for i in range(10):
 
 ground_tiles: list[pygame.Surface] = [
     load_img(f"{TEXTURES}/ground/ground.png", alpha=False).subsurface(0, 0, TILE_SIZE * 2, TILE_SIZE),
-    load_img(f"{TEXTURES}/ground/ground.png", alpha=False).subsurface(0, TILE_SIZE, TILE_SIZE * 2, TILE_SIZE)
+    load_img(f"{TEXTURES}/ground/ground.png", alpha=False).subsurface(0, TILE_SIZE, TILE_SIZE * 2, TILE_SIZE),
 ]
 
 powerup_icons = {
     "rapidfire": load_img(f"{TEXTURES}/misc/icon_rapidfire.png", alpha=False),
-    "strength": pygame.transform.scale2x(load_img(f"{TEXTURES}/misc/icon_rapidfire.png", alpha=False)), # TODO: CHANGE
+    "strength": pygame.Surface((40, 40)),
+    "clustershot": pygame.Surface((24, 24)),
 }
+powerup_icons["strength"].fill((255, 0, 0))
+powerup_icons["clustershot"].fill((0, 255, 0))
 gradient = pygame.transform.scale((load_img(f"{TEXTURES}/misc/gradient.png", factor=1)), (TILE_SIZE, 800))
 background = load_img(f"{TEXTURES}/misc/background.png", alpha=False)
 

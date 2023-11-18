@@ -54,7 +54,7 @@ class Powerup {
 		powerupId++;
 		this.vel = [0, 0]
 		this.pos = [randint(-1800, 1800), -800];
-		this.type = ["rapidfire", "strength"][randint(0, 1)]
+		this.type = ["rapidfire", "strength", "clustershot"][randint(0, 2)]
 		this.startTime = Date.now();
 	}
 
