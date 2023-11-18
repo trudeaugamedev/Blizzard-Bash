@@ -16,7 +16,7 @@ class Ground(VisibleSprite):
     instances = {}
     height_map = {}
 
-    def __init__(self, scene: Scene, pos: tuple[int, int], size: tuple[int, int], layer: Layers = Layers.MAP) -> None:
+    def __init__(self, scene: Scene, pos: tuple[int, int], size: tuple[int, int], layer: Layers = Layers.GROUND) -> None:
         super().__init__(scene, layer)
         self.size = VEC(size)
         self.pos = VEC(pos)
@@ -87,7 +87,7 @@ class Ground2(Ground):
     height_map = {}
 
     def __init__(self, scene: Scene, pos: tuple[int, int], size: tuple[int, int]) -> None:
-        super().__init__(scene, pos, size, Layers.MAP2)
+        super().__init__(scene, pos, size, Layers.GROUND2)
 
     def generate_image(self) -> None:
         self.generate_unsliced_image()
@@ -106,7 +106,7 @@ class Ground3(Ground):
     height_map = {}
 
     def __init__(self, scene: Scene, pos: tuple[int, int], size: tuple[int, int]) -> None:
-        super().__init__(scene, pos, size, Layers.MAP3)
+        super().__init__(scene, pos, size, Layers.GROUND3)
 
     def generate_image(self) -> None:
         self.generate_unsliced_image()
