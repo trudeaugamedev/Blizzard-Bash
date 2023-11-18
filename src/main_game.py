@@ -96,7 +96,7 @@ class MainGame(Scene):
                 ])
                 SnowFlake(self, pos + self.player.camera.offset)
 
-        if self.time_left is not None and self.time_left < 0:
+        if self.time_left is not None and self.time_left <= 0:
             self.manager.new_scene("EndMenu")
 
         # if "eliminate" in self.client.thread_data:
@@ -112,6 +112,8 @@ class MainGame(Scene):
 
         if KEYDOWN in self.manager.events and self.manager.events[KEYDOWN].key == K_RETURN:
             self.manager.ready = True
+
+        self.client.pers_data["score"] = self.score
 
     def draw(self) -> None:
         self.manager.screen.blit(assets.background, (0, 0))

@@ -14,7 +14,12 @@ function broadcastPlayerData() {
 	for (const [id, player] of players) {
 		let xplayers = new Map(players);
 		xplayers.delete(id);
-		let playerDataArray = Array.from(xplayers.values()).map(player => player.data);
+
+		let playerDataArray = new Array(0);
+		for (const [id, player] of xplayers) {
+			if (player.eliminated) continue;
+			playerDataArray.push(player.data);
+		}
 
 		let powerupDataArray = Array.from(powerups.values()).map(powerup => ({
 			"id": powerup.id,
@@ -38,6 +43,7 @@ class Player {
 		this.id = client.id;
 		this.socket = client.socket;
 		this.data = null;
+		this.eliminated = false;
 	}
 }
 
@@ -79,9 +85,10 @@ let windSpeed = [randint(-600, -200), randint(200, 600)][randint(0, 1)];
 let powerupTime = Date.now();
 let powerupDuration = randint(15000, 25000);
 
-const totalTime = 300000;
-let startTime, timerTime;
-let timeLeft = totalTime;
+const totalTime = 60000;
+let startTime, timerTime, midTime, elimTime;
+let secondsLeft = totalTime;
+let eliminated = 0;
 
 wss.on("connection", (socket) => {
     const client = {
@@ -105,8 +112,7 @@ wss.on("connection", (socket) => {
 	});
 
 	socket.on("message", (msg) => {
-		// Right when game had ended, this would still run despite all players being deleted (admin being the only one left)
-		if (players.size == 1 && players.has(-1)) return;
+		if (players.has(client.id) && players.get(client.id).eliminated) return;
 
 		if (msg.toString() === "admin") {
 			handleAdminConnect(client);
@@ -152,6 +158,8 @@ function handleAdminMessage(msg) {
 		waiting = false;
 		timerTime = Date.now();
 		startTime = Date.now();
+		midTime = startTime + totalTime / 2;
+		elimTime = totalTime / 2 / (players.size - 1 - 1); // minus admin, -1 again to offset the last two players
 	} else if (command === "elimination") {
 		mode = "elimination";
 	} else if (command === "infinite") {
@@ -170,6 +178,7 @@ function restart() {
 	}
 	powerups.clear();
 	waiting = true;
+	eliminated = 0;
 }
 
 function game() {
@@ -185,7 +194,6 @@ function game() {
 	if (Date.now() - powerupTime > powerupDuration) {
 		powerupTime = Date.now();
 		powerupDuration = randint(15000, 25000);
-		powerup_pos = [randint(-1800, 1800), -800];
 		powerups.set(powerupId, new Powerup(powerupId));
 	}
 	for (const [id, powerup] of powerups) {
@@ -194,10 +202,27 @@ function game() {
 
 	if (!waiting && mode === "elimination" && Date.now() - timerTime > 1000) {
 		timerTime = Date.now();
-		timeLeft = Math.floor((totalTime - (Date.now() - startTime)) / 1000);
-		broadcast(JSON.stringify({"type": "tm", "seconds": timeLeft}));
-		if (timeLeft < 0) {
+		secondsLeft = Math.floor((totalTime - (Date.now() - startTime)) / 1000);
+		broadcast(JSON.stringify({"type": "tm", "seconds": secondsLeft}));
+		if (secondsLeft < 0) {
 			restart();
+		}
+	}
+
+	if (!waiting && !(players.size == 1 && players.has(-1)) && Date.now() - midTime > elimTime * (eliminated + 1)) {
+		let min = 9999999;
+		let min_player = null;
+		for (const [id, player] of players) {
+			if (id == -1 || player.eliminated) continue;
+			if (player.data.score < min) {
+				min = player.data.score;
+				min_player = player;
+			}
+		}
+		if (min_player !== null) {
+			min_player.socket.send_obj({"type": "el"});
+			min_player.eliminated = true;
+			eliminated++;
 		}
 	}
 }

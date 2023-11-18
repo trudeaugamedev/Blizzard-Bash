@@ -74,7 +74,7 @@ class Snowball(VisibleSprite):
                 self.scene.hit = True
                 self.scene.hit_pos = self.pos
                 self.kill()
-                if not self.scene.waiting:
+                if not self.scene.waiting and not self.player.eliminated:
                     self.scene.score += self.score
                     self.client.pers_data["score"] = self.scene.score
                 self.client.irreg_data.put({"hit": self.score * sign(self.vel.x), "id": player.id})

@@ -33,6 +33,8 @@ class Parser:
                 Powerup(self.manager.scene, data["id"], data["pos"])
             case "tm": # Time
                 self.manager.scene.time_left = data["seconds"]
+            case "el": # Eliminated
+                self.manager.scene.player.eliminated = True
 
     def client_data(self, data: dict) -> None:
         if not isinstance(self.manager.scene, self.manager.Scenes.MainGame.value): return
