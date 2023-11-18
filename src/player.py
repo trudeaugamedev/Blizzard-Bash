@@ -176,9 +176,11 @@ class Player(VisibleSprite):
             elif time.time() - self.jump_time < 0.36:
                 self.vel.y = self.JUMP_SPEED3
             self.jumping = True
+            self.on_ground = False
 
-        if self.keys[K_s] and not self.jumping and self.on_ground:
+        if self.keys[K_s] and self.on_ground and self.ground_level in {Ground2, Ground3}:
             self.pos.y += 10
+            self.on_ground = False
 
         if self.keys[K_SPACE]:
             self.digging = True
@@ -219,21 +221,23 @@ class Player(VisibleSprite):
         self.pos += self.vel * self.manager.dt
 
         centerx = int(self.rect.centerx // PIXEL_SIZE * PIXEL_SIZE)
-        y1 = Ground.height_map[centerx]
-        y2 = Ground2.height_map[centerx]
-        y3 = Ground3.height_map[centerx]
-        if self.jumping and self.pos.y < y3 + 5:
-            self.ground_level = min([Ground, Ground2, Ground3], key=lambda g: g.height_map[centerx])
-        elif y3 + 15 < self.pos.y < y2 + 5:
-            self.ground_level = min([Ground, Ground2], key=lambda g: g.height_map[centerx])
-        elif self.pos.y > y2 + 15:
-            self.ground_level = Ground
-        if y2 < y3:
-            self.ground_level = Ground2
-            if y1 < y2:
+        if self.vel.y > 0:
+            grounds = [Ground, Ground2, Ground3]
+            highest = min(grounds, key=lambda g: g.height_map[centerx])
+            grounds.remove(highest)
+            middle = min(grounds, key=lambda g: g.height_map[centerx])
+            grounds.remove(middle)
+            lowest = grounds[0]
+            highest_y, middle_y, lowest_y = highest.height_map[centerx], middle.height_map[centerx], lowest.height_map[centerx]
+            above = lowest # Closest ground it is above
+            if self.pos.y <= highest_y + 12:
+                above = highest
+            elif self.pos.y <= middle_y + 12:
+                above = middle
+            self.ground_level = above
+            if highest is Ground or highest is Ground2 and above is Ground3:
                 self.ground_level = Ground
 
-        self.on_ground = False
         ground_y = self.ground_level.height_map[centerx]
         if self.pos.y > ground_y + 5:
             self.pos.y = ground_y + 5
