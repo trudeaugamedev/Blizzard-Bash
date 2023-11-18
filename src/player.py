@@ -30,6 +30,26 @@ class Camera:
         self.float_offset += self.tick_offset * self.follow * self.manager.dt
         self.offset = intvec(self.float_offset)
 
+class ThrowTrail(VisibleSprite):
+    def __init__(self, scene: Scene, player: Player) -> None:
+        super().__init__(scene, Layers.THROW_TRAIL)
+        self.player = player
+
+    def update(self) -> None:
+        ...
+
+    def draw(self) -> None:
+        if not self.player.throwing: return
+        factor = 0.015 # Basically how accurate we want the calculation to be, the distance factor between two points
+        pos = VEC(self.player.rect.topleft) + self.player.SB_OFFSET
+        vel = self.player.sb_vel.copy()
+        for i in range(60): # Number of points on the parabola that will be calculated
+            vel.y += GRAVITY * factor
+            vel += self.scene.wind_vel * factor
+            pos += vel * factor
+            if i % 3: continue # For every 4 calculated points, we draw 1 point
+            pygame.draw.circle(self.manager.screen, (0, 0, 0), pos - self.player.camera.offset, 3)
+
 class Player(VisibleSprite):
     def __init__(self, scene: Scene) -> None:
         super().__init__(scene, Layers.PLAYER)
@@ -63,6 +83,7 @@ class Player(VisibleSprite):
         self.powerup_time = time.time()
         self.powerup_flash_time = time.time()
 
+        self.throw_trail = ThrowTrail(self.scene, self)
         self.throwing = False
         self.can_throw = True
         self.sb_vel = VEC(0, 0)
@@ -123,17 +144,6 @@ class Player(VisibleSprite):
         if self.eliminated:
             self.image.set_alpha(80)
         self.manager.screen.blit(self.image, (*(VEC(self.rect.topleft) - self.camera.offset), *self.size))
-
-        if not self.throwing: return
-        factor = 0.015 # Basically how accurate we want the calculation to be, the distance factor between two points
-        pos = VEC(self.rect.topleft) + self.SB_OFFSET
-        vel = self.sb_vel.copy()
-        for i in range(60): # Number of points on the parabola that will be calculated
-            vel.y += GRAVITY * factor
-            vel += self.scene.wind_vel * factor
-            pos += vel * factor
-            if i % 3: continue # For every 4 calculated points, we draw 1 point
-            pygame.draw.circle(self.manager.screen, (0, 0, 0), pos - self.camera.offset, 3)
 
     def update_keys(self) -> None:
         self.keys = pygame.key.get_pressed()
