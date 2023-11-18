@@ -98,5 +98,24 @@ class Ground2(Ground):
         self.unsliced_image.blit(gradient, (0, 0), special_flags=BLEND_RGB_SUB)
         self.slice_image()
         trans_surf = pygame.Surface(self.image.get_size())
-        trans_surf.fill((35, 35, 35))
+        trans_surf.fill((30, 30, 30))
+        self.image.blit(trans_surf, (0, 0), special_flags=BLEND_RGB_SUB)
+
+class Ground3(Ground):
+    instances = {}
+    height_map = {}
+
+    def __init__(self, scene: Scene, pos: tuple[int, int], size: tuple[int, int]) -> None:
+        super().__init__(scene, pos, size, Layers.MAP3)
+
+    def generate_image(self) -> None:
+        self.generate_unsliced_image()
+        trans_surf = pygame.Surface(assets.gradient.get_size())
+        trans_surf.fill((50, 50, 50))
+        gradient = assets.gradient.copy()
+        gradient.blit(trans_surf, (0, 0), special_flags=BLEND_RGB_SUB)
+        self.unsliced_image.blit(gradient, (0, 0), special_flags=BLEND_RGB_SUB)
+        self.slice_image()
+        trans_surf = pygame.Surface(self.image.get_size())
+        trans_surf.fill((50, 50, 50))
         self.image.blit(trans_surf, (0, 0), special_flags=BLEND_RGB_SUB)
