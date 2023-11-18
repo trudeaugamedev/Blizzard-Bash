@@ -170,6 +170,7 @@ function handleAdminMessage(msg) {
 }
 
 function restart() {
+	seed = randint(0, 99999999);
 	startTime = Date.now();
 	if (players.has(-1)) {
 		let admin = players.get(-1);
