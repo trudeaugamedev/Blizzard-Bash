@@ -85,9 +85,9 @@ let windDuration = randint(4000, 8000);
 let windSpeed = [randint(-600, -200), randint(200, 600)][randint(0, 1)];
 
 let powerupTime = Date.now();
-let powerupDuration = randint(15000, 25000);
+let powerupDuration = randint(10000, 20000);
 
-const totalTime = 60000;
+const totalTime = 600000;
 let startTime, timerTime, midTime, elimTime;
 let secondsLeft = totalTime;
 let eliminated = 0;
@@ -196,7 +196,7 @@ function game() {
 
 	if (Date.now() - powerupTime > powerupDuration) {
 		powerupTime = Date.now();
-		powerupDuration = randint(15000, 25000);
+		powerupDuration = randint(10000, 20000);
 		powerups.set(powerupId, new Powerup(powerupId));
 	}
 	for (const [id, powerup] of powerups) {
