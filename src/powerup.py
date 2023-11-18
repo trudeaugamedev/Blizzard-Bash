@@ -4,6 +4,7 @@ if TYPE_CHECKING:
     from scene import Scene
 
 from pygame.locals import BLEND_RGB_SUB
+import pygame
 import time
 
 from .constants import VEC, GRAVITY, PIXEL_SIZE
@@ -29,6 +30,7 @@ class Powerup(VisibleSprite):
         self.image = assets.powerup_icons[self.type]
         self.size = VEC(self.image.get_size())
         self.pos = VEC(pos)
+        self.rect = pygame.Rect(self.pos - (12, 12), self.size + (24, 24))
         self.recv_pos = VEC(0, -2500)
         self.vel = VEC(0, 0)
 
@@ -48,6 +50,8 @@ class Powerup(VisibleSprite):
             self.scene.player.powerup = self.type
             self.scene.player.powerup_time = time.time()
             self.client.irreg_data.put({"id": self.id, "powerup": 1}) # powerup key to uniquify the message
+
+        self.rect = pygame.Rect(self.pos - (12, 12), self.size + (24, 24))
 
     def draw(self) -> None:
         if not hasattr(self, "initialized"): return

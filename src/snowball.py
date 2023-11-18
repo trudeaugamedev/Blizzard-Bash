@@ -12,6 +12,7 @@ import time
 from .constants import VEC, GRAVITY, PIXEL_SIZE
 from .sprite import VisibleSprite, Layers
 from .utils import shadow, sign
+from .powerup import Powerup
 from .ground import Ground
 from . import assets
 
@@ -80,6 +81,12 @@ class Snowball(VisibleSprite):
                 hit_strength = self.score * sign(self.vel.x) * (7 if self.player.powerup == "strength" else 1)
                 self.client.irreg_data.put({"hit": hit_strength, "id": player.id})
                 return
+
+        for powerup in Powerup.instances.values():
+            if powerup.rect.colliderect(self.real_rect):
+                self.player.powerup = powerup.type
+                self.player.powerup_time = time.time()
+                self.client.irreg_data.put({"id": powerup.id, "powerup": 1}) # powerup key to uniquify the message
 
         if self.pos.y > 1000:
             self.kill()
