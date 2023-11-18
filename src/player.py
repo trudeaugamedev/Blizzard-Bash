@@ -185,6 +185,7 @@ class Player(VisibleSprite):
             self.on_ground = False
 
         if self.keys[K_s] and self.on_ground and self.ground_level in {Ground2, Ground3}:
+            self.pos.y = self.ground_level.height_map[int(self.rect.centerx // PIXEL_SIZE * PIXEL_SIZE)] + 5
             self.pos.y += 10
             self.on_ground = False
 
