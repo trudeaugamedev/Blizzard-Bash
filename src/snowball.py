@@ -75,9 +75,10 @@ class Snowball(VisibleSprite):
                 self.scene.hit_pos = self.pos
                 self.kill()
                 if not self.scene.waiting and not self.player.eliminated:
-                    self.scene.score += self.score
+                    self.scene.score += self.score * (2 if self.player.powerup == "strength" else 1)
                     self.client.pers_data["score"] = self.scene.score
-                self.client.irreg_data.put({"hit": self.score * sign(self.vel.x), "id": player.id})
+                hit_strength = self.score * sign(self.vel.x) * (7 if self.player.powerup == "strength" else 1)
+                self.client.irreg_data.put({"hit": hit_strength, "id": player.id})
                 return
 
         if self.pos.y > 1000:

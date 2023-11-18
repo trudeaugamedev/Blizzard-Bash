@@ -29,8 +29,6 @@ class Parser:
                     self.manager.scene.time_left = -1
             case "wd": # Wind
                 self.manager.scene.wind_vel = VEC(data["speed"], 0)
-            case "pw": # Powerup
-                Powerup(self.manager.scene, data["id"], data["pos"])
             case "tm": # Time
                 self.manager.scene.time_left = data["seconds"]
             case "el": # Eliminated
@@ -81,7 +79,7 @@ class Parser:
                 powerup = Powerup.instances[powerup_data["id"]]
                 powerup.recv_pos = VEC(powerup_data["pos"])
             else:
-                Powerup.instances[powerup_data["id"]] = Powerup(self.manager.scene, powerup_data["id"], powerup_data["pos"])
+                Powerup.instances[powerup_data["id"]] = Powerup(self.manager.scene, powerup_data["id"], powerup_data["type"], powerup_data["pos"])
 
         for _id in all_ids:
             Powerup.instances.pop(_id).kill()

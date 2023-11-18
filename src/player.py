@@ -3,8 +3,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from scene import Scene
 
+from math import sin, pi, sqrt
 from pygame.locals import *
-from math import sin, pi
 import pygame
 import time
 
@@ -50,6 +50,7 @@ class Player(VisibleSprite):
         self.flip = False
         self.rotation = 30
         self.idle = True
+        self.active_movement = False
 
         self.digging = False
         self.can_move = True # Actually means if the player is digging
@@ -57,7 +58,7 @@ class Player(VisibleSprite):
 
         self.jump_time = time.time()
         
-        self.powerup = False
+        self.powerup = None
         self.powerup_time = time.time()
         self.powerup_flash_time = time.time()
 
@@ -137,7 +138,9 @@ class Player(VisibleSprite):
         self.keys = pygame.key.get_pressed()
 
         self.acc = VEC(0, GRAVITY)
+        self.active_movement = False
         if self.keys[K_a]: # Acceleration
+            self.active_movement = True
             self.acc.x -= self.CONST_ACC
             self.flip = True
             if self.can_move:
@@ -151,6 +154,7 @@ class Player(VisibleSprite):
             self.acc.x += self.CONST_ACC
             self.idle = True
         if self.keys[K_d]:
+            self.active_movement = True
             self.acc.x += self.CONST_ACC
             self.flip = False
             if self.can_move:
@@ -189,7 +193,7 @@ class Player(VisibleSprite):
             self.throwing = False
 
     def update_throw(self) -> None:
-        if not self.powerup:
+        if self.powerup != "rapidfire":
             self.can_throw = self.can_move and self.dig_iterations > 0
         elif time.time() - self.rapidfire_time > 0.25:
             self.rapidfire_time = time.time()
@@ -203,15 +207,15 @@ class Player(VisibleSprite):
                 self.frame_group = assets.player_throw_l
             # Use camera offset to convert screen-space pos to in-world pos
             try:
-                self.sb_vel = ((m_pos - self.SB_OFFSET + self.camera.offset) - self.pos) * 8
-                if self.sb_vel.length() > self.THROW_SPEED:
-                    self.sb_vel.scale_to_length(self.THROW_SPEED)
+                self.sb_vel = ((m_pos - self.SB_OFFSET + self.camera.offset) - self.pos) * 8 * (1.4 if self.powerup == "strength" else 1)
+                if self.sb_vel.length() > self.THROW_SPEED * (1.4 if self.powerup == "strength" else 1):
+                    self.sb_vel.scale_to_length(self.THROW_SPEED * (1.4 if self.powerup == "strength" else 1))
             except ValueError:
                 self.sb_vel = VEC() # 0 vector
         if MOUSEBUTTONUP in self.manager.events:
             if self.manager.events[MOUSEBUTTONUP].button == 1 and self.can_throw:
                 self.throwing = False
-                self.snowballs.append(Snowball(self.scene, self.sb_vel, assets.snowball_small if self.dig_iterations < 3 or self.powerup else assets.snowball_large))
+                self.snowballs.append(Snowball(self.scene, self.sb_vel, assets.snowball_small if self.dig_iterations < 3 or self.powerup == "rapidfire" else assets.snowball_large))
                 self.dig_iterations = 0
                 self.can_throw = False
 
@@ -219,10 +223,11 @@ class Player(VisibleSprite):
         self.vel += self.acc * self.manager.dt
         # _ to catch the successful clamp return value
         # Baiscally if it clamped to the left it would be -1, right would be 1, if it didn't clamp (value is in range), it's 0
-        if self.can_move:
-            self.vel.x, _ = clamp(self.vel.x, -self.MAX_SPEED, self.MAX_SPEED)
-        else:
-            self.vel.x, _ = clamp(self.vel.x, -self.SMALL_MAX_SPEED, self.SMALL_MAX_SPEED)
+        if self.active_movement:
+            if self.can_move:
+                self.vel.x, _ = clamp(self.vel.x, -self.MAX_SPEED, self.MAX_SPEED)
+            else:
+                self.vel.x, _ = clamp(self.vel.x, -self.SMALL_MAX_SPEED, self.SMALL_MAX_SPEED)
         # If the absolute value of x vel is less than the constant acceleration, snap to 0 so that deceleration doesn't overshoot
         self.vel.x = snap(self.vel.x, 0, self.CONST_ACC * self.manager.dt)
         self.pos += self.vel * self.manager.dt
@@ -253,7 +258,7 @@ class Player(VisibleSprite):
             self.jumping = False
 
         if self.hit_strength != 0:
-            self.vel.x = self.hit_strength * 130
+            self.vel.x = sign(self.hit_strength) * sqrt(abs(self.hit_strength)) * 150
             self.hit_strength = 0
 
         self.pos.x, _ = clamp(self.pos.x, -2007, 2061)
@@ -331,9 +336,11 @@ class Player(VisibleSprite):
         self.real_rect.midbottom = self.rect.midbottom
 
     def update_powerup(self) -> None:
-        if time.time() - self.powerup_time > 4 and self.powerup:
-            self.powerup = False
+        if self.powerup == "rapidfire" and time.time() - self.powerup_time > 4:
+            self.powerup = None
             self.throwing = False
+        if time.time() - self.powerup_time > 20:
+            self.powerup = None
 
     def update_camera(self) -> None:
         if self.snowballs:

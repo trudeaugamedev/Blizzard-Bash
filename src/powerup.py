@@ -15,9 +15,10 @@ from . import assets
 class Powerup(VisibleSprite):
     instances = {}
 
-    def __init__(self, scene: Scene, _id: int, pos: tuple[int, int]) -> None:
+    def __init__(self, scene: Scene, _id: int, _type: str, pos: tuple[int, int]) -> None:
         super().__init__(scene, Layers.POWERUP)
         self.id = _id
+        self.type = _type
         self.__class__.instances[self.id] = self
         if self.scene.powerup:
             try:
@@ -25,10 +26,10 @@ class Powerup(VisibleSprite):
             except ValueError:
                 pass
             self.scene.powerup = None
-        self.image = assets.powerup_icon
+        self.image = assets.powerup_icons[self.type]
         self.size = VEC(self.image.get_size())
         self.pos = VEC(pos)
-        self.recv_pos = VEC(0, -800)
+        self.recv_pos = VEC(0, -2500)
         self.vel = VEC(0, 0)
 
         self.initialized = True # Used to check whether the __init__ function has completed in the thread
@@ -36,7 +37,7 @@ class Powerup(VisibleSprite):
     def update(self) -> None:
         if not hasattr(self, "initialized"): return
 
-        self.pos = self.recv_pos
+        self.pos = self.recv_pos # so that the pos doesnt end up at (0, 0) at the beginning
 
         ground_y = Ground.height_map[int(self.pos.x // PIXEL_SIZE * PIXEL_SIZE)]
         if self.pos.y > ground_y - self.size.y // 2:
@@ -44,9 +45,9 @@ class Powerup(VisibleSprite):
             self.vel.x *= 0.85
 
         if self.pos.distance_to(VEC(self.scene.player.real_rect.center)) < 60:
-            self.scene.player.powerup = True
+            self.scene.player.powerup = self.type
             self.scene.player.powerup_time = time.time()
-            self.client.irreg_data.put({"id": self.id, "powerup": 1}) # powerup key to distinguish the message
+            self.client.irreg_data.put({"id": self.id, "powerup": 1}) # powerup key to uniquify the message
 
     def draw(self) -> None:
         if not hasattr(self, "initialized"): return
