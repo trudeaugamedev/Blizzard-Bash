@@ -269,15 +269,15 @@ class Player(VisibleSprite):
             if highest is Ground or highest is Ground2 and above is Ground3:
                 self.ground_level = Ground
 
-        if self.ground_level == Ground and self._layer != Layers.GROUND:
+        if self.ground_level == Ground and self._layer != Layers.PLAYER:
             self.scene.sprite_manager.remove(self)
             self._layer = Layers.PLAYER
             self.scene.sprite_manager.add(self)
-        elif self.ground_level == Ground2 and self._layer != Layers.GROUND2:
+        elif self.ground_level == Ground2 and self._layer != Layers.PLAYER2:
             self.scene.sprite_manager.remove(self)
             self._layer = Layers.PLAYER2
             self.scene.sprite_manager.add(self)
-        elif self.ground_level == Ground3 and self._layer != Layers.GROUND3:
+        elif self.ground_level == Ground3 and self._layer != Layers.PLAYER3:
             self.scene.sprite_manager.remove(self)
             self._layer = Layers.PLAYER3
             self.scene.sprite_manager.add(self)

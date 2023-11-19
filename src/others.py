@@ -40,15 +40,15 @@ class OtherPlayer(VisibleSprite):
         y1 = Ground.height_map[centerx]
         y2 = Ground2.height_map[centerx]
         y3 = Ground3.height_map[centerx]
-        if self.pos.y < y3 + 12 and self._layer != Layers.GROUND3:
+        if self.pos.y < y3 + 12 and self._layer != Layers.PLAYER3:
             self.scene.sprite_manager.remove(self)
             self._layer = Layers.PLAYER3
             self.scene.sprite_manager.add(self)
-        elif self.pos.y < y2 + 12 and self._layer != Layers.GROUND2:
+        elif self.pos.y < y2 + 12 and self._layer != Layers.PLAYER2:
             self.scene.sprite_manager.remove(self)
             self._layer = Layers.PLAYER2
             self.scene.sprite_manager.add(self)
-        elif self.pos.y < y1 + 12 and self._layer != Layers.GROUND:
+        elif self.pos.y < y1 + 12 and self._layer != Layers.PLAYER:
             self.scene.sprite_manager.remove(self)
             self._layer = Layers.PLAYER
             self.scene.sprite_manager.add(self)
