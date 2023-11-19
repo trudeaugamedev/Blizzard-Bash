@@ -11,7 +11,7 @@ function broadcast(msg) {
 }
 
 function getPlayerData(x_id, init) {
-	let playerDataArray = new Array(0);
+	let playerDataArray = [];
 	for (const [id, player] of players) {
 		if (id === x_id) continue;
 		if (id === -1) continue;
@@ -131,7 +131,7 @@ wss.on("connection", (socket) => {
 
 	socket.on("message", (msg) => {
 		if (players.has(client.id) && players.get(client.id).eliminated) return;
-
+		
 		if (msg.toString() === "admin") {
 			handleAdminConnect(client);
 			return;
@@ -152,6 +152,8 @@ wss.on("connection", (socket) => {
 			}
 			return;
 		}
+		
+		if (!players.has(client.id)) return;
 		players.get(client.id).received = data;
 		players.get(client.id).sent = 0;
 		let playerData = players.get(client.id).data;
@@ -240,6 +242,12 @@ function game() {
 		secondsLeft = Math.floor((totalTime - (Date.now() - startTime)) / 1000);
 		broadcast(JSON.stringify({"type": "tm", "seconds": secondsLeft}));
 		if (secondsLeft < 0) {
+			let scoreData = [];
+			for (const [id, player] of players) {
+				if (id === -1) continue;
+				scoreData.push({"id": id, "name": player.data.name, "score": player.data.score});
+			}
+			broadcast(JSON.stringify({"type": "en", "data": scoreData}));
 			restart();
 		}
 	}

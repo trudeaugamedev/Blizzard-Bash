@@ -95,6 +95,8 @@ class MainGame(Scene):
 
         self.name = self.previous_scene.input_box.text
         self.client.queue_data("name", self.name)
+        self.game_over = False
+        self.score_data = []
 
     def update(self) -> None:
         super().update()
@@ -111,11 +113,11 @@ class MainGame(Scene):
                 ])
                 SnowFlake(self, pos + self.player.camera.offset)
 
-        if self.time_left is not None and self.time_left <= 0:
-            self.manager.new_scene("EndMenu")
-
         if KEYDOWN in self.manager.events and self.manager.events[KEYDOWN].key == K_RETURN:
             self.manager.ready = True
+
+        if self.game_over:
+            self.manager.new_scene("EndMenu")
 
         self.client.queue_data("score", self.score)
 

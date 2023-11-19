@@ -17,9 +17,9 @@ class EndMenu(Scene):
 
         self.background = pygame.transform.gaussian_blur(self.manager.screen, 15)
 
-        scores = sorted([(player.id, player.name, player.score) for player in self.manager.other_players.values()] + [(self.client.id, self.previous_scene.name, self.previous_scene.score)], key = lambda p: p[1], reverse=True)
-        for i, (_id, name, score) in enumerate(scores):
-            EndMenuScore(self, i, name, score, self.client.id == _id)
+        scores = sorted(self.previous_scene.score_data, key = lambda d: d["score"], reverse=True)
+        for i, data in enumerate(scores):
+            EndMenuScore(self, i, data["name"], data["score"], self.client.id == data["id"])
 
         self.manager.other_players = {}
 

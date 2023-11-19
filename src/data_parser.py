@@ -40,6 +40,10 @@ class Parser:
             case "dc": # Disconnect
                 if data["id"] in self.manager.other_players:
                     self.manager.other_players.pop(data["id"]).kill()
+            case "en": # End (game over)
+                print("GAME OVER")
+                self.manager.scene.score_data = data["data"]
+                self.manager.scene.game_over = True
 
     def client_data(self, data: dict, init: bool = False) -> None:
         if not init and not isinstance(self.manager.scene, self.manager.Scenes.MainGame.value): return
