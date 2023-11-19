@@ -8,6 +8,7 @@ from uuid import uuid4, UUID
 import pygame
 
 from .constants import VEC, FONT, PIXEL_SIZE, WIDTH
+from .ground import Ground, Ground2, Ground3
 from .sprite import VisibleSprite, Layers
 from .utils import shadow
 from . import assets
@@ -34,6 +35,23 @@ class OtherPlayer(VisibleSprite):
     def update(self) -> None:
         self.rect = self.image.get_rect(midbottom=self.pos)
         self.real_rect.midbottom = self.rect.midbottom
+
+        centerx = int(self.rect.centerx // PIXEL_SIZE * PIXEL_SIZE)
+        y1 = Ground.height_map[centerx]
+        y2 = Ground2.height_map[centerx]
+        y3 = Ground3.height_map[centerx]
+        if self.pos.y < y3 + 12 and self._layer != Layers.GROUND3:
+            self.scene.sprite_manager.remove(self)
+            self._layer = Layers.PLAYER3
+            self.scene.sprite_manager.add(self)
+        elif self.pos.y < y2 + 12 and self._layer != Layers.GROUND2:
+            self.scene.sprite_manager.remove(self)
+            self._layer = Layers.PLAYER2
+            self.scene.sprite_manager.add(self)
+        elif self.pos.y < y1 + 12 and self._layer != Layers.GROUND:
+            self.scene.sprite_manager.remove(self)
+            self._layer = Layers.PLAYER
+            self.scene.sprite_manager.add(self)
 
         self.orig_image = assets.player[self.frame]
         self.upright_image = pygame.transform.flip(self.orig_image, self.flip, False)
