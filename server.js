@@ -13,8 +13,9 @@ function broadcast(msg) {
 function getPlayerData(x_id, init) {
 	let playerDataArray = new Array(0);
 	for (const [id, player] of players) {
-		if (id == x_id) continue;
-		if (id == -1) continue;
+		if (id === x_id) continue;
+		if (id === -1) continue;
+		if (player.type) continue; // whether it is admin or player has been confirmed
 		if (player.eliminated) continue;
 		if (player.sent == players.size - 1 && !init) continue;
 		playerDataArray.push(init ? player.data : player.received);
@@ -36,7 +37,7 @@ function getPlayerData(x_id, init) {
 
 function broadcastPlayerData() {
 	for (const [id, player] of players) {
-		player.socket.send(JSON.stringify(getPlayerData(id, false)));
+		player.socket.send(JSON.stringify(getPlayerData(id, id === -1)));
 	}
 }
 
@@ -47,6 +48,7 @@ WebSocket.WebSocket.prototype.send_obj = function send_obj (obj) {
 class Player {
 	constructor (client) {
 		this.id = client.id;
+		this.type = null;
 		this.socket = client.socket;
 		this.data = {};
 		this.received = {};
@@ -134,6 +136,9 @@ wss.on("connection", (socket) => {
 		if (msg.toString() === "admin") {
 			handleAdminConnect(client);
 			return;
+		} else if (msg.toString() === "player") {
+			players.get(client.id).type = "player";
+			return;
 		}
 
 		if (client.id == -1) {
@@ -163,6 +168,7 @@ wss.on("connection", (socket) => {
 
 function handleAdminConnect(client) {
 	console.log("Admin has connected");
+	players.get(client.id).type = "admin";
 	// Move the admin player object to -1, since it was added as a normal player on connection
 	players.set(-1, players.get(client.id));
 	players.delete(client.id);
