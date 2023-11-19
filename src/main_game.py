@@ -93,7 +93,8 @@ class MainGame(Scene):
         self.hit_alpha = 255
         self.hit_pos = None
 
-        self.client.queue_data("name", self.previous_scene.input_box.text)
+        self.name = self.previous_scene.input_box.text
+        self.client.queue_data("name", self.name)
 
     def update(self) -> None:
         super().update()
