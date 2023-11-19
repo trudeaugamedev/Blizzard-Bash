@@ -10,28 +10,33 @@ function broadcast(msg) {
 	}
 }
 
+function getPlayerData(x_id, init) {
+	let playerDataArray = new Array(0);
+	for (const [id, player] of players) {
+		if (id == x_id) continue;
+		if (id == -1) continue;
+		if (player.eliminated) continue;
+		if (player.sent == players.size - 1 && !init) continue;
+		playerDataArray.push(init ? player.data : player.received);
+		player.sent++;
+	}
+	
+	let powerupDataArray = Array.from(powerups.values()).map(powerup => ({
+		"id": powerup.id,
+		"type": powerup.type,
+		"pos": [Math.floor(powerup.pos[0]), Math.floor(powerup.pos[1])],
+	}));
+
+	return {
+		"type": "cl",
+		"players": playerDataArray,
+		"powerups": powerupDataArray,
+	};
+}
+
 function broadcastPlayerData() {
 	for (const [id, player] of players) {
-		let xplayers = new Map(players);
-		xplayers.delete(id);
-
-		let playerDataArray = new Array(0);
-		for (const [id, player] of xplayers) {
-			if (player.eliminated) continue;
-			playerDataArray.push(player.data);
-		}
-
-		let powerupDataArray = Array.from(powerups.values()).map(powerup => ({
-			"id": powerup.id,
-			"type": powerup.type,
-			"pos": [Math.floor(powerup.pos[0]), Math.floor(powerup.pos[1])],
-		}));
-
-		player.socket.send(JSON.stringify({
-			"type": "cl",
-			"players": playerDataArray,
-			"powerups": powerupDataArray,
-		}));
+		player.socket.send(JSON.stringify(getPlayerData(id, false)));
 	}
 }
 
@@ -44,6 +49,9 @@ class Player {
 		this.id = client.id;
 		this.socket = client.socket;
 		this.data = {};
+		this.received = {};
+		// the number of other players it has already sent the received data out to before a new update
+		this.sent = 0;
 		this.eliminated = false;
 	}
 }
@@ -98,9 +106,12 @@ wss.on("connection", (socket) => {
 		socket: socket
 	};
 
+	broadcast(JSON.stringify({"type": "cn", "id": client.id}));
+
+    socket.send_obj({"type": "hi", "id": client.id, "seed": seed, "waiting": waiting, "data": getPlayerData(client.id, true)});
+	// console.log(getPlayerData(client.id, true));
 	players.set(client.id, new Player(client));
 	console.log(`Client ${client.id} connected`);
-    socket.send_obj({"type": "hi", "id": client.id, "seed": seed, "waiting": waiting});
 
 	socket.on("error", (error) => {
 		console.error(error);
@@ -109,8 +120,12 @@ wss.on("connection", (socket) => {
 	socket.on("close", (code) => {
 		players.delete(client.id);
 		socket.close();
-		if (client.id === -1) console.log(`Admin has disconnected, code ${code}`);
-		else console.log(`Client ${client.id} disconnected, code ${code}`);
+		if (client.id === -1) {
+			console.log(`Admin has disconnected, code ${code}`);
+		} else {
+			console.log(`Client ${client.id} disconnected, code ${code}`);
+		}
+		broadcast(JSON.stringify({"type": "dc", "id": client.id}));
 	});
 
 	socket.on("message", (msg) => {
@@ -136,10 +151,11 @@ wss.on("connection", (socket) => {
 			}
 			return;
 		}
-		// players.get(client.id).data = data;
-		player_data = players.get(client.id).data;
+		players.get(client.id).received = data;
+		players.get(client.id).sent = 0;
+		let playerData = players.get(client.id).data;
 		for (const [key, value] of Object.entries(data)) {
-			player_data[key] = value;
+			playerData[key] = value;
 		}
 		// console.log(`Client ${client.id}: ${JSON.stringify(players.get(client.id).data)}`);
 	});

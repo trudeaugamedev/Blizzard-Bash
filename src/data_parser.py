@@ -13,11 +13,13 @@ class Parser:
         self.manager = client.manager
 
     def parse(self, data: dict) -> None:
+        # THIS SECTION DOES NOT RAISE EXCEPTIONS PROPERLY!!!!!!!!
         match data["type"]:
             case "hi": # Initial
                 self.client.id = data["id"]
                 self.manager.scene.seed = data["seed"]
                 self.manager.scene.waiting = data["waiting"]
+                self.client_data(data["data"], init=True)
             case "cl": # Client data
                 self.client_data(data)
             case "ir": # Irregular client data
@@ -33,40 +35,38 @@ class Parser:
                 self.manager.scene.time_left = data["seconds"]
             case "el": # Eliminated
                 self.manager.scene.player.eliminated = True
+            case "cn": # Connect
+                self.manager.other_players[data["id"]] = OtherPlayer(self.manager.scene, data["id"], (0, -100))
+            case "dc": # Disconnect
+                self.manager.other_players.pop(data["id"]).kill()
 
-    def client_data(self, data: dict) -> None:
-        if not isinstance(self.manager.scene, self.manager.Scenes.MainGame.value): return
+    def client_data(self, data: dict, init: bool = False) -> None:
+        if not init and not isinstance(self.manager.scene, self.manager.Scenes.MainGame.value): return
 
-        all_ids = set(self.manager.other_players.keys())
         for player_data in data["players"]:
             if not player_data: continue
 
-            if player_data["id"] in all_ids:
-                all_ids.remove(player_data["id"])
-
             # Parse data of player itself
-            if player_data["id"] in self.manager.other_players:
+            if not init:
                 other: OtherPlayer = self.manager.other_players[player_data["id"]]
-                other.pos = player_data["pos"]
-                other.rotation = player_data["rot"]
-                other.flip = player_data["flip"]
-                other.frame = player_data["frame"]
-                other.score = player_data["score"]
             else:
                 other = self.manager.other_players[player_data["id"]] = OtherPlayer(self.manager.scene, player_data["id"], player_data["pos"])
 
-            # Parse data of snowballs
-            for snowball in other.snowballs:
-                snowball.kill()
-            other.snowballs = []
-            for data in player_data["snowballs"]:
-                other.snowballs.append(
-                    OtherSnowball(self.manager.scene, data["pos"], data["frame"], data["type"])
-                )
+            if "pos" in player_data: other.pos = player_data["pos"]
+            if "rot" in player_data: other.rotation = player_data["rot"]
+            if "flip" in player_data: other.flip = player_data["flip"]
+            if "frame" in player_data: other.frame = player_data["frame"]
+            if "score" in player_data: other.score = player_data["score"]
 
-        # Remove disconnected players
-        for _id in all_ids:
-            self.manager.other_players.pop(_id).kill()
+            if "snowballs" in player_data:
+                # Parse data of snowballs
+                for snowball in other.snowballs:
+                    snowball.kill()
+                other.snowballs = []
+                for snowball_data in player_data["snowballs"]:
+                    other.snowballs.append(
+                        OtherSnowball(self.manager.scene, snowball_data["pos"], snowball_data["frame"], snowball_data["type"])
+                    )
 
         all_ids = set(Powerup.instances.keys())
         # Parse powerup position
