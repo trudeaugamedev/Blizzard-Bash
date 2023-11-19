@@ -368,12 +368,12 @@ class Player(VisibleSprite):
         self.real_rect.midbottom = self.rect.midbottom
 
     def update_powerup(self) -> None:
-        if self.powerup == "rapidfire" and time.time() - self.powerup_time > 4:
+        if self.powerup == "rapidfire" and time.time() - self.powerup_time > 5:
             self.powerup = None
             self.throwing = False
         if self.powerup == "strength" and time.time() - self.powerup_time > 20:
             self.powerup = None
-        if self.powerup == "clustershot" and time.time() - self.powerup_time > 20:
+        if self.powerup == "clustershot" and time.time() - self.powerup_time > 15:
             self.powerup = None
 
     def update_camera(self) -> None:
