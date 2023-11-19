@@ -38,7 +38,8 @@ class Parser:
             case "cn": # Connect
                 self.manager.other_players[data["id"]] = OtherPlayer(self.manager.scene, data["id"], (0, -100))
             case "dc": # Disconnect
-                self.manager.other_players.pop(data["id"]).kill()
+                if data["id"] in self.manager.other_players:
+                    self.manager.other_players.pop(data["id"]).kill()
 
     def client_data(self, data: dict, init: bool = False) -> None:
         if not init and not isinstance(self.manager.scene, self.manager.Scenes.MainGame.value): return

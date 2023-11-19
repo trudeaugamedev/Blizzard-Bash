@@ -21,7 +21,7 @@ function getPlayerData(x_id, init) {
 		playerDataArray.push(init ? player.data : player.received);
 		player.sent++;
 	}
-	
+
 	let powerupDataArray = Array.from(powerups.values()).map(powerup => ({
 		"id": powerup.id,
 		"type": powerup.type,
@@ -156,7 +156,7 @@ wss.on("connection", (socket) => {
 		players.get(client.id).sent = 0;
 		let playerData = players.get(client.id).data;
 		for (const [key, value] of Object.entries(data)) {
-			if (key === "name") console.log(value);
+			if (key === "name") console.log(`Username: ${value}`);
 			if (value === null) continue;
 			playerData[key] = value;
 		}
@@ -192,6 +192,14 @@ function handleAdminMessage(msg) {
 		mode = "infinite";
 	} else if (command === "stop") {
 		restart();
+	} else if (command.startsWith("kick")) {
+		let id = parseInt(command.substring(5));
+		if (players.has(id)) {
+			players.get(id).socket.close();
+			players.delete(id);
+		} else {
+			console.log(`Non-existent player id ${id}!`)
+		}
 	}
 }
 

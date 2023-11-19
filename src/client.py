@@ -111,6 +111,10 @@ class Client:
             await asyncio.gather(self.send_wrapper(), self.recv_wrapper())
         except ConnectionClosedError:
             print("Connection to the server was forcibly closed!")
+            try:
+                self.manager.new_scene("StartMenu")
+            except Exception:
+                print("Redirecting to start menu...")
         except ConnectionClosedOK:
             print("Cleanly disconnected from the server")
         except ManualExit:
