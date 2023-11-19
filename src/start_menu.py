@@ -14,11 +14,12 @@ import pygame
 class StartMenu(Scene):
     def __init__(self, manager: GameManager, previous_scene: Scene) -> None:
         super().__init__(manager, previous_scene)
-        self.start_button = Button(
-            self, (WIDTH // 2, HEIGHT // 2 + 70), (300, 80), "JOIN GAME",
-            lambda: self.manager.new_scene("MainGame"), centered=True
-        )
+        self.start_button = Button(self, (WIDTH // 2, HEIGHT // 2 + 70), (300, 80), "JOIN GAME", self.start_game, centered=True)
         self.input_box = InputBox(self, (WIDTH // 2 - 109, HEIGHT // 2 - 70), (466, 76))
+
+    def start_game(self) -> None:
+        if not self.input_box.text: return
+        self.manager.new_scene("MainGame")
 
     def update(self) -> None:
         super().update()
