@@ -52,6 +52,7 @@ class Parser:
             else:
                 other = self.manager.other_players[player_data["id"]] = OtherPlayer(self.manager.scene, player_data["id"], player_data["pos"])
 
+            if "name" in player_data: other.name = player_data["name"]
             if "pos" in player_data: other.pos = VEC(player_data["pos"])
             if "rot" in player_data: other.rotation = player_data["rot"]
             if "flip" in player_data: other.flip = player_data["flip"]

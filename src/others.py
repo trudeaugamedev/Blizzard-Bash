@@ -30,6 +30,7 @@ class OtherPlayer(VisibleSprite):
         self.rotation = 0
         self.flip = False
         self.score = 0
+        self.name = "..."
         self.arrow = OtherArrow(self.scene, self)
 
     def update(self) -> None:
@@ -66,6 +67,13 @@ class OtherPlayer(VisibleSprite):
         text = FONT[28].render(f"{self.score}", True, (0, 0, 0))
         pos = VEC(self.rect.midtop) - (text.get_width() // 2, text.get_height() + 5)
         text_shadow = FONT[28].render(f"{self.score}", True, (0, 0, 0))
+        text_shadow.set_alpha(70)
+        self.manager.screen.blit(text_shadow, pos + (3, 3) - self.scene.player.camera.offset)
+        self.manager.screen.blit(text, pos - self.scene.player.camera.offset)
+
+        text = FONT[20].render(f"{self.name}", True, (0, 0, 0))
+        pos = VEC(self.rect.midtop) - (text.get_width() // 2, text.get_height() + 40)
+        text_shadow = FONT[20].render(f"{self.name}", True, (0, 0, 0))
         text_shadow.set_alpha(70)
         self.manager.screen.blit(text_shadow, pos + (3, 3) - self.scene.player.camera.offset)
         self.manager.screen.blit(text, pos - self.scene.player.camera.offset)
