@@ -120,12 +120,12 @@ class Player(VisibleSprite):
         self.first_start = False
 
     def sync_data(self) -> None:
-        self.client.pers_data["pos"] = inttup(self.pos)
-        self.client.pers_data["rot"] = int(self.rotation)
-        self.client.pers_data["flip"] = self.flip
-        self.client.pers_data["frame"] = assets.player.index(self.orig_image)
+        self.client.queue_data("pos", inttup(self.pos))
+        self.client.queue_data("rot", int(self.rotation))
+        self.client.queue_data("flip", self.flip)
+        self.client.queue_data("frame", assets.player.index(self.orig_image))
 
-        snowballs = self.client.pers_data["snowballs"] = []
+        snowballs = []
         for snowball in self.snowballs:
             data = {
                 "pos": inttup(snowball.pos),
@@ -133,6 +133,7 @@ class Player(VisibleSprite):
                 "type": int(snowball.type == assets.snowball_large),
             }
             snowballs.append(data)
+        self.client.queue_data("snowballs", snowballs)
 
     def draw(self) -> None:
         if self.powerup:

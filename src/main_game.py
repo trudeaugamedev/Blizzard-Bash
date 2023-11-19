@@ -114,7 +114,7 @@ class MainGame(Scene):
         if KEYDOWN in self.manager.events and self.manager.events[KEYDOWN].key == K_RETURN:
             self.manager.ready = True
 
-        self.client.pers_data["score"] = self.score
+        self.client.queue_data("score", self.score)
 
     def draw(self) -> None:
         self.manager.screen.blit(assets.background, (0, 0))

@@ -43,7 +43,7 @@ class Player {
 	constructor (client) {
 		this.id = client.id;
 		this.socket = client.socket;
-		this.data = null;
+		this.data = {};
 		this.eliminated = false;
 	}
 }
@@ -136,7 +136,11 @@ wss.on("connection", (socket) => {
 			}
 			return;
 		}
-		players.get(client.id).data = data;
+		// players.get(client.id).data = data;
+		player_data = players.get(client.id).data;
+		for (const [key, value] of Object.entries(data)) {
+			player_data[key] = value;
+		}
 		// console.log(`Client ${client.id}: ${JSON.stringify(players.get(client.id).data)}`);
 	});
 });

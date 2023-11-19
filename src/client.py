@@ -9,6 +9,7 @@ from traceback import print_exc
 from threading import Thread
 from random import randint
 from queue import Queue
+from typing import Any
 from uuid import uuid4
 import asyncio
 import json
@@ -39,11 +40,17 @@ class Client:
             "snowballs": [],
             "score": 0,
         }
+        self.modified_data = {key: True for key in self.pers_data}
         self.irreg_data = Queue() # Occasional data
 
     def restart(self) -> None:
         self.reset()
         self.thread.start()
+
+    def queue_data(self, key: str, value: Any) -> None:
+        if value == self.pers_data[key]: return
+        self.pers_data[key] = value
+        self.modified_data[key] = True
 
     async def recv_wrapper(self) -> None:
         print("Coroutine 'recv' started")
@@ -76,7 +83,14 @@ class Client:
 
     async def send(self) -> None:
         await asyncio.sleep(0.014) # Slightly higher than 60 FPS
-        await self.socket.send(json.dumps(self.pers_data | {"id": self.id}))
+
+        final = {}
+        for key in self.modified_data:
+            if self.modified_data[key]:
+                final[key] = self.pers_data[key]
+                self.modified_data[key] = False
+        await self.socket.send(json.dumps({"id": self.id} | final))
+
         while self.irreg_data.qsize() > 0:
             item = {"type": "ir"} | self.irreg_data.get()
             await self.socket.send(json.dumps(item))
