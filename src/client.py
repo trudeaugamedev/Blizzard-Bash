@@ -31,7 +31,7 @@ class Client:
         self.parser = Parser(self)
         self.running = True # Modify this attribute to stop client
         self.exited = False # Indicates whether the client has really exited
-        self.id = -1
+        self.id = -2
         self.pers_data = { # Persistent data
             "pos": (0, 0),
             "rot": 0,

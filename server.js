@@ -18,6 +18,7 @@ function getPlayerData(x_id, init) {
 		if (player.type) continue; // whether it is admin or player has been confirmed
 		if (player.eliminated) continue;
 		if (player.sent == players.size - 1 && !init) continue;
+		if (player.received.id == -2) continue; // assuming it might be delay, but -2 is when the player hasn't gotten an id yet
 		playerDataArray.push(init ? player.data : player.received);
 		player.sent++;
 	}
