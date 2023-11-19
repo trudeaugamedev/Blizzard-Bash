@@ -14,4 +14,5 @@ TILE_SIZE = REAL_TILE_SIZE * PIXEL_SIZE
 
 pygame.font.init()
 FONT = [pygame.font.Font(pathof("assets/fonts/PixelTandysoft-0rJG.ttf"), i) for i in range(1, 129)]
+STOPPING_CHARS = {" ", "!", "$", "%", "(", "-", "+", "{", "}", "[", "|", "\\", "?"}
 TEXT_COLOR = (0, 100, 220)

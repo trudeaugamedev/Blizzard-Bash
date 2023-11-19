@@ -1,6 +1,6 @@
-from pygame.locals import HWSURFACE, DOUBLEBUF, RESIZABLE, SCALED, WINDOWRESIZED, WINDOWMOVED, QUIT
 from websocket._exceptions import WebSocketConnectionClosedException
 from threading import Thread
+from pygame.locals import *
 from enum import Enum
 import asyncio
 import pygame
@@ -23,6 +23,7 @@ class AbortScene(Exception):
 class GameManager:
     def __init__(self) -> None:
         pygame.init()
+        pygame.key.set_repeat(500, 25)
 
         self.client = Client(self)
 
@@ -57,6 +58,9 @@ class GameManager:
         pygame.display.set_caption(f"Blizzard Bash | FPS: {round(self.clock.get_fps())}")
 
         self.events = {event.type: event for event in pygame.event.get()}
+        self.key_downs = {event.key: event for event in self.events.values() if event.type == KEYDOWN}
+        self.key_ups = {event.key: event for event in self.events.values() if event.type == KEYUP}
+        self.key_presses = pygame.key.get_pressed()
 
         if QUIT in self.events:
             self.quit()
