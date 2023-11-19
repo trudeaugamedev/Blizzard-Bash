@@ -89,7 +89,9 @@ class Client:
             if self.modified_data[key]:
                 final[key] = self.pers_data[key]
                 self.modified_data[key] = False
-        await self.socket.send(json.dumps({"id": self.id} | final))
+
+        if final:
+            await self.socket.send(json.dumps({"id": self.id} | final))
 
         while self.irreg_data.qsize() > 0:
             item = {"type": "ir"} | self.irreg_data.get()
