@@ -257,7 +257,7 @@ class InputBox(VisibleSprite):
 
     def draw(self) -> None:
         pygame.draw.rect(self.manager.screen, (196, 230, 255), (*self.pos, *self.size))
-        self.manager.screen.blit(FONT[50].render(self.text, True, TEXT_COLOR), self.pos + (12, 0))
+        self.manager.screen.blit(FONT[50].render(self.text, True, (0, 0, 0)), self.pos + (12, 0))
 
         if self.selecting:
             self.draw_selection()
