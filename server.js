@@ -245,19 +245,27 @@ function game() {
 	}
 
 	if (!waiting && !(players.size == 1 && players.has(-1)) && Date.now() - midTime > elimTime * (eliminated + 1)) {
-		let min = 9999999;
-		let min_player = null;
+		let min = 99999;
 		for (const [id, player] of players) {
 			if (id == -1 || player.eliminated) continue;
 			if (player.data.score < min) {
 				min = player.data.score;
-				min_player = player;
 			}
 		}
-		if (min_player !== null) {
-			min_player.socket.send_obj({"type": "el"});
-			min_player.eliminated = true;
-			eliminated++;
+		if (min !== 99999) {
+			let choices = [];
+			for (const [id, player] of players) {
+				if (player.data.score !== min) continue;
+				choices.push(player);
+			}
+			if (choices.length > 0) {
+				let min_player = choices.at(randint(0, choices.length - 1));
+				min_player.socket.send_obj({"type": "el"});
+				min_player.eliminated = true;
+				eliminated++;
+				broadcast(JSON.stringify({"type": "dc", "id": min_player.id}));
+				console.log(`Eliminated player '${min_player.data.name}' at id ${min_player.id}`);
+			}
 		}
 	}
 }
