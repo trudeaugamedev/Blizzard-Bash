@@ -96,7 +96,7 @@ let windSpeed = [randint(-600, -200), randint(200, 600)][randint(0, 1)];
 let powerupTime = Date.now();
 let powerupDuration = randint(10000, 20000);
 
-const totalTime = 15000;
+const totalTime = 600000;
 let startTime, timerTime, midTime, elimTime;
 let secondsLeft = totalTime;
 let eliminated = 0;
