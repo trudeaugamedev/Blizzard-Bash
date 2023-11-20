@@ -12,6 +12,7 @@ from .constants import TILE_SIZE, WIDTH, VEC, HEIGHT, FONT, TEXT_COLOR
 from .ground import Ground, Ground2, Ground3
 from .snowflake import SnowFlake
 from .player import Player
+from .border import Border
 from .utils import clamp
 from .scene import Scene
 from . import assets
@@ -29,50 +30,29 @@ class MainGame(Scene):
             time.sleep(0.01)
         noise.seed(self.seed)
 
-        for x in range(-42, 43):
+        for x in range(-80, 80):
             # Horizontal stretch and vertical stretch (essentially)
             y = noise.noise2(x * 0.1, 0) * 150
             Ground(self, (x * TILE_SIZE, y), (TILE_SIZE, 800))
-        Ground(self, (-43 * TILE_SIZE, noise.noise2(-43 * 0.1, 0) * 200 - 250), (TILE_SIZE, 2000))
-        Ground(self, (43 * TILE_SIZE, noise.noise2(43 * 0.1, 0) * 200 - 250), (TILE_SIZE, 2000))
-        for x in range(-63, -43):
-            y = noise.noise2(x * 0.1, 0) * 200 - 400
-            Ground(self, (x * TILE_SIZE, y), (TILE_SIZE, 2000))
-        for x in range(44, 64):
-            y = noise.noise2(x * 0.1, 0) * 200 - 400
-            Ground(self, (x * TILE_SIZE, y), (TILE_SIZE, 2000))
         for ground in Ground.instances.values():
             ground.generate_image() # Create a images only after all tiles have been created
 
-        for x in range(-42, 43):
+        for x in range(-80, 80):
             # Horizontal stretch and vertical stretch (essentially)
             y = noise.noise2(x * 0.1 + 10000, 0) * 200 - 120
             Ground2(self, (x * TILE_SIZE, y), (TILE_SIZE, 800))
-        Ground2(self, (-43 * TILE_SIZE, noise.noise2(-43 * 0.1, 0) * 200 - 250), (TILE_SIZE, 2000))
-        Ground2(self, (43 * TILE_SIZE, noise.noise2(43 * 0.1, 0) * 200 - 250), (TILE_SIZE, 2000))
-        for x in range(-63, -43):
-            y = noise.noise2(x * 0.1, 0) * 200 - 400
-            Ground2(self, (x * TILE_SIZE, y), (TILE_SIZE, 2000))
-        for x in range(44, 64):
-            y = noise.noise2(x * 0.1, 0) * 200 - 400
-            Ground2(self, (x * TILE_SIZE, y), (TILE_SIZE, 2000))
         for ground in Ground2.instances.values():
             ground.generate_image() # Create a images only after all tiles have been created
 
-        for x in range(-42, 43):
+        for x in range(-80, 80):
             # Horizontal stretch and vertical stretch (essentially)
             y = noise.noise2(x * 0.1 + 20000, 0) * 250 - 250
             Ground3(self, (x * TILE_SIZE, y), (TILE_SIZE, 800))
-        Ground3(self, (-43 * TILE_SIZE, noise.noise2(-43 * 0.1, 0) * 200 - 250), (TILE_SIZE, 2000))
-        Ground3(self, (43 * TILE_SIZE, noise.noise2(43 * 0.1, 0) * 200 - 250), (TILE_SIZE, 2000))
-        for x in range(-63, -43):
-            y = noise.noise2(x * 0.1, 0) * 200 - 400
-            Ground3(self, (x * TILE_SIZE, y), (TILE_SIZE, 2000))
-        for x in range(44, 64):
-            y = noise.noise2(x * 0.1, 0) * 200 - 400
-            Ground3(self, (x * TILE_SIZE, y), (TILE_SIZE, 2000))
         for ground in Ground3.instances.values():
             ground.generate_image() # Create a images only after all tiles have been created
+
+        Border(self, -1)
+        Border(self, 1)
 
         self.player = Player(self)
 

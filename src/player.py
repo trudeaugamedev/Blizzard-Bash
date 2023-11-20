@@ -293,7 +293,7 @@ class Player(VisibleSprite):
             self.vel.x = sign(self.hit_strength) * sqrt(abs(self.hit_strength)) * 150
             self.hit_strength = 0
 
-        self.pos.x, _ = clamp(self.pos.x, -2007, 2061)
+        self.pos.x, _ = clamp(self.pos.x, -2400, 2400)
 
         self.can_move = self.frame_group != assets.player_dig and not self.digging
 
