@@ -191,6 +191,12 @@ function handleAdminMessage(msg) {
 	} else if (command === "infinite") {
 		mode = "infinite";
 	} else if (command === "stop") {
+		let scoreData = [];
+		for (const [id, player] of players) {
+			if (id === -1) continue;
+			scoreData.push({"id": id, "name": player.data.name, "score": player.data.score});
+		}
+		broadcast(JSON.stringify({"type": "en", "data": scoreData}));
 		restart();
 	} else if (command.startsWith("kick")) {
 		let id = parseInt(command.substring(5));
