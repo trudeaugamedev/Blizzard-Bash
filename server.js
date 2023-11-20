@@ -96,7 +96,7 @@ let windSpeed = [randint(-600, -200), randint(200, 600)][randint(0, 1)];
 let powerupTime = Date.now();
 let powerupDuration = randint(10000, 20000);
 
-const totalTime = 600000;
+const totalTime = 6000;
 let startTime, timerTime, midTime, elimTime;
 let secondsLeft = totalTime;
 let eliminated = 0;
@@ -109,6 +109,7 @@ wss.on("connection", (socket) => {
 
 	broadcast(JSON.stringify({"type": "cn", "id": client.id}));
 
+	console.log(seed);
     socket.send_obj({"type": "hi", "id": client.id, "seed": seed, "waiting": waiting, "data": getPlayerData(client.id, true)});
 	players.set(client.id, new Player(client));
 	console.log(`Client ${client.id} connected`);
