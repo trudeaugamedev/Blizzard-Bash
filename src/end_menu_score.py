@@ -58,9 +58,9 @@ class EndMenuScore(VisibleSprite):
         (surf := pygame.Surface(VEC(self.size.x * self.progress, self.size.y), SRCALPHA)).fill((255, 255, 255, 40))
         self.manager.screen.blit(surf, self.pos)
         pygame.draw.rect(self.manager.screen, (0, 0, 0), (self.pos, (self.size.x * self.progress, self.size.y)), 3)
-        pygame.draw.line(self.manager.screen, (0, 0, 0), self.pos + (self.offset2, 0), self.pos + (self.offset2, self.size.y - 1), 3)
-        pygame.draw.line(self.manager.screen, (0, 0, 0), self.pos + (self.offset3, 0), self.pos + (self.offset3, self.size.y - 1), 3)
         if self.progress > 0.75:
+            pygame.draw.line(self.manager.screen, (0, 0, 0), self.pos + (self.offset2, 0), self.pos + (self.offset2, self.size.y - 1), 3)
+            pygame.draw.line(self.manager.screen, (0, 0, 0), self.pos + (self.offset3, 0), self.pos + (self.offset3, self.size.y - 1), 3)
             self.manager.screen.blit(self.rank_surf, self.pos + (12, -5))
             self.manager.screen.blit(self.name_surf, self.pos + (self.offset2 + 12, -5))
             self.manager.screen.blit(self.score_surf, self.pos + (self.offset3 + 12, -5))
