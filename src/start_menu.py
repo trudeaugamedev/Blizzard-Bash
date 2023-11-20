@@ -37,10 +37,10 @@ class StartMenu(Scene):
         self.manager.screen.blit(assets.background, (0, 0))
 
         pygame.draw.rect(self.manager.screen, (196, 230, 255), (WIDTH // 2 - 374, HEIGHT // 2 - 70, 400, 76))
-        text = FONT[50].render("Username:", True, TEXT_COLOR)
+        text = FONT[50].render("Username:", False, TEXT_COLOR)
         self.manager.screen.blit(text, (WIDTH // 2 - 359, HEIGHT // 2 - 70))
 
-        text = FONT[24].render(self.warning, True, (255, 0, 0))
+        text = FONT[24].render(self.warning, False, (255, 0, 0))
         self.manager.screen.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 - 115))
 
         super().draw()

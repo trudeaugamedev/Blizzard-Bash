@@ -20,7 +20,7 @@ class Button(VisibleSprite):
         self.rect = pygame.Rect(self.pos, self.size)
         self.color = (196, 230, 255)
         self.text = text
-        self.text_surf = FONT[36].render(self.text, True, TEXT_COLOR)
+        self.text_surf = FONT[36].render(self.text, False, TEXT_COLOR)
         self.text_size = VEC(self.text_surf.get_size())
         self.command = command
 

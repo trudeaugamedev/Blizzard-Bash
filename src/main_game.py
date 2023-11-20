@@ -122,17 +122,17 @@ class MainGame(Scene):
         self.manager.screen.blit(assets.background, (0, 0))
         super().draw()
 
-        self.manager.screen.blit(FONT[60].render(f"Score: {self.score}", True, TEXT_COLOR), (20, 0))
-        text = FONT[60].render(f"Score: {self.score}", True, TEXT_COLOR)
+        self.manager.screen.blit(FONT[60].render(f"Score: {self.score}", False, TEXT_COLOR), (20, 0))
+        text = FONT[60].render(f"Score: {self.score}", False, TEXT_COLOR)
         text.set_alpha(70)
         self.manager.screen.blit(text, VEC(20, 0) + (3, 3))
 
         topleft = VEC(WIDTH - assets.player_idle[0].get_width() - 10, 10)
         self.manager.screen.blit(assets.player_idle[0], topleft)
-        text = FONT[54].render(f"{len(self.manager.other_players)} x", True, TEXT_COLOR)
+        text = FONT[54].render(f"{len(self.manager.other_players)} x", False, TEXT_COLOR)
         text.set_alpha(70)
         self.manager.screen.blit(text, topleft - (text.get_width() + 20, 5) + (3, 3))
-        text = FONT[54].render(f"{len(self.manager.other_players)} x", True, TEXT_COLOR)
+        text = FONT[54].render(f"{len(self.manager.other_players)} x", False, TEXT_COLOR)
         self.manager.screen.blit(text, topleft - (text.get_width() + 20, 5))
 
         if self.hit:
@@ -142,25 +142,25 @@ class MainGame(Scene):
                 self.hit = False
             else:
                 pos = VEC(self.hit_pos - self.player.camera.offset)
-                text = FONT[32].render("HIT!", True, TEXT_COLOR)
+                text = FONT[32].render("HIT!", False, TEXT_COLOR)
                 text.set_alpha(self.hit_alpha)
                 pos.x, _ = clamp(pos.x, text.get_width() // 2 + 10, WIDTH - text.get_width() // 2 - 10)
-                text_shadow = FONT[32].render("HIT!", True, TEXT_COLOR)
+                text_shadow = FONT[32].render("HIT!", False, TEXT_COLOR)
                 text_shadow.set_alpha(70)
                 self.manager.screen.blit(text_shadow, pos - (text.get_width() // 2, 0) + (3, 3))
                 self.manager.screen.blit(text, pos - (text.get_width() // 2, 0))
 
         if self.time_left is not None:
             text_str = f"Time Left: {self.time_left // 60}:{'0' if self.time_left % 60 < 10 else ''}{self.time_left % 60}"
-            text = FONT[30].render(text_str, True, TEXT_COLOR)
+            text = FONT[30].render(text_str, False, TEXT_COLOR)
             text.set_alpha(70)
             self.manager.screen.blit(text, VEC(20, 72) + (3, 3))
-            text = FONT[30].render(text_str, True, TEXT_COLOR)
+            text = FONT[30].render(text_str, False, TEXT_COLOR)
             self.manager.screen.blit(text, (20, 72))
 
         if self.waiting:
             self.draw_waiting_text()
 
     def draw_waiting_text(self) -> None:
-        text = FONT[54].render("Waiting for game to start...", True, (0, 0, 0))
+        text = FONT[54].render("Waiting for game to start...", False, (0, 0, 0))
         self.manager.screen.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 - text.get_height() // 2))
