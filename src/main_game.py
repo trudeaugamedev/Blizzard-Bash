@@ -26,7 +26,7 @@ class MainGame(Scene):
         self.waiting = True
         self.client.restart()
         self.seed = -1
-        while self.client.id == -1:
+        while self.seed == -1:
             time.sleep(0.01)
         noise.seed(self.seed)
 
