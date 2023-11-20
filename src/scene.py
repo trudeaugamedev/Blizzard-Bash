@@ -14,6 +14,7 @@ class Scene:
         self.running = True
 
     def setup(self) -> None:
+        # Only exists for a specific scene
         pass
 
     def update(self) -> None:

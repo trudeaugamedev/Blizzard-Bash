@@ -3,19 +3,16 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from manager import GameManager
 
-from pygame.locals import K_RETURN, KEYDOWN, BLEND_RGB_ADD
+from pygame.locals import K_RETURN, KEYDOWN
 from random import randint, choice
-from threading import Thread
 import opensimplex as noise
-import pygame
 import time
 
 from .constants import TILE_SIZE, WIDTH, VEC, HEIGHT, FONT, TEXT_COLOR
 from .ground import Ground, Ground2, Ground3
 from .snowflake import SnowFlake
-from .utils import clamp, inttup
-from .powerup import Powerup
 from .player import Player
+from .utils import clamp
 from .scene import Scene
 from . import assets
 

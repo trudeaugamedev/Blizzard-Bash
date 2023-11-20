@@ -110,7 +110,6 @@ wss.on("connection", (socket) => {
 	broadcast(JSON.stringify({"type": "cn", "id": client.id}));
 
     socket.send_obj({"type": "hi", "id": client.id, "seed": seed, "waiting": waiting, "data": getPlayerData(client.id, true)});
-	// console.log(getPlayerData(client.id, true));
 	players.set(client.id, new Player(client));
 	console.log(`Client ${client.id} connected`);
 
@@ -162,7 +161,6 @@ wss.on("connection", (socket) => {
 			if (value === null) continue;
 			playerData[key] = value;
 		}
-		// console.log(`Client ${client.id}: ${JSON.stringify(players.get(client.id).data)}`);
 	});
 });
 

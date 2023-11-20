@@ -9,7 +9,7 @@ from random import uniform
 import pygame
 import time
 
-from .constants import VEC, SCR_DIM, GRAVITY, PIXEL_SIZE, TILE_SIZE, WIDTH
+from .constants import VEC, SCR_DIM, GRAVITY, PIXEL_SIZE, TILE_SIZE
 from .utils import intvec, snap, clamp, snap, sign, shadow, inttup
 from .ground import Ground, Ground2, Ground3
 from .sprite import VisibleSprite, Layers

@@ -1,20 +1,14 @@
-from websocket._exceptions import WebSocketConnectionClosedException
-from threading import Thread
 from pygame.locals import *
 from enum import Enum
-import asyncio
 import pygame
-import time
 import sys
 
-from .others import OtherPlayer, OtherSnowball
-from .constants import WIDTH, HEIGHT, FPS, VEC
-from .client import Client, ManualExit
+from .constants import WIDTH, HEIGHT, FPS
 from .start_menu import StartMenu
 from .main_game import MainGame
 from .end_menu import EndMenu
+from .client import Client
 from .scene import Scene
-from . import assets
 
 class AbortScene(Exception):
     def __str__(self):
@@ -75,8 +69,6 @@ class GameManager:
         print("Quitting Pygame")
         pygame.quit()
         print("Waiting for client to exit")
-        # while not self.client.exited:
-        #     time.sleep(0.1)
         print("Client has exited")
         sys.exit()
 

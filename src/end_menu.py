@@ -3,10 +3,9 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from manager import GameManager
 
-from pygame.locals import SRCALPHA, KEYDOWN, K_RETURN
+from pygame.locals import KEYDOWN, K_RETURN
 import pygame
 
-from .constants import WIDTH, HEIGHT, FONT
 from .end_menu_score import EndMenuScore
 from .scene import Scene
 

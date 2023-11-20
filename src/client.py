@@ -7,15 +7,12 @@ from websockets.exceptions import ConnectionClosedError, ConnectionClosedOK
 import websockets.client as ws_client
 from traceback import print_exc
 from threading import Thread
-from random import randint
 from queue import Queue
 from typing import Any
-from uuid import uuid4
 import asyncio
 import json
 
 from src.data_parser import Parser
-from src.utils import inttup
 
 class ManualExit(Exception):
     def __str__(self) -> str:

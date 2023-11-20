@@ -2,7 +2,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from scene import Scene
-    from player import Player
 
 from random import choices, uniform, randint, choice
 import pygame

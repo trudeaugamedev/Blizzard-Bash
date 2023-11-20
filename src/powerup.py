@@ -7,7 +7,7 @@ from pygame.locals import BLEND_RGB_SUB
 import pygame
 import time
 
-from .constants import VEC, GRAVITY, PIXEL_SIZE
+from .constants import VEC, PIXEL_SIZE
 from .sprite import VisibleSprite, Layers
 from .ground import Ground
 from .utils import shadow
