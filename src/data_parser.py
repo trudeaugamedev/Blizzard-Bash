@@ -13,7 +13,7 @@ class Parser:
         self.manager = client.manager
 
     def parse(self, data: dict) -> None:
-        # THIS SECTION DOES NOT RAISE EXCEPTIONS PROPERLY!!!!!!!!
+        # THIS SECTION MIGHT NOT RAISE EXCEPTIONS PROPERLY!!!!!!!!
         match data["type"]:
             case "hi": # Initial
                 self.client.id = data["id"]
@@ -21,7 +21,10 @@ class Parser:
                 self.manager.scene.waiting = data["waiting"]
                 self.client_data(data["data"], init=True)
             case "cl": # Client data
-                self.client_data(data)
+                try:
+                    self.client_data(data)
+                except KeyError: # Once, I have had an error slip pass ONCE, IDK WHY ;-;-;-;-;-;
+                    pass
             case "ir": # Irregular client data
                 self.irregular_client_data(data)
             case "ad": # Admin command
