@@ -37,6 +37,16 @@ class EndMenuScore(VisibleSprite):
         self.linear_progress = 0
         self.delay_time = time.time()
 
+        self.surf = pygame.Surface(self.size, SRCALPHA)
+        self.surf.fill((255, 255, 255, 40))
+        pygame.draw.rect(self.surf, (0, 0, 0), (0, 0, *self.size), 3)
+        pygame.draw.line(self.surf, (0, 0, 0), (self.offset2, 0), (self.offset2, self.size.y - 1), 3)
+        pygame.draw.line(self.surf, (0, 0, 0), (self.offset3, 0), (self.offset3, self.size.y - 1), 3)
+        self.surf.blit(self.rank_surf, (12, -5))
+        self.surf.blit(self.name_surf, (self.offset2 + 12, -5))
+        self.surf.blit(self.score_surf, (self.offset3 + 12, -5))
+        self.surf.blit(self.rank_ss_surf, (12 + self.rank_surf.get_width(), -5 + 8))
+
         if self.mine:
             self.white = False
             self.flash_timer = time.time()
@@ -48,6 +58,8 @@ class EndMenuScore(VisibleSprite):
     def update(self) -> None:
         if time.time() - self.delay_time < 0.4 + self.index * 0.2: return
         self.linear_progress += 0.8 * self.manager.dt
+        if self.progress > 0.99:
+            self.progress = 1
         if self.linear_progress > 1:
             self.linear_progress = 1
             return
@@ -55,16 +67,8 @@ class EndMenuScore(VisibleSprite):
 
     def draw(self) -> None:
         if time.time() - self.delay_time < self.index * 0.2: return
-        (surf := pygame.Surface(VEC(self.size.x * self.progress, self.size.y), SRCALPHA)).fill((255, 255, 255, 40))
-        self.manager.screen.blit(surf, self.pos)
-        pygame.draw.rect(self.manager.screen, (0, 0, 0), (self.pos, (self.size.x * self.progress, self.size.y)), 3)
+        self.manager.screen.blit(self.surf, self.pos, (0, 0, self.size.x * self.progress, self.size.y))
         if self.progress > 0.75:
-            pygame.draw.line(self.manager.screen, (0, 0, 0), self.pos + (self.offset2, 0), self.pos + (self.offset2, self.size.y - 1), 3)
-            pygame.draw.line(self.manager.screen, (0, 0, 0), self.pos + (self.offset3, 0), self.pos + (self.offset3, self.size.y - 1), 3)
-            self.manager.screen.blit(self.rank_surf, self.pos + (12, -5))
-            self.manager.screen.blit(self.name_surf, self.pos + (self.offset2 + 12, -5))
-            self.manager.screen.blit(self.score_surf, self.pos + (self.offset3 + 12, -5))
-            self.manager.screen.blit(self.rank_ss_surf, self.pos + (12, -5) + (self.rank_surf.get_width(), 8))
             if self.mine:
                 if time.time() - self.flash_timer > 0.5:
                     self.flash_timer = time.time()
