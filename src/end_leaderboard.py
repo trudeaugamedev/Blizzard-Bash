@@ -20,7 +20,7 @@ def get_superscript(n: int) -> str:
         case "3": return "rd"
         case _: return "th"
 
-class EndMenuScore(VisibleSprite):
+class EndLeaderboard(VisibleSprite):
     def __init__(self, scene: Scene, index: int, name: str, score: int, mine: bool) -> None:
         super().__init__(scene, Layers.GUI)
         self.pos = VEC(30, 30 + index * 50)

@@ -6,7 +6,7 @@ if TYPE_CHECKING:
 from pygame.locals import KEYDOWN, K_RETURN
 import pygame
 
-from .end_menu_score import EndMenuScore
+from .end_leaderboard import EndLeaderboard
 from .scene import Scene
 
 class EndMenu(Scene):
@@ -18,7 +18,7 @@ class EndMenu(Scene):
 
         scores = sorted(self.previous_scene.score_data, key = lambda d: d["score"], reverse=True)
         for i, data in enumerate(scores):
-            EndMenuScore(self, i, data["name"], data["score"], self.client.id == data["id"])
+            EndLeaderboard(self, i, data["name"], data["score"], self.client.id == data["id"])
 
         self.manager.other_players = {}
 
