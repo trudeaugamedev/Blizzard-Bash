@@ -21,10 +21,7 @@ class Parser:
                 self.manager.scene.waiting = data["waiting"]
                 self.client_data(data["data"], init=True)
             case "cl": # Client data
-                try:
-                    self.client_data(data)
-                except KeyError: # Once, I have had an error slip pass ONCE, IDK WHY ;-;-;-;-;-;
-                    pass
+                self.client_data(data)
             case "ir": # Irregular client data
                 self.irregular_client_data(data)
             case "ad": # Admin command
@@ -39,7 +36,7 @@ class Parser:
             case "el": # Eliminated
                 self.manager.scene.player.eliminated = True
             case "cn": # Connect
-                self.manager.other_players[data["id"]] = OtherPlayer(self.manager.scene, data["id"], (0, -100))
+                self.manager.other_players[data["id"]] = OtherPlayer(self.manager.scene, data["id"], (0, -3000))
             case "dc": # Disconnect
                 if data["id"] in self.manager.other_players:
                     self.manager.other_players.pop(data["id"]).kill()
@@ -54,11 +51,9 @@ class Parser:
         for player_data in data["players"]:
             if not player_data: continue
 
-            # Parse data of player itself
-            if not init:
-                other: OtherPlayer = self.manager.other_players[player_data["id"]]
-            else:
-                other = self.manager.other_players[player_data["id"]] = OtherPlayer(self.manager.scene, player_data["id"], player_data["pos"])
+            if init: self.manager.other_players[player_data["id"]] = OtherPlayer(self.manager.scene, player_data["id"], player_data["pos"])
+            if player_data["id"] not in self.manager.other_players: continue
+            other = self.manager.other_players[player_data["id"]]
 
             if "name" in player_data: other.name = player_data["name"]
             if "pos" in player_data: other.pos = VEC(player_data["pos"])
