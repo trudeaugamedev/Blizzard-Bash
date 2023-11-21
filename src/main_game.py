@@ -9,6 +9,7 @@ import opensimplex as noise
 import time
 
 from .constants import TILE_SIZE, WIDTH, VEC, HEIGHT, FONT, TEXT_COLOR
+from .game_leaderboard import GameLeaderboard
 from .ground import Ground, Ground2, Ground3
 from .snowflake import SnowFlake
 from .player import Player
@@ -51,6 +52,8 @@ class MainGame(Scene):
             Ground3(self, (x * TILE_SIZE, y), (TILE_SIZE, 800))
         for ground in Ground3.instances.values():
             ground.generate_image() # Create a images only after all tiles have been created
+
+        self.leaderboard = GameLeaderboard(self)
 
         Border(self, -1)
         Border(self, 1)
@@ -122,14 +125,6 @@ class MainGame(Scene):
         text = FONT[60].render(f"Score: {self.score}", False, TEXT_COLOR)
         text.set_alpha(70)
         self.manager.screen.blit(text, VEC(20, 0) + (3, 3))
-
-        topleft = VEC(WIDTH - assets.player_idle[0].get_width() - 10, 10)
-        self.manager.screen.blit(assets.player_idle[0], topleft)
-        text = FONT[54].render(f"{len(self.manager.other_players)} x", False, TEXT_COLOR)
-        text.set_alpha(70)
-        self.manager.screen.blit(text, topleft - (text.get_width() + 20, 5) + (3, 3))
-        text = FONT[54].render(f"{len(self.manager.other_players)} x", False, TEXT_COLOR)
-        self.manager.screen.blit(text, topleft - (text.get_width() + 20, 5))
 
         if self.hit:
             self.hit_alpha -= 250 * self.manager.dt
