@@ -62,10 +62,10 @@ class Ground(VisibleSprite):
             y_offset = 0
         interval /= REAL_TILE_SIZE
 
-        for x in range(REAL_TILE_SIZE): # naming it "surf" instead of "slice" bcs slice is a builtin
+        for x in range(REAL_TILE_SIZE):
             column = self.unsliced_image.subsurface(x * PIXEL_SIZE, 0, PIXEL_SIZE, self.size.y)
-            y = x * interval + y_offset
-            self.image.blit(column, (x * PIXEL_SIZE, y))
+            y = (x * interval + y_offset)
+            self.image.blit(column, (x * PIXEL_SIZE, y // PIXEL_SIZE * PIXEL_SIZE))
             self.__class__.height_map[int(self.pos.x + x * PIXEL_SIZE)] = self.pos.y + y
 
         self.incline = degrees(atan2(-interval, PIXEL_SIZE))
