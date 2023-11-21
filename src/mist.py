@@ -15,7 +15,7 @@ from . import assets
 
 class Mist(VisibleSprite):
     def __init__(self, scene: Scene, pos: tuple[int, int]) -> None:
-        super().__init__(scene, Layers.BORDER)
+        super().__init__(scene, Layers.MIST)
         self.pos = VEC(pos)
         self.vel = VEC(0, 0)
         self.resistance = uniform(0.6, 0.8)
@@ -36,8 +36,8 @@ class Mist(VisibleSprite):
 
         if not self.appeared:
             self.opacity += 100 * self.manager.dt
-        if self.opacity > 200 and not self.appeared:
-            self.opacity = 200
+        if self.opacity > 150 and not self.appeared:
+            self.opacity = 150
             self.appeared = True
             self.start_time = time.time()
         if time.time() - self.start_time > 5:

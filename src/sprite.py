@@ -19,6 +19,7 @@ class Layers(Enum):
     GROUND = auto()
     SNOWBALL = auto()
     POWERUP = auto()
+    MIST = auto()
     BORDER = auto()
     THROW_TRAIL = auto()
     ARROW = auto()

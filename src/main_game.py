@@ -66,9 +66,9 @@ class MainGame(Scene):
 
         self.mist_time = time.time()
         self.mists = []
-        for _ in range(8):
+        for _ in range(11):
             self.mists.append(Mist(self, (
-                randint(int(self.player.pos.x - 1000), int(self.player.pos.x + 1000)),
+                randint(int(self.player.pos.x - 1300), int(self.player.pos.x + 1300)),
                 randint(-600, 600),
             )))
 
@@ -99,10 +99,10 @@ class MainGame(Scene):
                 ])
                 SnowFlake(self, pos + self.player.camera.offset)
 
-        if len(self.mists) < 8 and time.time() - self.mist_time > 1:
+        if len(self.mists) < 11 and time.time() - self.mist_time > 1:
             self.mist_time = time.time()
             self.mists.append(Mist(self, (
-                randint(int(self.player.pos.x - 1000), int(self.player.pos.x + 1000)),
+                randint(int(self.player.pos.x - 1300), int(self.player.pos.x + 1300)),
                 randint(-600, 600),
             )))
 
