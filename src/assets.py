@@ -33,6 +33,7 @@ powerup_icons["clustershot"].fill((0, 255, 0))
 gradient = pygame.transform.scale((load_img(f"{TEXTURES}/misc/gradient.png", factor=1)), (TILE_SIZE, 800))
 background = load_img(f"{TEXTURES}/misc/background.png", alpha=False)
 border = load_img(f"{TEXTURES}/misc/border.png", alpha=True)
+mist = load_img(f"{TEXTURES}/misc/mist.png", factor=1, alpha=True)
 
 class Frames:
     def __init__(self, path: str, prefix: str) -> None:

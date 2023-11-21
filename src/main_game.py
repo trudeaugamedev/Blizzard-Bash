@@ -15,6 +15,7 @@ from .player import Player
 from .border import Border
 from .utils import clamp
 from .scene import Scene
+from .mist import Mist
 from . import assets
 
 class MainGame(Scene):
@@ -63,6 +64,14 @@ class MainGame(Scene):
         self.wind_vel = VEC(0, 0)
         self.time_left = None
 
+        self.mist_time = time.time()
+        self.mists = []
+        for _ in range(8):
+            self.mists.append(Mist(self, (
+                randint(int(self.player.pos.x - 1000), int(self.player.pos.x + 1000)),
+                randint(-600, 600),
+            )))
+
         self.score = 0
         self.lost = False
         self.started = False
@@ -89,6 +98,13 @@ class MainGame(Scene):
                     VEC(randint(WIDTH, WIDTH + 600), randint(-100, HEIGHT)) # Right
                 ])
                 SnowFlake(self, pos + self.player.camera.offset)
+
+        if len(self.mists) < 8 and time.time() - self.mist_time > 1:
+            self.mist_time = time.time()
+            self.mists.append(Mist(self, (
+                randint(int(self.player.pos.x - 1000), int(self.player.pos.x + 1000)),
+                randint(-600, 600),
+            )))
 
         if KEYDOWN in self.manager.events and self.manager.events[KEYDOWN].key == K_RETURN:
             self.manager.ready = True
