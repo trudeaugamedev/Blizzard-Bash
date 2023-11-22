@@ -142,7 +142,6 @@ wss.on("connection", (socket) => {
 				if (!(key === "name" || key === "score")) continue;
 				playerData[key] = value;
 			}
-			// also fix crash that happens when eliminated player hits other player
 			return;
 		}
 		
