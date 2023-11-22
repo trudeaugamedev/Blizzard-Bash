@@ -19,6 +19,8 @@ class Parser:
                 self.client.id = data["id"]
                 self.manager.scene.seed = data["seed"]
                 self.manager.scene.waiting = data["waiting"]
+                if not data["waiting"]:
+                    self.manager.scene.eliminated = True
                 self.client_data(data["data"], init=True)
             case "cl": # Client data
                 self.client_data(data)

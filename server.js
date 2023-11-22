@@ -96,7 +96,7 @@ let windSpeed = [randint(-600, -200), randint(200, 600)][randint(0, 1)];
 let powerupTime = Date.now();
 let powerupDuration = randint(5000, 15000);
 
-const totalTime = 6000;
+const totalTime = 60000;
 let startTime, timerTime, midTime, elimTime;
 let secondsLeft = totalTime;
 let eliminated = 0;
@@ -107,12 +107,13 @@ wss.on("connection", (socket) => {
 		socket: socket
 	};
 
-	broadcast(JSON.stringify({"type": "cn", "id": client.id}));
+	if (waiting) broadcast(JSON.stringify({"type": "cn", "id": client.id}));
 
-	console.log(seed);
     socket.send_obj({"type": "hi", "id": client.id, "seed": seed, "waiting": waiting, "data": getPlayerData(client.id, true)});
 	players.set(client.id, new Player(client));
 	console.log(`Client ${client.id} connected`);
+
+	if (!waiting) players.get(client.id).eliminated = true;
 
 	socket.on("error", (error) => {
 		console.error(error);
@@ -130,7 +131,20 @@ wss.on("connection", (socket) => {
 	});
 
 	socket.on("message", (msg) => {
-		if (players.has(client.id) && players.get(client.id).eliminated) return;
+		if (players.has(client.id) && players.get(client.id).eliminated) {
+			// set player name and score only
+			const strMsg = msg.toString();
+			const data = JSON.parse(strMsg);
+			let playerData = players.get(client.id).data;
+			for (const [key, value] of Object.entries(data)) {
+				if (key === "name") console.log(`Username: ${value}`);
+				if (value === null) continue;
+				if (!(key === "name" || key === "score")) continue;
+				playerData[key] = value;
+			}
+			// also fix crash that happens when eliminated player hits other player
+			return;
+		}
 		
 		if (msg.toString() === "admin") {
 			handleAdminConnect(client);

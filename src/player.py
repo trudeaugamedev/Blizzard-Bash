@@ -96,7 +96,6 @@ class Player(VisibleSprite):
 
         self.first_start = True
         self.hit_strength = 0 # The strength another player's snowball hit the player
-        self.eliminated = False
 
         self.CONST_ACC = 500 # 500 pixels per second squared (physics :P)
         self.MAX_SPEED = 200
@@ -142,7 +141,7 @@ class Player(VisibleSprite):
             self.manager.screen.blit(mask.scale(VEC(mask.get_size()) + (20, 14)).to_surface(setcolor=(140, 230, 255, alpha), unsetcolor=(0, 0, 0, 0)), VEC(self.rect.topleft) - (10, 7) - self.camera.offset)
 
         self.manager.screen.blit(shadow(self.image), VEC(self.rect.topleft) - self.camera.offset + (3, 3), special_flags=BLEND_RGB_SUB)
-        if self.eliminated:
+        if self.scene.eliminated:
             self.image.set_alpha(80)
         self.manager.screen.blit(self.image, (*(VEC(self.rect.topleft) - self.camera.offset), *self.size))
 

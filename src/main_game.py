@@ -26,6 +26,7 @@ class MainGame(Scene):
 
     def setup(self) -> None:
         self.waiting = True
+        self.eliminated = False
         self.client.restart()
         self.seed = -1
         while self.seed == -1:
