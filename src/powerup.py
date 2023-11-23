@@ -22,6 +22,7 @@ class Powerup(VisibleSprite):
         self.type = _type
         self.__class__.instances[self.id] = self
         self.image = assets.powerup_icons[self.type]
+        self.shadow_image = shadow(self.image)
         self.size = VEC(self.image.get_size())
         self.pos = VEC(pos)
         self.rect = pygame.Rect(self.pos - (12, 12), self.size + (24, 24))
@@ -48,7 +49,7 @@ class Powerup(VisibleSprite):
 
     def draw(self) -> None:
         if not hasattr(self, "initialized"): return
-        self.manager.screen.blit(shadow(self.image), self.pos - self.size // 2 - self.scene.player.camera.offset + (3, 3), special_flags=BLEND_RGB_SUB)
+        self.manager.screen.blit(self.shadow_image, self.pos - self.size // 2 - self.scene.player.camera.offset + (3, 3), special_flags=BLEND_RGB_SUB)
         self.manager.screen.blit(self.image, self.pos - self.size // 2 - self.scene.player.camera.offset)
 
     def kill(self) -> None:
