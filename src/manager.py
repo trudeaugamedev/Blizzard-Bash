@@ -9,6 +9,7 @@ from .main_game import MainGame
 from .profiling import profile
 from .end_menu import EndMenu
 from .client import Client
+from .sprite import Layers
 from .scene import Scene
 
 class AbortScene(Exception):
