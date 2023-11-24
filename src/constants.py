@@ -3,7 +3,7 @@ import pygame
 from .exe import pathof
 
 VEC = pygame.math.Vector2
-WIDTH, HEIGHT = 1200, 800
+WIDTH, HEIGHT = 1200, 675
 SCR_DIM = VEC(WIDTH, HEIGHT)
 FPS = 144
 
