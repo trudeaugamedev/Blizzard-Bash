@@ -13,9 +13,6 @@ def sign(num: int | float) -> int:
 def shadow(surf: pygame.Surface) -> pygame.Surface:
     return pygame.mask.from_surface(surf).to_surface(setcolor=(50, 50, 50))
 
-def light_shadow(surf: pygame.Surface) -> pygame.Surface:
-    return pygame.mask.from_surface(surf).to_surface(setcolor=(6, 6, 6))
-
 # The clamp functions clamps a value to the max or min if it exceeds them
 
 @dispatch((int, float), (int, float), (int, float))

@@ -10,7 +10,6 @@ import pygame
 
 from .constants import TILE_SIZE, VEC, PIXEL_SIZE, REAL_TILE_SIZE, WIDTH
 from .sprite import VisibleSprite, Layers
-from .utils import light_shadow
 from . import assets
 
 class Ground(VisibleSprite):
@@ -70,7 +69,6 @@ class Ground(VisibleSprite):
             self.__class__.height_map[int(self.pos.x + x * PIXEL_SIZE)] = self.pos.y + y
 
         self.incline = degrees(atan2(-interval, PIXEL_SIZE))
-        self.shadow_image = light_shadow(self.image)
 
     def generate_image(self) -> None:
         self.generate_unsliced_image()
@@ -82,7 +80,6 @@ class Ground(VisibleSprite):
 
     def draw(self) -> None:
         if self.rect.right - self.scene.player.camera.offset.x < 0 or self.rect.left - self.scene.player.camera.offset.x > WIDTH: return
-        self.manager.screen.blit(self.shadow_image, self.pos + (0, -12) - self.scene.player.camera.offset, special_flags=BLEND_RGB_SUB)
         self.manager.screen.blit(self.image, self.pos - self.scene.player.camera.offset)
 
 class Ground2(Ground):
