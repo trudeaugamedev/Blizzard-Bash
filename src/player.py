@@ -71,7 +71,6 @@ class Player(VisibleSprite):
         self.flip = False
         self.rotation = 30
         self.idle = True
-        self.active_movement = False
 
         self.digging = False
         self.can_move = True # Actually means if the player is digging
@@ -98,7 +97,6 @@ class Player(VisibleSprite):
         self.hit_strength = 0 # The strength another player's snowball hit the player
 
         self.CONST_ACC = 500 # 500 pixels per second squared (physics :P)
-        self.MAX_SPEED = 200
         self.SMALL_MAX_SPEED = 30
         self.JUMP_SPEED1 = -400
         self.JUMP_SPEED2 = -320
@@ -149,9 +147,7 @@ class Player(VisibleSprite):
         self.keys = pygame.key.get_pressed()
 
         self.acc = VEC(0, GRAVITY)
-        self.active_movement = False
         if self.keys[K_a]: # Acceleration
-            self.active_movement = True
             self.acc.x -= self.CONST_ACC
             self.flip = True
             if self.can_move:
@@ -165,7 +161,6 @@ class Player(VisibleSprite):
             self.acc.x += self.CONST_ACC
             self.idle = True
         if self.keys[K_d]:
-            self.active_movement = True
             self.acc.x += self.CONST_ACC
             self.flip = False
             if self.can_move:
@@ -181,6 +176,11 @@ class Player(VisibleSprite):
         if self.keys[K_a] and self.keys[K_d]:
             self.acc.x = -sign(self.vel.x) * self.CONST_ACC
             self.idle = True
+
+        if self.can_move:
+            self.vel.x -= sign(self.vel.x) * self.vel.x ** 2 * 0.01 * self.manager.dt
+        else:
+            self.vel.x -= sign(self.vel.x) * self.vel.x ** 2 * 0.2 * self.manager.dt
 
         if self.on_ground:
             self.jump_time = time.time()
@@ -241,11 +241,10 @@ class Player(VisibleSprite):
         self.vel += self.acc * self.manager.dt
         # _ to catch the successful clamp return value
         # Baiscally if it clamped to the left it would be -1, right would be 1, if it didn't clamp (value is in range), it's 0
-        if self.active_movement:
-            if self.can_move:
-                self.vel.x, _ = clamp(self.vel.x, -self.MAX_SPEED, self.MAX_SPEED)
-            else:
-                self.vel.x, _ = clamp(self.vel.x, -self.SMALL_MAX_SPEED, self.SMALL_MAX_SPEED)
+        # if self.can_move:
+        #     self.vel.x, _ = clamp(self.vel.x, -self.MAX_SPEED, self.MAX_SPEED)
+        # else:
+        #     self.vel.x, _ = clamp(self.vel.x, -self.SMALL_MAX_SPEED, self.SMALL_MAX_SPEED)
         # If the absolute value of x vel is less than the constant acceleration, snap to 0 so that deceleration doesn't overshoot
         self.vel.x = snap(self.vel.x, 0, self.CONST_ACC * self.manager.dt)
         self.pos += self.vel * self.manager.dt
