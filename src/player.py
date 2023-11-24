@@ -386,5 +386,5 @@ class Player(VisibleSprite):
             if self.throwing:
                 self.camera.extra_offset = -VEC(self.sb_vel.x * 0.15, 0)
             else:
-                self.camera.extra_offset = VEC(0, 100)
-            self.camera.update(self.pos - (0, 100))
+                self.camera.extra_offset = VEC(0, self.pos.y * 0.3 + 80)
+            self.camera.update(self.pos - (0, self.pos.y * 0.3 + 80))
