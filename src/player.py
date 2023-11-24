@@ -9,8 +9,8 @@ from random import uniform
 import pygame
 import time
 
+from .utils import intvec, snap, clamp, clamp_max, snap, sign, shadow, inttup
 from .constants import VEC, SCR_DIM, GRAVITY, PIXEL_SIZE, TILE_SIZE
-from .utils import intvec, snap, clamp, snap, sign, shadow, inttup
 from .ground import Ground, Ground2, Ground3
 from .sprite import VisibleSprite, Layers
 from .snowball import Snowball
@@ -284,6 +284,11 @@ class Player(VisibleSprite):
         ground_y = self.ground_level.height_map[centerx]
         if self.pos.y > ground_y + 5:
             self.pos.y = ground_y + 5
+            self.vel.y = 0
+            self.on_ground = True
+            self.jumping = False
+        if self.pos.y > Ground.height_map[centerx] + 5:
+            self.pos.y = Ground.height_map[centerx] + 5
             self.vel.y = 0
             self.on_ground = True
             self.jumping = False
