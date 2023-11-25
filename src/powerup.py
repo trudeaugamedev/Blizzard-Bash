@@ -36,7 +36,11 @@ class Powerup(VisibleSprite):
 
         self.pos = self.recv_pos # so that the pos doesnt end up at (0, 0) at the beginning
 
-        ground_y = Ground.height_map[int(self.pos.x // PIXEL_SIZE * PIXEL_SIZE)]
+        try:
+            ground_y = Ground.height_map[int(self.pos.x // PIXEL_SIZE * PIXEL_SIZE)]
+        except KeyError:
+            self.kill()
+            return
         if self.pos.y > ground_y - self.size.y // 2:
             self.pos.y = ground_y - self.size.y // 2
             self.vel.x *= 0.85
