@@ -142,6 +142,7 @@ class Player(VisibleSprite):
         if self.scene.eliminated:
             self.image.set_alpha(80)
         self.manager.screen.blit(self.image, (*(VEC(self.rect.topleft) - self.camera.offset), *self.size))
+        self.image.set_alpha(255)
 
     def update_keys(self) -> None:
         self.keys = pygame.key.get_pressed()
