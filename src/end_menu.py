@@ -7,6 +7,8 @@ from pygame.locals import KEYDOWN, K_RETURN
 import pygame
 
 from .end_leaderboard import EndLeaderboard
+from .constants import WIDTH, HEIGHT
+from .button import Button
 from .scene import Scene
 
 class EndMenu(Scene):
@@ -22,10 +24,10 @@ class EndMenu(Scene):
 
         self.manager.other_players = {}
 
+        self.button = Button(self, (WIDTH - 300 - 30, HEIGHT - 80 - 30), (300, 80), "Back", lambda: self.manager.new_scene("StartMenu"))
+
     def update(self) -> None:
         super().update()
-        if KEYDOWN in self.manager.events and self.manager.events[KEYDOWN].key == K_RETURN:
-            self.manager.new_scene("StartMenu")
 
     def draw(self) -> None:
         self.manager.screen.blit(self.background, (0, 0))

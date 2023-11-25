@@ -9,13 +9,14 @@ from .button import Button
 from .scene import Scene
 from . import assets
 
+from pygame.locals import SRCALPHA
 import pygame
 
 class StartMenu(Scene):
     def __init__(self, manager: GameManager, previous_scene: Scene) -> None:
         super().__init__(manager, previous_scene)
         self.start_button = Button(self, (WIDTH // 2, HEIGHT // 2 + 70), (300, 80), "JOIN GAME", self.start_game, centered=True)
-        self.input_box = InputBox(self, (WIDTH // 2 - 109, HEIGHT // 2 - 70), (466, 76))
+        self.input_box = InputBox(self, (WIDTH // 2 - 105, HEIGHT // 2 - 70), (466, 76))
         self.warning = ""
 
     def start_game(self) -> None:
@@ -36,7 +37,9 @@ class StartMenu(Scene):
     def draw(self) -> None:
         self.manager.screen.blit(assets.background, (0, 0))
 
-        pygame.draw.rect(self.manager.screen, (196, 230, 255), (WIDTH // 2 - 374, HEIGHT // 2 - 70, 400, 76))
+        (surf := pygame.Surface((748, 76), SRCALPHA)).fill((255, 255, 255, 80))
+        self.manager.screen.blit(surf, (WIDTH // 2 - 374, HEIGHT // 2 - 70))
+        pygame.draw.rect(self.manager.screen, (0, 0, 0), (WIDTH // 2 - 374, HEIGHT // 2 - 70, 748, 76), 3)
         text = FONT[50].render("Username:", False, TEXT_COLOR)
         self.manager.screen.blit(text, (WIDTH // 2 - 359, HEIGHT // 2 - 70))
 

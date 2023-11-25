@@ -18,7 +18,6 @@ class Button(VisibleSprite):
         if centered:
             self.pos = self.pos - self.size // 2
         self.rect = pygame.Rect(self.pos, self.size)
-        self.color = (196, 230, 255)
         self.text = text
         self.text_surf = FONT[36].render(self.text, False, TEXT_COLOR)
         self.text_size = VEC(self.text_surf.get_size())
@@ -42,5 +41,7 @@ class Button(VisibleSprite):
             self.command()
 
     def draw(self) -> None:
-        pygame.draw.rect(self.manager.screen, self.color, (*self.pos, *self.size))
+        (surf := pygame.Surface(self.size, SRCALPHA)).fill((255, 255, 255, 80))
+        self.manager.screen.blit(surf, self.pos)
+        pygame.draw.rect(self.manager.screen, (0, 0, 0), (*self.pos, *self.size), 3)
         self.manager.screen.blit(self.text_surf, self.pos + self.size // 2 - (self.text_size.x // 2, self.text_size.y // 2 * 1.1))
