@@ -38,12 +38,8 @@ class GameManager:
         while self.scene.running:
             self.update()
             try:
-                # profile(self.scene.update)
                 self.scene.update()
-                if K_RETURN in self.key_downs:
-                    profile(self.scene.draw)
-                else:
-                    self.scene.draw()
+                self.scene.draw()
             except AbortScene:
                 pass
 
