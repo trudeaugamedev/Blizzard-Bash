@@ -25,12 +25,10 @@ ground_tiles: list[pygame.Surface] = [
 ]
 
 powerup_icons = {
-    "rapidfire": load_img(f"{TEXTURES}/misc/icon_rapidfire.png", alpha=False),
-    "strength": pygame.Surface((40, 40)),
-    "clustershot": pygame.Surface((24, 24)),
+    "rapidfire": load_img(f"{TEXTURES}/powerup/rapidfire.png", alpha=False),
+    "strength": load_img(f"{TEXTURES}/powerup/strength.png", alpha=False),
+    "clustershot": load_img(f"{TEXTURES}/powerup/clustershot.png", alpha=False),
 }
-powerup_icons["strength"].fill((255, 0, 0))
-powerup_icons["clustershot"].fill((0, 255, 0))
 gradient = pygame.transform.scale((load_img(f"{TEXTURES}/misc/gradient.png", factor=1)), (TILE_SIZE, 800))
 background = load_img(f"{TEXTURES}/misc/background.png", alpha=False)
 border = load_img(f"{TEXTURES}/misc/border.png", alpha=True)
