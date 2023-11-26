@@ -27,7 +27,7 @@ class Ground1Manager(VisibleSprite):
         self.create_ground()
 
     def create_ground(self) -> None:
-        for x in range(-65, 65):
+        for x in range(-75, 75):
             # Horizontal stretch and vertical stretch (essentially)
             y = noise.noise2(x * 0.1, 0) * 150
             ground = Ground1(self.scene, self, (x * TILE_SIZE, y), (TILE_SIZE, 400 - y))
@@ -73,7 +73,7 @@ class Ground2Manager(Ground1Manager):
         self.ground = Ground2
 
     def create_ground(self) -> None:
-        for x in range(-65, 65):
+        for x in range(-75, 75):
             # Horizontal stretch and vertical stretch (essentially)
             y = noise.noise2(x * 0.1 + 10000, 0) * 200 - 120
             Ground2(self.scene, self, (x * TILE_SIZE, y), (TILE_SIZE, 400 - y))
@@ -90,7 +90,7 @@ class Ground3Manager(Ground1Manager):
         self.ground = Ground3
 
     def create_ground(self) -> None:
-        for x in range(-65, 65):
+        for x in range(-75, 75):
             # Horizontal stretch and vertical stretch (essentially)
             y = noise.noise2(x * 0.1 + 20000, 0) * 250 - 250
             Ground3(self.scene, self, (x * TILE_SIZE, y), (TILE_SIZE, 400 - y))
