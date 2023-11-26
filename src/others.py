@@ -7,14 +7,14 @@ from pygame.locals import BLEND_RGB_SUB
 import pygame
 
 from .constants import VEC, FONT, PIXEL_SIZE, WIDTH
-from .ground import Ground, Ground2, Ground3
+from .ground import Ground1, Ground2, Ground3
 from .sprite import VisibleSprite, Layers
 from .utils import shadow
 from . import assets
 
 class OtherPlayer(VisibleSprite):
     def __init__(self, scene: Scene, _id: int, pos: tuple[int, int]) -> None:
-        super().__init__(scene, Layers.PLAYER)
+        super().__init__(scene, Layers.PLAYER1)
         self.id = _id
         self.size = VEC(45, 60)
         self.pos = VEC(pos)
@@ -37,7 +37,7 @@ class OtherPlayer(VisibleSprite):
         self.real_rect.midbottom = self.rect.midbottom
 
         centerx = int(self.rect.centerx // PIXEL_SIZE * PIXEL_SIZE)
-        y1 = Ground.height_map[centerx]
+        y1 = Ground1.height_map[centerx]
         y2 = Ground2.height_map[centerx]
         y3 = Ground3.height_map[centerx]
         if self.pos.y < y3 + 12 and y2 > y3 and self._layer != Layers.PLAYER3:
@@ -48,9 +48,9 @@ class OtherPlayer(VisibleSprite):
             self.scene.sprite_manager.remove(self)
             self._layer = Layers.PLAYER2
             self.scene.sprite_manager.add(self)
-        elif self.pos.y < y1 + 12 and self._layer != Layers.PLAYER:
+        elif self.pos.y < y1 + 12 and self._layer != Layers.PLAYER1:
             self.scene.sprite_manager.remove(self)
-            self._layer = Layers.PLAYER
+            self._layer = Layers.PLAYER1
             self.scene.sprite_manager.add(self)
 
         self.orig_image = assets.player[self.frame]

@@ -15,10 +15,10 @@ from .decor import Decor
 from .utils import sign
 from . import assets
 
-class GroundManager(VisibleSprite):
-    def __init__(self, scene: Scene, ground: Ground | Ground2 | Ground3 = None, layer: Layers = Layers.GROUND) -> None:
+class Ground1Manager(VisibleSprite):
+    def __init__(self, scene: Scene, ground: Ground1 | Ground2 | Ground3 = None, layer: Layers = Layers.GROUND1) -> None:
         super().__init__(scene, layer)
-        self.ground = ground if ground else Ground
+        self.ground = ground if ground else Ground1
         self.size = VEC(26 * TILE_SIZE, 850)
         self.image = pygame.Surface(self.size)
         self.image.set_colorkey((0, 0, 0))
@@ -30,13 +30,13 @@ class GroundManager(VisibleSprite):
         for x in range(-65, 65):
             # Horizontal stretch and vertical stretch (essentially)
             y = noise.noise2(x * 0.1, 0) * 150
-            ground = Ground(self.scene, self, (x * TILE_SIZE, y), (TILE_SIZE, 400 - y))
-        for ground in Ground.instances.values():
+            ground = Ground1(self.scene, self, (x * TILE_SIZE, y), (TILE_SIZE, 400 - y))
+        for ground in Ground1.instances.values():
             ground.generate_image() # Create a images only after all tiles have been created
             ground.draw()
         for _ in range(30):
             ground = choice(list(self.ground.instances.values()))
-            Decor(self.scene, ground.pos, ground.incline * 0.5, choice([Layers.DECOR, Layers.DECOR2]))
+            Decor(self.scene, ground.pos, ground.incline * 0.5, choice([Layers.DECOR1, Layers.DECOR2]))
 
     def update(self) -> None:
         if self.scene.player.camera.offset.x < self.pos.x:
@@ -67,7 +67,7 @@ class GroundManager(VisibleSprite):
     def draw(self) -> None:
         self.manager.screen.fblits([(self.image, self.pos - self.scene.player.camera.offset)])
 
-class Ground2Manager(GroundManager):
+class Ground2Manager(Ground1Manager):
     def __init__(self, scene: Scene) -> None:
         super().__init__(scene, Ground2, Layers.GROUND2)
         self.ground = Ground2
@@ -84,7 +84,7 @@ class Ground2Manager(GroundManager):
             ground = choice(list(self.ground.instances.values()))
             Decor(self.scene, ground.pos, ground.incline * 0.5, choice([Layers.DECOR3, Layers.DECOR4]))
 
-class Ground3Manager(GroundManager):
+class Ground3Manager(Ground1Manager):
     def __init__(self, scene: Scene) -> None:
         super().__init__(scene, Ground3, Layers.GROUND3)
         self.ground = Ground3
@@ -101,11 +101,11 @@ class Ground3Manager(GroundManager):
             ground = choice(list(self.ground.instances.values()))
             Decor(self.scene, ground.pos, ground.incline * 0.5, choice([Layers.DECOR5, Layers.DECOR6]))
 
-class Ground(Sprite):
+class Ground1(Sprite):
     instances = {}
     height_map = {}
 
-    def __init__(self, scene: Scene, ground_manager: GroundManager, pos: tuple[int, int], size: tuple[int, int], layer: Layers = Layers.GROUND) -> None:
+    def __init__(self, scene: Scene, ground_manager: Ground1Manager, pos: tuple[int, int], size: tuple[int, int], layer: Layers = Layers.GROUND1) -> None:
         super().__init__(scene, layer)
         self.ground_manager = ground_manager
         self.size = VEC(size)
@@ -172,11 +172,11 @@ class Ground(Sprite):
     def draw(self) -> None:
         self.ground_manager.image.blit(self.image, self.pos - self.ground_manager.pos)
 
-class Ground2(Ground):
+class Ground2(Ground1):
     instances = {}
     height_map = {}
 
-    def __init__(self, scene: Scene, ground_manager: GroundManager, pos: tuple[int, int], size: tuple[int, int]) -> None:
+    def __init__(self, scene: Scene, ground_manager: Ground1Manager, pos: tuple[int, int], size: tuple[int, int]) -> None:
         super().__init__(scene, ground_manager, pos, size, Layers.GROUND2)
 
     def generate_image(self) -> None:
@@ -191,11 +191,11 @@ class Ground2(Ground):
         trans_surf.fill((30, 30, 30))
         self.image.blit(trans_surf, (0, 0), special_flags=BLEND_RGB_SUB)
 
-class Ground3(Ground):
+class Ground3(Ground1):
     instances = {}
     height_map = {}
 
-    def __init__(self, scene: Scene, ground_manager: GroundManager, pos: tuple[int, int], size: tuple[int, int]) -> None:
+    def __init__(self, scene: Scene, ground_manager: Ground1Manager, pos: tuple[int, int], size: tuple[int, int]) -> None:
         super().__init__(scene, ground_manager, pos, size, Layers.GROUND3)
 
     def generate_image(self) -> None:

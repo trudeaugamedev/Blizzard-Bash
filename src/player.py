@@ -11,7 +11,7 @@ import time
 
 from .utils import intvec, snap, clamp, clamp_max, snap, sign, shadow, inttup
 from .constants import VEC, SCR_DIM, GRAVITY, PIXEL_SIZE, TILE_SIZE
-from .ground import Ground, Ground2, Ground3
+from .ground import Ground1, Ground2, Ground3
 from .sprite import VisibleSprite, Layers
 from .snowball import Snowball
 from . import assets
@@ -52,7 +52,7 @@ class ThrowTrail(VisibleSprite):
 
 class Player(VisibleSprite):
     def __init__(self, scene: Scene) -> None:
-        super().__init__(scene, Layers.PLAYER)
+        super().__init__(scene, Layers.PLAYER1)
         self.size = VEC(45, 60)
         self.pos = VEC(0, -100)
         self.vel = VEC(0, 0)
@@ -66,7 +66,7 @@ class Player(VisibleSprite):
         self.real_rect.size = (10 * PIXEL_SIZE, 20 * PIXEL_SIZE)
         self.on_ground = False # on_ground is not stable
         self.jumping = True # which is why jumping needs to exist
-        self.ground_level = Ground
+        self.ground_level = Ground1
         self.ground = self.ground_level.instances[int(self.pos.x // TILE_SIZE * TILE_SIZE)]
         self.flip = False
         self.rotation = 30
@@ -252,7 +252,7 @@ class Player(VisibleSprite):
 
         centerx = int(self.rect.centerx // PIXEL_SIZE * PIXEL_SIZE)
         if self.vel.y > 0:
-            grounds = [Ground, Ground2, Ground3]
+            grounds = [Ground1, Ground2, Ground3]
             highest = min(grounds, key=lambda g: g.height_map[centerx])
             grounds.remove(highest)
             middle = min(grounds, key=lambda g: g.height_map[centerx])
@@ -265,12 +265,12 @@ class Player(VisibleSprite):
             elif self.pos.y <= middle_y + 12:
                 above = middle
             self.ground_level = above
-            if highest is Ground or highest is Ground2 and above is Ground3:
-                self.ground_level = Ground
+            if highest is Ground1 or highest is Ground2 and above is Ground3:
+                self.ground_level = Ground1
 
-        if self.ground_level == Ground and self._layer != Layers.PLAYER:
+        if self.ground_level == Ground1 and self._layer != Layers.PLAYER1:
             self.scene.sprite_manager.remove(self)
-            self._layer = Layers.PLAYER
+            self._layer = Layers.PLAYER1
             self.scene.sprite_manager.add(self)
         elif self.ground_level == Ground2 and self._layer != Layers.PLAYER2:
             self.scene.sprite_manager.remove(self)
@@ -287,8 +287,8 @@ class Player(VisibleSprite):
             self.vel.y = 0
             self.on_ground = True
             self.jumping = False
-        if self.pos.y > Ground.height_map[centerx] + 5:
-            self.pos.y = Ground.height_map[centerx] + 5
+        if self.pos.y > Ground1.height_map[centerx] + 5:
+            self.pos.y = Ground1.height_map[centerx] + 5
             self.vel.y = 0
             self.on_ground = True
             self.jumping = False

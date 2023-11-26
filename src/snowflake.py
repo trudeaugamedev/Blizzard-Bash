@@ -7,7 +7,7 @@ from random import choices, uniform, randint, choice
 import pygame
 
 from .constants import VEC, GRAVITY, PIXEL_SIZE, WIDTH
-from .ground import Ground, Ground2, Ground3
+from .ground import Ground1, Ground2, Ground3
 from .sprite import VisibleSprite, Layers
 from . import assets
 
@@ -26,10 +26,10 @@ class SnowflakeRenderer(VisibleSprite):
 # actually not visible, but just needs to be updated
 class SnowFlake(VisibleSprite):
     def __init__(self, scene: Scene, pos: tuple[int, int]) -> None:
-        super().__init__(scene, choice([Layers.SNOWFLAKE, Layers.SNOWFLAKE2, Layers.SNOWFLAKE3]))
-        if self._layer == Layers.SNOWFLAKE:
+        super().__init__(scene, choice([Layers.SNOWFLAKE1, Layers.SNOWFLAKE2, Layers.SNOWFLAKE3]))
+        if self._layer == Layers.SNOWFLAKE1:
             self.renderer = self.scene.snowflake_renderer1
-            self.ground = Ground
+            self.ground = Ground1
         elif self._layer == Layers.SNOWFLAKE2:
             self.renderer = self.scene.snowflake_renderer2
             self.ground = Ground2

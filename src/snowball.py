@@ -13,7 +13,7 @@ from .constants import VEC, GRAVITY, PIXEL_SIZE
 from .sprite import VisibleSprite, Layers
 from .utils import shadow, sign
 from .powerup import Powerup
-from .ground import Ground
+from .ground import Ground1
 from . import assets
 
 class Snowball(VisibleSprite):
@@ -62,7 +62,7 @@ class Snowball(VisibleSprite):
         self.real_rect.center = self.rect.center
 
         try:
-            ground_y = Ground.height_map[int(self.rect.centerx // PIXEL_SIZE * PIXEL_SIZE)]
+            ground_y = Ground1.height_map[int(self.rect.centerx // PIXEL_SIZE * PIXEL_SIZE)]
         except KeyError:
             self.kill()
             return

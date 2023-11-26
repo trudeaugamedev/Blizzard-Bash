@@ -9,7 +9,7 @@ import time
 
 from .constants import VEC, PIXEL_SIZE
 from .sprite import VisibleSprite, Layers
-from .ground import Ground
+from .ground import Ground1
 from .utils import shadow
 from . import assets
 
@@ -37,7 +37,7 @@ class Powerup(VisibleSprite):
         self.pos = self.recv_pos # so that the pos doesnt end up at (0, 0) at the beginning
 
         try:
-            ground_y = Ground.height_map[int(self.pos.x // PIXEL_SIZE * PIXEL_SIZE)]
+            ground_y = Ground1.height_map[int(self.pos.x // PIXEL_SIZE * PIXEL_SIZE)]
         except KeyError:
             self.kill()
             return

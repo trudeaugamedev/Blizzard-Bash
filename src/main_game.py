@@ -9,7 +9,7 @@ import opensimplex as noise
 import time
 
 from .constants import TILE_SIZE, WIDTH, VEC, HEIGHT, FONT, TEXT_COLOR
-from .ground import GroundManager, Ground2Manager, Ground3Manager
+from .ground import Ground1Manager, Ground2Manager, Ground3Manager
 from .snowflake import SnowFlake, SnowflakeRenderer
 from .game_leaderboard import GameLeaderboard
 from .sprite import Layers
@@ -34,7 +34,7 @@ class MainGame(Scene):
         noise.seed(self.seed)
 
         seed(self.seed)
-        GroundManager(self)
+        Ground1Manager(self)
         Ground2Manager(self)
         Ground3Manager(self)
         seed()
@@ -47,7 +47,7 @@ class MainGame(Scene):
         self.player = Player(self)
 
         self.snowflake_time = time.time()
-        self.snowflake_renderer1 = SnowflakeRenderer(self, Layers.SNOWFLAKE)
+        self.snowflake_renderer1 = SnowflakeRenderer(self, Layers.SNOWFLAKE1)
         self.snowflake_renderer2 = SnowflakeRenderer(self, Layers.SNOWFLAKE2)
         self.snowflake_renderer3 = SnowflakeRenderer(self, Layers.SNOWFLAKE3)
         for _ in range(1000):
