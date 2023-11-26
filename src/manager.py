@@ -39,7 +39,10 @@ class GameManager:
             self.update()
             try:
                 self.scene.update()
-                self.scene.draw()
+                if K_F12 in self.key_downs:
+                    profile(self.scene.draw)
+                else:
+                    self.scene.draw()
             except AbortScene:
                 pass
 

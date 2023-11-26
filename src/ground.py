@@ -5,19 +5,98 @@ if TYPE_CHECKING:
 
 from pygame.locals import SRCALPHA, BLEND_RGB_SUB
 from math import atan2, degrees
+import opensimplex as noise
 from random import randint
 import pygame
 
 from .constants import TILE_SIZE, VEC, PIXEL_SIZE, REAL_TILE_SIZE, WIDTH
-from .sprite import VisibleSprite, Layers
+from .sprite import Sprite, VisibleSprite, Layers
 from . import assets
 
-class Ground(VisibleSprite):
+class GroundManager(VisibleSprite):
+    def __init__(self, scene: Scene, layer: Layers = Layers.GROUND) -> None:
+        super().__init__(scene, layer)
+        self.ground = Ground
+        self.size = VEC(26 * TILE_SIZE, 850)
+        self.image = pygame.Surface(self.size)
+        self.image.set_colorkey((0, 0, 0))
+        self.pos = VEC(-WIDTH // 2, -450)
+        self.tile_x = self.pos.x // TILE_SIZE
+        self.create_ground()
+
+    def create_ground(self) -> None:
+        for x in range(-65, 65):
+            # Horizontal stretch and vertical stretch (essentially)
+            y = noise.noise2(x * 0.1, 0) * 150
+            Ground(self.scene, self, (x * TILE_SIZE, y), (TILE_SIZE, 400 - y))
+        for ground in Ground.instances.values():
+            ground.generate_image() # Create a images only after all tiles have been created
+            ground.draw()
+
+    def update(self) -> None:
+        if self.scene.player.camera.offset.x < self.pos.x:
+            self.pos.x -= TILE_SIZE
+            self.tile_x = self.pos.x // TILE_SIZE
+            self.shift_image_left()
+        elif self.scene.player.camera.offset.x + WIDTH > self.pos.x + self.size.x:
+            self.pos.x += TILE_SIZE
+            self.tile_x = self.pos.x // TILE_SIZE
+            self.shift_image_right()
+
+    def shift_image_left(self) -> None:
+        new_image = pygame.Surface(self.size)
+        new_image.set_colorkey((0, 0, 0))
+        new_image.blit(self.image, (TILE_SIZE, 0))
+        self.image = new_image
+        self.ground.instances[int(self.tile_x * TILE_SIZE)].draw()
+        self.ground.instances[int(self.tile_x * TILE_SIZE + TILE_SIZE)].draw()
+
+    def shift_image_right(self) -> None:
+        new_image = pygame.Surface(self.size)
+        new_image.set_colorkey((0, 0, 0))
+        new_image.blit(self.image, (-TILE_SIZE, 0))
+        self.image = new_image
+        self.ground.instances[int(self.tile_x * TILE_SIZE + self.size.x)].draw()
+        self.ground.instances[int(self.tile_x * TILE_SIZE - TILE_SIZE + self.size.x)].draw()
+
+    def draw(self) -> None:
+        self.manager.screen.blit(self.image, self.pos - self.scene.player.camera.offset)
+
+class Ground2Manager(GroundManager):
+    def __init__(self, scene: Scene) -> None:
+        super().__init__(scene, Layers.GROUND2)
+        self.ground = Ground2
+
+    def create_ground(self) -> None:
+        for x in range(-65, 65):
+            # Horizontal stretch and vertical stretch (essentially)
+            y = noise.noise2(x * 0.1 + 10000, 0) * 200 - 120
+            Ground2(self.scene, self, (x * TILE_SIZE, y), (TILE_SIZE, 400 - y))
+        for ground in Ground2.instances.values():
+            ground.generate_image() # Create a images only after all tiles have been created
+            ground.draw()
+
+class Ground3Manager(GroundManager):
+    def __init__(self, scene: Scene) -> None:
+        super().__init__(scene, Layers.GROUND3)
+        self.ground = Ground3
+
+    def create_ground(self) -> None:
+        for x in range(-65, 65):
+            # Horizontal stretch and vertical stretch (essentially)
+            y = noise.noise2(x * 0.1 + 20000, 0) * 250 - 250
+            Ground3(self.scene, self, (x * TILE_SIZE, y), (TILE_SIZE, 400 - y))
+        for ground in Ground3.instances.values():
+            ground.generate_image() # Create a images only after all tiles have been created
+            ground.draw()
+
+class Ground(Sprite):
     instances = {}
     height_map = {}
 
-    def __init__(self, scene: Scene, pos: tuple[int, int], size: tuple[int, int], layer: Layers = Layers.GROUND) -> None:
+    def __init__(self, scene: Scene, ground_manager: GroundManager, pos: tuple[int, int], size: tuple[int, int], layer: Layers = Layers.GROUND) -> None:
         super().__init__(scene, layer)
+        self.ground_manager = ground_manager
         self.size = VEC(size)
         self.pos = VEC(pos)
         self.rect = pygame.Rect(self.pos, self.size)
@@ -80,15 +159,14 @@ class Ground(VisibleSprite):
         ...
 
     def draw(self) -> None:
-        if self.rect.right - self.scene.player.camera.offset.x < 0 or self.rect.left - self.scene.player.camera.offset.x > WIDTH: return
-        self.manager.screen.blit(self.image, self.pos - self.scene.player.camera.offset)
+        self.ground_manager.image.blit(self.image, self.pos - self.ground_manager.pos)
 
 class Ground2(Ground):
     instances = {}
     height_map = {}
 
-    def __init__(self, scene: Scene, pos: tuple[int, int], size: tuple[int, int]) -> None:
-        super().__init__(scene, pos, size, Layers.GROUND2)
+    def __init__(self, scene: Scene, ground_manager: GroundManager, pos: tuple[int, int], size: tuple[int, int]) -> None:
+        super().__init__(scene, ground_manager, pos, size, Layers.GROUND2)
 
     def generate_image(self) -> None:
         self.generate_unsliced_image()
@@ -106,8 +184,8 @@ class Ground3(Ground):
     instances = {}
     height_map = {}
 
-    def __init__(self, scene: Scene, pos: tuple[int, int], size: tuple[int, int]) -> None:
-        super().__init__(scene, pos, size, Layers.GROUND3)
+    def __init__(self, scene: Scene, ground_manager: GroundManager, pos: tuple[int, int], size: tuple[int, int]) -> None:
+        super().__init__(scene, ground_manager, pos, size, Layers.GROUND3)
 
     def generate_image(self) -> None:
         self.generate_unsliced_image()

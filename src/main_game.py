@@ -9,8 +9,8 @@ import opensimplex as noise
 import time
 
 from .constants import TILE_SIZE, WIDTH, VEC, HEIGHT, FONT, TEXT_COLOR
+from .ground import GroundManager, Ground2Manager, Ground3Manager
 from .game_leaderboard import GameLeaderboard
-from .ground import Ground, Ground2, Ground3
 from .snowflake import SnowFlake
 from .player import Player
 from .border import Border
@@ -32,26 +32,9 @@ class MainGame(Scene):
             time.sleep(0.01)
         noise.seed(self.seed)
 
-        for x in range(-80, 80):
-            # Horizontal stretch and vertical stretch (essentially)
-            y = noise.noise2(x * 0.1, 0) * 150
-            Ground(self, (x * TILE_SIZE, y), (TILE_SIZE, 400 - y))
-        for ground in Ground.instances.values():
-            ground.generate_image() # Create a images only after all tiles have been created
-
-        for x in range(-80, 80):
-            # Horizontal stretch and vertical stretch (essentially)
-            y = noise.noise2(x * 0.1 + 10000, 0) * 200 - 120
-            Ground2(self, (x * TILE_SIZE, y), (TILE_SIZE, 400 - y))
-        for ground in Ground2.instances.values():
-            ground.generate_image() # Create a images only after all tiles have been created
-
-        for x in range(-80, 80):
-            # Horizontal stretch and vertical stretch (essentially)
-            y = noise.noise2(x * 0.1 + 20000, 0) * 250 - 250
-            Ground3(self, (x * TILE_SIZE, y), (TILE_SIZE, 400 - y))
-        for ground in Ground3.instances.values():
-            ground.generate_image() # Create a images only after all tiles have been created
+        GroundManager(self)
+        Ground2Manager(self)
+        Ground3Manager(self)
 
         self.leaderboard = GameLeaderboard(self)
 
