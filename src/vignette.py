@@ -32,7 +32,7 @@ class ElimVignette(VisibleSprite):
         self.flashing = False
 
     def update(self) -> None:
-        self.flashing = self.manager.other_players and min(map(lambda p: p.score, self.manager.other_players.values())) >= self.scene.score
+        self.flashing = self.scene.time_left is not None and self.scene.time_left < self.scene.total_time / 2 and self.manager.other_players and min(map(lambda p: p.score, self.manager.other_players.values())) >= self.scene.score
         if not self.flashing:
             self.progress = 0
             self.direction = 1

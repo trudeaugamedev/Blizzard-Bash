@@ -27,7 +27,7 @@ class Parser:
             case "ir": # Irregular client data
                 self.irregular_client_data(data)
             case "ad": # Admin command
-                if data["command"] == "start":
+                if data["command"].startswith("start"):
                     self.manager.scene.waiting = False
                 elif data["command"] == "stop":
                     self.manager.scene.time_left = -1

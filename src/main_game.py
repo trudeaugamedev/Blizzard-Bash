@@ -58,6 +58,7 @@ class MainGame(Scene):
 
         self.wind_vel = VEC(0, 0)
         self.time_left = None
+        self.total_time = 0
 
         self.score = 0
         self.lost = False
@@ -85,6 +86,9 @@ class MainGame(Scene):
                     VEC(randint(WIDTH, WIDTH + 600), randint(-100, HEIGHT)) # Right
                 ])
                 SnowFlake(self, pos + self.player.camera.offset)
+
+        if self.time_left is not None:
+            self.total_time = max(self.total_time, self.time_left)
 
         if KEYDOWN in self.manager.events and self.manager.events[KEYDOWN].key == K_RETURN:
             self.manager.ready = True
