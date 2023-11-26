@@ -28,6 +28,7 @@ class Layers(Enum):
     MIST = auto()
     BORDER = auto()
     THROW_TRAIL = auto()
+    VIGNETTE = auto()
     ARROW = auto()
     GUI = auto()
 

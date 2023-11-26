@@ -93,3 +93,4 @@ class Parser:
     def irregular_client_data(self, data: dict) -> None:
         if "hit" in data:
             self.manager.scene.player.hit_strength = data["hit"]
+            self.manager.scene.frost_vignette.opacity += 70 * abs(data["hit"])
