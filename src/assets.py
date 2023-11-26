@@ -24,14 +24,21 @@ ground_tiles: list[pygame.Surface] = [
     load_img(f"{TEXTURES}/ground/ground.png", alpha=False).subsurface(0, TILE_SIZE, TILE_SIZE * 2, TILE_SIZE),
 ]
 
-decor = [
+trees = [
     load_img(f"{TEXTURES}/decor/tree1.png", alpha=True),
     load_img(f"{TEXTURES}/decor/tree2.png", alpha=True),
+]
+tree_weights = [
+    2,
+    3,
+]
+rocks = [
     load_img(f"{TEXTURES}/decor/rock1.png", alpha=True),
     load_img(f"{TEXTURES}/decor/rock2.png", alpha=True),
 ]
-decor_weights = [
-    2, 3, 8, 5
+rock_weights = [
+    8,
+    5,
 ]
 
 powerup_icons = {

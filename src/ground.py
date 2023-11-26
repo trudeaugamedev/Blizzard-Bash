@@ -4,14 +4,14 @@ if TYPE_CHECKING:
     from scene import Scene
 
 from pygame.locals import SRCALPHA, BLEND_RGB_SUB
+from random import randint, choice, choices
 from math import atan2, degrees, sqrt
-from random import randint, choice
 import opensimplex as noise
 import pygame
 
 from .constants import TILE_SIZE, VEC, PIXEL_SIZE, REAL_TILE_SIZE, WIDTH
 from .sprite import Sprite, VisibleSprite, Layers
-from .decor import Decor
+from .decor import Tree, Rock
 from .utils import sign
 from . import assets
 
@@ -36,7 +36,7 @@ class Ground1Manager(VisibleSprite):
             ground.draw()
         for _ in range(30):
             ground = choice(list(self.ground.instances.values()))
-            Decor(self.scene, ground.pos, ground.incline * 0.5, choice([Layers.DECOR1, Layers.DECOR2]))
+            (choices([Tree, Rock], [1, 3])[0])(self.scene, ground.pos + (TILE_SIZE // 2, 0), ground.incline, choice([Layers.DECOR1, Layers.DECOR2]))
 
     def update(self) -> None:
         if self.scene.player.camera.offset.x < self.pos.x:
@@ -82,7 +82,7 @@ class Ground2Manager(Ground1Manager):
             ground.draw()
         for _ in range(25):
             ground = choice(list(self.ground.instances.values()))
-            Decor(self.scene, ground.pos, ground.incline * 0.5, choice([Layers.DECOR3, Layers.DECOR4]))
+            (choices([Tree, Rock], [1, 3])[0])(self.scene, ground.pos + (TILE_SIZE // 2, 0), ground.incline, choice([Layers.DECOR3, Layers.DECOR4]))
 
 class Ground3Manager(Ground1Manager):
     def __init__(self, scene: Scene) -> None:
@@ -99,7 +99,7 @@ class Ground3Manager(Ground1Manager):
             ground.draw()
         for _ in range(20):
             ground = choice(list(self.ground.instances.values()))
-            Decor(self.scene, ground.pos, ground.incline * 0.5, choice([Layers.DECOR5, Layers.DECOR6]))
+            (choices([Tree, Rock], [1, 3])[0])(self.scene, ground.pos + (TILE_SIZE // 2, 0), ground.incline, choice([Layers.DECOR5, Layers.DECOR6]))
 
 class Ground1(Sprite):
     instances = {}
