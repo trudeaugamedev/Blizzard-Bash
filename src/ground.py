@@ -60,7 +60,7 @@ class GroundManager(VisibleSprite):
         self.ground.instances[int(self.tile_x * TILE_SIZE - TILE_SIZE + self.size.x)].draw()
 
     def draw(self) -> None:
-        self.manager.screen.blit(self.image, self.pos - self.scene.player.camera.offset)
+        self.manager.screen.fblits([(self.image, self.pos - self.scene.player.camera.offset)])
 
 class Ground2Manager(GroundManager):
     def __init__(self, scene: Scene) -> None:

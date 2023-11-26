@@ -7,14 +7,36 @@ from random import choices, uniform, randint, choice
 import pygame
 
 from .constants import VEC, GRAVITY, PIXEL_SIZE, WIDTH
+from .ground import Ground, Ground2, Ground3
 from .sprite import VisibleSprite, Layers
-from .ground import Ground
 from . import assets
 
+class SnowflakeRenderer(VisibleSprite):
+    def __init__(self, scene: Scene, layer: Layers) -> None:
+        super().__init__(scene, layer)
+        self.snowflakes = []
+
+    def update(self) -> None:
+        ...
+
+    def draw(self) -> None:
+        self.manager.screen.fblits(self.snowflakes)
+        self.snowflakes = []
+
+# actually not visible, but just needs to be updated
 class SnowFlake(VisibleSprite):
     def __init__(self, scene: Scene, pos: tuple[int, int]) -> None:
         super().__init__(scene, choice([Layers.SNOWFLAKE, Layers.SNOWFLAKE2, Layers.SNOWFLAKE3]))
-        
+        if self._layer == Layers.SNOWFLAKE:
+            self.renderer = self.scene.snowflake_renderer1
+            self.ground = Ground
+        elif self._layer == Layers.SNOWFLAKE2:
+            self.renderer = self.scene.snowflake_renderer2
+            self.ground = Ground2
+        elif self._layer == Layers.SNOWFLAKE3:
+            self.renderer = self.scene.snowflake_renderer3
+            self.ground = Ground3
+
         self.pos = VEC(pos)
         self.vel = VEC(0, 0)
         self.resistance = uniform(0.85, 0.98)
@@ -31,9 +53,11 @@ class SnowFlake(VisibleSprite):
 
         self.rect.center = self.pos
 
-        # Fast solution instead of looping through every single ground object
+        if -self.size.x < self.rect.left - self.scene.player.camera.offset.x < WIDTH:
+            self.renderer.snowflakes.append((self.image, self.rect.topleft - self.scene.player.camera.offset))
+
         try:
-            if self.rect.bottom > Ground.height_map[self.pos.x // PIXEL_SIZE * PIXEL_SIZE]:
+            if self.rect.bottom > self.ground.height_map[self.pos.x // PIXEL_SIZE * PIXEL_SIZE]:
                 self.kill()
                 return
         except KeyError:
@@ -42,5 +66,4 @@ class SnowFlake(VisibleSprite):
             self.kill()
 
     def draw(self) -> None:
-        if self.rect.right - self.scene.player.camera.offset.x < 0 or self.rect.left - self.scene.player.camera.offset.x > WIDTH: return
-        self.manager.screen.blit(self.image, self.rect.topleft - self.scene.player.camera.offset)
+        ...

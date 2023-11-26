@@ -10,8 +10,9 @@ import time
 
 from .constants import TILE_SIZE, WIDTH, VEC, HEIGHT, FONT, TEXT_COLOR
 from .ground import GroundManager, Ground2Manager, Ground3Manager
+from .snowflake import SnowFlake, SnowflakeRenderer
 from .game_leaderboard import GameLeaderboard
-from .snowflake import SnowFlake
+from .sprite import Layers
 from .player import Player
 from .border import Border
 from .utils import clamp
@@ -44,6 +45,9 @@ class MainGame(Scene):
         self.player = Player(self)
 
         self.snowflake_time = time.time()
+        self.snowflake_renderer1 = SnowflakeRenderer(self, Layers.SNOWFLAKE)
+        self.snowflake_renderer2 = SnowflakeRenderer(self, Layers.SNOWFLAKE2)
+        self.snowflake_renderer3 = SnowflakeRenderer(self, Layers.SNOWFLAKE3)
         for _ in range(1000):
             SnowFlake(self, VEC(randint(0 - 1000, WIDTH + 1000), randint(-400, HEIGHT)) + self.player.camera.offset)
 
