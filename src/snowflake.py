@@ -53,7 +53,7 @@ class SnowFlake(VisibleSprite):
 
         self.rect.center = self.pos
 
-        if -self.size.x < self.rect.left - self.scene.player.camera.offset.x < WIDTH:
+        if -self.size.x < self.rect.left - self.scene.player.camera.offset.x < WIDTH and self.rect.bottom > self.scene.player.camera.offset.y:
             self.renderer.snowflakes.append((self.image, self.rect.topleft - self.scene.player.camera.offset))
 
         try:
