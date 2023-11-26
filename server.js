@@ -96,7 +96,7 @@ let windSpeed = [randint(-600, -200), randint(200, 600)][randint(0, 1)];
 let powerupTime = Date.now();
 let powerupDuration = randint(5000, 15000);
 
-const totalTime = 60000;
+let totalTime = 600000;
 let startTime, timerTime, midTime, elimTime;
 let secondsLeft = totalTime;
 let eliminated = 0;
@@ -194,7 +194,11 @@ function handleAdminMessage(msg) {
 	const command = msg.toString();
 	broadcast(JSON.stringify({"type": "ad", "command": command}));
 	console.log(`Admin sent the command "${command}"`);
-	if (command === "start") {
+	if (command.startsWith("start")) {
+		let minutes = command.substring(6);
+		if (minutes) {
+			totalTime = parseFloat(minutes) * 60000;
+		}
 		waiting = false;
 		timerTime = Date.now();
 		startTime = Date.now();
