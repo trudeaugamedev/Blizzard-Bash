@@ -31,6 +31,7 @@ powerup_icons = {
 }
 gradient = pygame.transform.scale((load_img(f"{TEXTURES}/misc/gradient.png", factor=1)), (TILE_SIZE, 800))
 background = load_img(f"{TEXTURES}/misc/background.png", alpha=False)
+title = load_img(f"{TEXTURES}/misc/title.png", alpha=True)
 border = load_img(f"{TEXTURES}/misc/border.png", alpha=True)
 
 class Frames:
