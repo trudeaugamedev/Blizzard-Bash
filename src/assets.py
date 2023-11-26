@@ -51,6 +51,7 @@ background = load_img(f"{TEXTURES}/misc/background.png", alpha=False)
 title = load_img(f"{TEXTURES}/misc/title.png", alpha=True)
 border = load_img(f"{TEXTURES}/misc/border.png", alpha=True)
 frost_vignette = load_img(f"{TEXTURES}/vignette/frost_vignette.png", alpha=True)
+elim_vignette = load_img(f"{TEXTURES}/vignette/elim_vignette.png", alpha=True)
 
 class Frames:
     def __init__(self, path: str, prefix: str) -> None:

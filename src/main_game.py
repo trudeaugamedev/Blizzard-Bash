@@ -11,8 +11,8 @@ import time
 from .constants import TILE_SIZE, WIDTH, VEC, HEIGHT, FONT, TEXT_COLOR
 from .ground import Ground1Manager, Ground2Manager, Ground3Manager
 from .snowflake import SnowFlake, SnowflakeRenderer
+from .vignette import FrostVignette, ElimVignette
 from .game_leaderboard import GameLeaderboard
-from .vignette import FrostVignette
 from .sprite import Layers
 from .player import Player
 from .border import Border
@@ -47,6 +47,7 @@ class MainGame(Scene):
 
         self.player = Player(self)
         self.frost_vignette = FrostVignette(self)
+        self.elim_vignette = ElimVignette(self)
 
         self.snowflake_time = time.time()
         self.snowflake_renderer1 = SnowflakeRenderer(self, Layers.SNOWFLAKE1)

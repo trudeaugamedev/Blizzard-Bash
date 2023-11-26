@@ -204,6 +204,8 @@ function handleAdminMessage(msg) {
 		startTime = Date.now();
 		midTime = startTime + totalTime / 2;
 		elimTime = totalTime / 2 / (players.size - 1 - 1); // minus admin, -1 again to offset the last two players
+		secondsLeft = Math.floor((totalTime - (Date.now() - startTime)) / 1000) - 1;
+		broadcast(JSON.stringify({"type": "tm", "seconds": secondsLeft}));
 	} else if (command === "elimination") {
 		mode = "elimination";
 	} else if (command === "infinite") {
