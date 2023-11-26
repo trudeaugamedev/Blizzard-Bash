@@ -4,19 +4,21 @@ if TYPE_CHECKING:
     from scene import Scene
 
 from pygame.locals import SRCALPHA, BLEND_RGB_SUB
-from math import atan2, degrees
+from math import atan2, degrees, sqrt
+from random import randint, choice
 import opensimplex as noise
-from random import randint
 import pygame
 
 from .constants import TILE_SIZE, VEC, PIXEL_SIZE, REAL_TILE_SIZE, WIDTH
 from .sprite import Sprite, VisibleSprite, Layers
+from .decor import Decor
+from .utils import sign
 from . import assets
 
 class GroundManager(VisibleSprite):
-    def __init__(self, scene: Scene, layer: Layers = Layers.GROUND) -> None:
+    def __init__(self, scene: Scene, ground: Ground | Ground2 | Ground3 = None, layer: Layers = Layers.GROUND) -> None:
         super().__init__(scene, layer)
-        self.ground = Ground
+        self.ground = ground if ground else Ground
         self.size = VEC(26 * TILE_SIZE, 850)
         self.image = pygame.Surface(self.size)
         self.image.set_colorkey((0, 0, 0))
@@ -28,10 +30,13 @@ class GroundManager(VisibleSprite):
         for x in range(-65, 65):
             # Horizontal stretch and vertical stretch (essentially)
             y = noise.noise2(x * 0.1, 0) * 150
-            Ground(self.scene, self, (x * TILE_SIZE, y), (TILE_SIZE, 400 - y))
+            ground = Ground(self.scene, self, (x * TILE_SIZE, y), (TILE_SIZE, 400 - y))
         for ground in Ground.instances.values():
             ground.generate_image() # Create a images only after all tiles have been created
             ground.draw()
+        for _ in range(30):
+            ground = choice(list(self.ground.instances.values()))
+            Decor(self.scene, ground.pos, ground.incline * 0.5, choice([Layers.DECOR, Layers.DECOR2]))
 
     def update(self) -> None:
         if self.scene.player.camera.offset.x < self.pos.x:
@@ -64,7 +69,7 @@ class GroundManager(VisibleSprite):
 
 class Ground2Manager(GroundManager):
     def __init__(self, scene: Scene) -> None:
-        super().__init__(scene, Layers.GROUND2)
+        super().__init__(scene, Ground2, Layers.GROUND2)
         self.ground = Ground2
 
     def create_ground(self) -> None:
@@ -75,10 +80,13 @@ class Ground2Manager(GroundManager):
         for ground in Ground2.instances.values():
             ground.generate_image() # Create a images only after all tiles have been created
             ground.draw()
+        for _ in range(25):
+            ground = choice(list(self.ground.instances.values()))
+            Decor(self.scene, ground.pos, ground.incline * 0.5, choice([Layers.DECOR3, Layers.DECOR4]))
 
 class Ground3Manager(GroundManager):
     def __init__(self, scene: Scene) -> None:
-        super().__init__(scene, Layers.GROUND3)
+        super().__init__(scene, Ground3, Layers.GROUND3)
         self.ground = Ground3
 
     def create_ground(self) -> None:
@@ -89,6 +97,9 @@ class Ground3Manager(GroundManager):
         for ground in Ground3.instances.values():
             ground.generate_image() # Create a images only after all tiles have been created
             ground.draw()
+        for _ in range(20):
+            ground = choice(list(self.ground.instances.values()))
+            Decor(self.scene, ground.pos, ground.incline * 0.5, choice([Layers.DECOR5, Layers.DECOR6]))
 
 class Ground(Sprite):
     instances = {}

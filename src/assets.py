@@ -24,6 +24,16 @@ ground_tiles: list[pygame.Surface] = [
     load_img(f"{TEXTURES}/ground/ground.png", alpha=False).subsurface(0, TILE_SIZE, TILE_SIZE * 2, TILE_SIZE),
 ]
 
+decor = [
+    load_img(f"{TEXTURES}/decor/tree1.png", alpha=True),
+    load_img(f"{TEXTURES}/decor/tree2.png", alpha=True),
+    load_img(f"{TEXTURES}/decor/rock1.png", alpha=True),
+    load_img(f"{TEXTURES}/decor/rock2.png", alpha=True),
+]
+decor_weights = [
+    2, 3, 8, 5
+]
+
 powerup_icons = {
     "rapidfire": load_img(f"{TEXTURES}/powerup/rapidfire.png", alpha=False),
     "strength": load_img(f"{TEXTURES}/powerup/strength.png", alpha=False),

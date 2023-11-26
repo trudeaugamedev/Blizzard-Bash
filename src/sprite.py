@@ -8,13 +8,19 @@ from abc import abstractmethod
 from enum import Enum, auto
 
 class Layers(Enum):
+    DECOR6 = auto()
     PLAYER3 = auto()
+    DECOR5 = auto()
     SNOWFLAKE3 = auto()
     GROUND3 = auto()
+    DECOR4 = auto()
     PLAYER2 = auto()
+    DECOR3 = auto()
     SNOWFLAKE2 = auto()
     GROUND2 = auto()
+    DECOR2 = auto()
     PLAYER = auto()
+    DECOR = auto()
     SNOWFLAKE = auto()
     GROUND = auto()
     SNOWBALL = auto()

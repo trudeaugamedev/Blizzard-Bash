@@ -4,7 +4,7 @@ if TYPE_CHECKING:
     from manager import GameManager
 
 from pygame.locals import K_RETURN, KEYDOWN
-from random import randint, choice
+from random import randint, choice, seed
 import opensimplex as noise
 import time
 
@@ -33,9 +33,11 @@ class MainGame(Scene):
             time.sleep(0.01)
         noise.seed(self.seed)
 
+        seed(self.seed)
         GroundManager(self)
         Ground2Manager(self)
         Ground3Manager(self)
+        seed()
 
         self.leaderboard = GameLeaderboard(self)
 
