@@ -56,7 +56,3 @@ class Powerup(VisibleSprite):
         while self.image.get_locked(): pass
         self.manager.screen.blit(self.shadow_image, self.pos - self.size // 2 - self.scene.player.camera.offset + (3, 3), special_flags=BLEND_RGB_SUB)
         self.manager.screen.blit(self.image, self.pos - self.size // 2 - self.scene.player.camera.offset)
-
-    def kill(self) -> None:
-        self.scene.powerup = None
-        super().kill()

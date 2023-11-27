@@ -29,6 +29,7 @@ class Parser:
             case "ad": # Admin command
                 if data["command"].startswith("start"):
                     self.manager.scene.waiting = False
+                    self.manager.scene.player.powerup = None
                 elif data["command"] == "stop":
                     self.manager.scene.time_left = -1
             case "wd": # Wind
