@@ -39,6 +39,9 @@ function broadcastPlayerData() {
 	for (const [id, player] of players) {
 		player.socket.send(JSON.stringify(getPlayerData(id, id === -1)));
 	}
+	for (const [id, spectator] of spectators) {
+		spectator.socket.send(JSON.stringify(getPlayerData(-1, true)));
+	}
 }
 
 WebSocket.WebSocket.prototype.send_obj = function send_obj (obj) {
@@ -81,6 +84,7 @@ const wss = new WebSocket.Server({
 	port: parseInt(process.env.PORT, 10) || 3000
 });
 const players = new Map();
+const spectators = new Map();
 const powerups = new Map();
 
 let seed = randint(0, 99999999);
@@ -148,6 +152,9 @@ wss.on("connection", (socket) => {
 		if (msg.toString() === "admin") {
 			handleAdminConnect(client);
 			return;
+		} else if (msg.toString() === "spectator") {
+			handleSpectatorConnect(client);
+			return;
 		}
 
 		if (client.id == -1) {
@@ -187,6 +194,14 @@ function handleAdminConnect(client) {
 	// Change IDs
 	players.get(-1).id = -1;
 	client.id = -1;
+	playerId--;
+}
+
+function handleSpectatorConnect(client) {
+	console.log("A spectator has connected");
+	broadcast(JSON.stringify({"type": "dc", "id": client.id}));
+	spectators.set(client.id, client);
+	players.delete(client.id);
 	playerId--;
 }
 
