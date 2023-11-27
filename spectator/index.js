@@ -3,6 +3,12 @@
 const WSS_URL = "ws://localhost:3000";
 // const WSS_URL = "wss://trudeaugamedev-winter.herokuapp.com";
 
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+const player = new Image();
+player.src = "../assets/textures/player/player_idle_0.png";
+
 const socket = new WebSocket(WSS_URL);
 socket.addEventListener("error", (event) => {
     console.error("Websocket error: ", event);
@@ -16,6 +22,7 @@ socket.addEventListener("message", (event) => {
     let parsed = JSON.parse(event.data.toString());
     if (parsed.type === "cl") {
         displayGameState(parsed);
+        drawGame(parsed);
     }
 });
 socket.addEventListener("close", (event) => {
@@ -24,6 +31,13 @@ socket.addEventListener("close", (event) => {
 });
 
 function displayGameState(data) {
-    data = JSON.stringify(data, null, 3);
-    document.getElementById("received").innerHTML = data;
+    let str_data = JSON.stringify(data, null, 3);
+    document.getElementById("received").innerHTML = str_data;
+}
+
+function drawGame(data) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (const p of data.players) {
+        ctx.drawImage(player, p.pos[0], p.pos[1]);
+    }
 }
