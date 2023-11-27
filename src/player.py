@@ -80,6 +80,7 @@ class Player(VisibleSprite):
         
         self.powerup = None
         self.powerup_time = time.time()
+        self.powerup_max_time = 0
         self.powerup_flash_time = time.time()
 
         self.throw_trail = ThrowTrail(self.scene, self)
@@ -372,13 +373,16 @@ class Player(VisibleSprite):
         self.real_rect.midbottom = self.rect.midbottom
 
     def update_powerup(self) -> None:
-        if self.powerup == "rapidfire" and time.time() - self.powerup_time > 5:
-            self.powerup = None
-            self.throwing = False
-        if self.powerup == "strength" and time.time() - self.powerup_time > 20:
-            self.powerup = None
-        if self.powerup == "clustershot" and time.time() - self.powerup_time > 15:
-            self.powerup = None
+        if self.powerup is None: return
+        self.powerup_max_time = {"rapidfire": 5, "strength": 20, "clustershot": 10}[self.powerup]
+        if time.time() - self.powerup_time > self.powerup_max_time:
+            if self.powerup == "rapidfire":
+                self.powerup = None
+                self.throwing = False
+            if self.powerup == "strength":
+                self.powerup = None
+            if self.powerup == "clustershot":
+                self.powerup = None
 
     def update_camera(self) -> None:
         if self.snowballs:
