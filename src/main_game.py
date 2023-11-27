@@ -130,6 +130,10 @@ class MainGame(Scene):
             text = FONT[30].render(text_str, False, TEXT_COLOR)
             self.manager.screen.blit(text, (20, 72))
 
+        if self.elim_vignette.flashing:
+            text = FONT[20].render("You have the least number of points and may be eliminated soon.", False, (255, 0, 0))
+            self.manager.screen.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT - 50))
+
         if self.waiting:
             self.draw_waiting_text()
 
