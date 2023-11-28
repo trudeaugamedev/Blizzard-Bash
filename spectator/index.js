@@ -6,6 +6,28 @@ const WSS_URL = "ws://localhost:3000";
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
+let mouse = [0, 0];
+let dragging = false;
+
+canvas.addEventListener("mousedown", (event) => {
+    dragging = true;
+    mouse[0] = event.clientX;
+    mouse[1] = event.clientY;
+});
+canvas.addEventListener("mousemove", (event) => {
+    if (!dragging) return;
+    const delta = [event.clientX - mouse[0], event.clientY - mouse[1]];
+    camera[0] -= delta[0] * 0.5;
+    camera[1] -= delta[1] * 0.5;
+    mouse[0] = event.clientX;
+    mouse[1] = event.clientY;
+});
+canvas.addEventListener("mouseup", (event) => {
+    dragging = false;
+});
+
+let camera = [-100, -100];
+
 const player = new Image();
 player.src = "../assets/textures/player/player_idle_0.png";
 
@@ -38,6 +60,6 @@ function displayGameState(data) {
 function drawGame(data) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (const p of data.players) {
-        ctx.drawImage(player, p.pos[0], p.pos[1]);
+        ctx.drawImage(player, p.pos[0] - camera[0], p.pos[1] - camera[1]);
     }
 }
