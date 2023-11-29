@@ -6,6 +6,10 @@ const WSS_URL = "ws://localhost:3000";
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
+canvas.width = window.innerWidth - 30;
+canvas.height = window.innerHeight - 30;
+ctx.imageSmoothingEnabled = false;
+
 let mouse = [0, 0];
 let dragging = false;
 
@@ -30,6 +34,8 @@ let camera = [-100, -100];
 
 const player = new Image();
 player.src = "../assets/textures/player/player_idle_0.png";
+player.width *= 3;
+player.height *= 3;
 
 const socket = new WebSocket(WSS_URL);
 socket.addEventListener("error", (event) => {
@@ -60,6 +66,6 @@ function displayGameState(data) {
 function drawGame(data) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (const p of data.players) {
-        ctx.drawImage(player, p.pos[0] - camera[0], p.pos[1] - camera[1]);
+        ctx.drawImage(player, p.pos[0] - camera[0], p.pos[1] - camera[1], player.width, player.height);
     }
 }
