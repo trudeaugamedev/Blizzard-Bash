@@ -93,7 +93,9 @@ socket.addEventListener("open", (event) => {
 });
 socket.addEventListener("message", (event) => {
     let parsed = JSON.parse(event.data.toString());
+    console.log("hello :(");
     if (parsed.type === "cl") {
+        console.log("lmao :(");
         displayGameState(parsed);
         drawGame(parsed);
     }
@@ -110,7 +112,6 @@ function displayGameState(data) {
 
 function drawGame(state) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    console.log("hello :(");
     for (const p of state.players) {
         let image = player_images[p.frame];
         flip(ctx, image, p.pos[0] - image.width / 2 - camera[0], p.pos[1] - image.height - camera[1], 1, 0);
