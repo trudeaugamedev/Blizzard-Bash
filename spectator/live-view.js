@@ -4,6 +4,7 @@
 const WSS_URL = "wss://trudeaugamedev-winter.herokuapp.com";
 
 // From https://stackoverflow.com/a/37388113
+// draws an image with rotation + x/y flip + centering or not centering
 function drawImage(img, x, y, width, height, deg, flip, flop, center) {
     ctx.save();
     
@@ -38,6 +39,7 @@ function drawImage(img, x, y, width, height, deg, flip, flop, center) {
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
+// Fit canvas size to window
 canvas.width = window.innerWidth - 30;
 canvas.height = window.innerHeight - 30;
 ctx.imageSmoothingEnabled = false;
@@ -45,6 +47,7 @@ ctx.imageSmoothingEnabled = false;
 let mousex = 0;
 let dragging = false;
 
+// Canvas drag event listeners
 canvas.addEventListener("mousedown", (event) => {
     dragging = true;
     mousex = event.clientX;
@@ -72,8 +75,10 @@ canvas.addEventListener("touchend", (event) => {
     dragging = false;
 });
 
+// Center the camera
 let camera = [-canvas.width / 2, -canvas.height / 2];
 
+// Load player images in the correct order
 let player_paths = [
     "../assets/textures/player/player_idle_0.png",
     "../assets/textures/player/player_idle_l_0.png",
@@ -120,6 +125,7 @@ for (let i = 0; i < player_paths.length; i++) {
     player_images[i].height *= 3;
 }
 
+// Websocket events
 const socket = new WebSocket(WSS_URL);
 socket.addEventListener("error", (event) => {
     console.error("Websocket error: ", event);
@@ -141,11 +147,13 @@ socket.addEventListener("close", (event) => {
     console.log("Websocket closed");
 });
 
+// Textual display of the game state, for debug purposes
 function displayGameState(data) {
     let str_data = JSON.stringify(data, null, 3);
     document.getElementById("received").innerHTML = str_data;
 }
 
+// Draw the game relative to the camera position according to the received game state
 function drawGame(state) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (const p of state.players) {
