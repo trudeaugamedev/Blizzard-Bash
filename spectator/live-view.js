@@ -112,6 +112,7 @@ function drawGame(state) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (const p of state.players) {
         let image = player_images[p.frame];
+        console.log(p.pos[0] - image.width / 2 - camera[0]);
         flip(ctx, image, p.pos[0] - image.width / 2 - camera[0], p.pos[1] - image.height - camera[1], 1, 0);
     }
 }
