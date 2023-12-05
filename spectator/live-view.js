@@ -49,13 +49,26 @@ canvas.addEventListener("mousedown", (event) => {
     dragging = true;
     mousex = event.clientX;
 });
+canvas.addEventListener("touchstart", (event) => {
+    dragging = true;
+    mousex = event.touches[0].clientX;
+})
 canvas.addEventListener("mousemove", (event) => {
     if (!dragging) return;
     const dx = event.clientX - mousex;
     camera[0] -= dx * 0.5;
     mousex = event.clientX;
 });
+canvas.addEventListener("touchmove", (event) => {
+    if (!dragging) return;
+    const dx = event.touches[0].clientX - mousex;
+    camera[0] -= dx * 0.5;
+    mousex = event.touches[0].clientX;
+});
 canvas.addEventListener("mouseup", (event) => {
+    dragging = false;
+});
+canvas.addEventListener("touchend", (event) => {
     dragging = false;
 });
 
