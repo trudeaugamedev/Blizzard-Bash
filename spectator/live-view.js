@@ -3,10 +3,35 @@
 // const WSS_URL = "ws://localhost:3000";
 const WSS_URL = "wss://trudeaugamedev-winter.herokuapp.com";
 
-function flip(ctx, image, x, y, horizontal, vertical){
+// From https://stackoverflow.com/a/37388113
+function drawImage(img, x, y, width, height, deg, flip, flop, center) {
     ctx.save();
-    ctx.scale(horizontal, vertical);
-    ctx.drawImage(image, horizontal * x, vertical * y, horizontal * image.width, vertical * image.height);
+    
+    if(typeof width === "undefined") width = img.width;
+    if(typeof height === "undefined") height = img.height;
+    if(typeof center === "undefined") center = false;
+    
+    // Set rotation point to center of image, instead of top/left
+    if(center) {
+        x -= width/2;
+        y -= height/2;
+    }
+    
+    // Set the origin to the center of the image
+    ctx.translate(x + width/2, y + height/2);
+    
+    // Rotate the canvas around the origin
+    let rad = 2 * Math.PI - deg * Math.PI / 180;    
+    ctx.rotate(rad);
+    
+    // Flip/flop the canvas
+    let flipScale = flip ? -1 : 1;
+    let flopScale = flop ? -1 : 1;
+    ctx.scale(flipScale, flopScale);
+    
+    // Draw the image    
+    ctx.drawImage(img, -width/2, -height/2, width, height);
+    
     ctx.restore();
 }
 
@@ -109,10 +134,9 @@ function displayGameState(data) {
 }
 
 function drawGame(state) {
-    console.log("lmao :(");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (const p of state.players) {
         let image = player_images[p.frame];
-        flip(ctx, image, p.pos[0] - image.width / 2 - camera[0], p.pos[1] - image.height - camera[1], 1, 0);
+        drawImage(image, p.pos[0] - image.width / 2 - camera[0], p.pos[1] - image.height - camera[1], image.width, image.height, p.rot, p.flip, 0, true)
     }
 }
