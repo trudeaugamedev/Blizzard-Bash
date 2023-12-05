@@ -90,6 +90,7 @@ const powerups = new Map();
 let seed = randint(0, 99999999);
 let mode = "elimination";
 let playerId = 0;
+let spectatorId = 0;
 let powerupId = 0;
 let waiting = true;
 
@@ -200,7 +201,7 @@ function handleAdminConnect(client) {
 function handleSpectatorConnect(client) {
 	console.log("A spectator has connected");
 	broadcast(JSON.stringify({"type": "dc", "id": client.id}));
-	spectators.set(client.id, client);
+	spectators.set(spectatorId++, client);
 	players.delete(client.id);
 	playerId--;
 }
