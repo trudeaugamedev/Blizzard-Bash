@@ -95,9 +95,7 @@ socket.addEventListener("message", (event) => {
     let parsed = JSON.parse(event.data.toString());
     if (parsed.type === "cl") {
         displayGameState(parsed);
-        console.log("hello :(");
         drawGame(parsed);
-        console.log("lmao :(");
     }
 });
 socket.addEventListener("close", (event) => {
@@ -111,6 +109,7 @@ function displayGameState(data) {
 }
 
 function drawGame(state) {
+    console.log("lmao :(");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (const p of state.players) {
         let image = player_images[p.frame];
