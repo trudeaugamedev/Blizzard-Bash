@@ -93,11 +93,11 @@ socket.addEventListener("open", (event) => {
 });
 socket.addEventListener("message", (event) => {
     let parsed = JSON.parse(event.data.toString());
-    console.log("hello :(");
     if (parsed.type === "cl") {
-        console.log("lmao :(");
         displayGameState(parsed);
+        console.log("hello :(");
         drawGame(parsed);
+        console.log("lmao :(");
     }
 });
 socket.addEventListener("close", (event) => {
