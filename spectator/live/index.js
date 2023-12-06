@@ -193,7 +193,7 @@ function drawGame(state) {
 
         for (const s of p.snowballs) {
             let image = (s.type == 0 ? smallSnowballImages : largeSnowballImages)[s.frame];
-            drawImage(image, s.pos[0] - camera[0], s.pos[1] - camera[1], image.width, image.height, 0, 0, 0, false)
+            drawImage(image, s.pos[0] - camera[0], s.pos[1] - camera[1], image.width, image.height, 0, 0, 0, true)
         }
     }
 
