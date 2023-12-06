@@ -80,42 +80,42 @@ let camera = [-canvas.width / 2, -canvas.height / 2];
 
 // Load player images in the correct order
 let playerPaths = [
-    "../assets/textures/player/player_idle_0.png",
-    "../assets/textures/player/player_idle_l_0.png",
-    "../assets/textures/player/player_idle_s_0.png",
-    "../assets/textures/player/player_dig_0.png",
-    "../assets/textures/player/player_dig_1.png",
-    "../assets/textures/player/player_dig_2.png",
-    "../assets/textures/player/player_dig_3.png",
-    "../assets/textures/player/player_dig_4.png",
-    "../assets/textures/player/player_dig_5.png",
-    "../assets/textures/player/player_dig_6.png",
-    "../assets/textures/player/player_dig_7.png",
-    "../assets/textures/player/player_dig_8.png",
-    "../assets/textures/player/player_dig_9.png",
-    "../assets/textures/player/player_run_0.png",
-    "../assets/textures/player/player_run_1.png",
-    "../assets/textures/player/player_run_2.png",
-    "../assets/textures/player/player_run_3.png",
-    "../assets/textures/player/player_run_4.png",
-    "../assets/textures/player/player_run_s_0.png",
-    "../assets/textures/player/player_run_s_1.png",
-    "../assets/textures/player/player_run_s_2.png",
-    "../assets/textures/player/player_run_s_3.png",
-    "../assets/textures/player/player_run_s_4.png",
-    "../assets/textures/player/player_run_l_0.png",
-    "../assets/textures/player/player_run_l_1.png",
-    "../assets/textures/player/player_run_l_2.png",
-    "../assets/textures/player/player_run_l_3.png",
-    "../assets/textures/player/player_run_l_4.png",
-    "../assets/textures/player/player_throw_l_0.png",
-    "../assets/textures/player/player_throw_l_1.png",
-    "../assets/textures/player/player_throw_l_2.png",
-    "../assets/textures/player/player_throw_l_3.png",
-    "../assets/textures/player/player_throw_s_0.png",
-    "../assets/textures/player/player_throw_s_1.png",
-    "../assets/textures/player/player_throw_s_2.png",
-    "../assets/textures/player/player_throw_s_3.png",
+    "../../assets/textures/player/player_idle_0.png",
+    "../../assets/textures/player/player_idle_l_0.png",
+    "../../assets/textures/player/player_idle_s_0.png",
+    "../../assets/textures/player/player_dig_0.png",
+    "../../assets/textures/player/player_dig_1.png",
+    "../../assets/textures/player/player_dig_2.png",
+    "../../assets/textures/player/player_dig_3.png",
+    "../../assets/textures/player/player_dig_4.png",
+    "../../assets/textures/player/player_dig_5.png",
+    "../../assets/textures/player/player_dig_6.png",
+    "../../assets/textures/player/player_dig_7.png",
+    "../../assets/textures/player/player_dig_8.png",
+    "../../assets/textures/player/player_dig_9.png",
+    "../../assets/textures/player/player_run_0.png",
+    "../../assets/textures/player/player_run_1.png",
+    "../../assets/textures/player/player_run_2.png",
+    "../../assets/textures/player/player_run_3.png",
+    "../../assets/textures/player/player_run_4.png",
+    "../../assets/textures/player/player_run_s_0.png",
+    "../../assets/textures/player/player_run_s_1.png",
+    "../../assets/textures/player/player_run_s_2.png",
+    "../../assets/textures/player/player_run_s_3.png",
+    "../../assets/textures/player/player_run_s_4.png",
+    "../../assets/textures/player/player_run_l_0.png",
+    "../../assets/textures/player/player_run_l_1.png",
+    "../../assets/textures/player/player_run_l_2.png",
+    "../../assets/textures/player/player_run_l_3.png",
+    "../../assets/textures/player/player_run_l_4.png",
+    "../../assets/textures/player/player_throw_l_0.png",
+    "../../assets/textures/player/player_throw_l_1.png",
+    "../../assets/textures/player/player_throw_l_2.png",
+    "../../assets/textures/player/player_throw_l_3.png",
+    "../../assets/textures/player/player_throw_s_0.png",
+    "../../assets/textures/player/player_throw_s_1.png",
+    "../../assets/textures/player/player_throw_s_2.png",
+    "../../assets/textures/player/player_throw_s_3.png",
 ];
 let playerImages = [];
 for (let i = 0; i < playerPaths.length; i++) {
@@ -127,19 +127,33 @@ for (let i = 0; i < playerPaths.length; i++) {
 
 // Load snowball images
 let smallSnowballImages = [];
-for (let i = 0; i < 8; i++) {
+for (let i = 0; i < 5; i++) {
     smallSnowballImages.push(new Image());
-    smallSnowballImages[i].src = "../assets/textures/snowball/snowball_small_" + i + ".png";
+    smallSnowballImages[i].src = "../../assets/textures/snowball/snowball_small_" + i + ".png";
     smallSnowballImages[i].width *= 3;
     smallSnowballImages[i].height *= 3;
 }
 let largeSnowballImages = [];
-for (let i = 0; i < 5; i++) {
+for (let i = 0; i < 8; i++) {
     largeSnowballImages.push(new Image());
-    largeSnowballImages[i].src = "../assets/textures/snowball/snowball_large_" + i + ".png";
+    largeSnowballImages[i].src = "../../assets/textures/snowball/snowball_large_" + i + ".png";
     largeSnowballImages[i].width *= 3;
     largeSnowballImages[i].height *= 3;
 }
+
+// Load powerup images
+let rapidfire = new Image();
+rapidfire.src = "../../assets/textures/powerup/rapidfire.png"
+rapidfire.width *= 3
+rapidfire.height *= 3
+let strength = new Image();
+strength.src = "../../assets/textures/powerup/strength.png"
+strength.width *= 3
+strength.height *= 3
+let clustershot = new Image();
+clustershot.src = "../../assets/textures/powerup/clustershot.png"
+clustershot.width *= 3
+clustershot.height *= 3
 
 // Websocket events
 const socket = new WebSocket(WSS_URL);
@@ -172,13 +186,27 @@ function displayGameState(data) {
 // Draw the game relative to the camera position according to the received game state
 function drawGame(state) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
     for (const p of state.players) {
         let image = playerImages[p.frame];
         drawImage(image, p.pos[0] - image.width / 2 - camera[0], p.pos[1] - image.height - camera[1], image.width, image.height, p.rot, p.flip, 0, true);
 
         for (const s of p.snowballs) {
             let image = (s.type == 0 ? smallSnowballImages : largeSnowballImages)[s.frame];
-            drawImage(image, s.pos[0] - camera[0], s.pos[1] - camera[1], image.width, image.height, 0, 0, 0, true)
+            drawImage(image, s.pos[0] - camera[0], s.pos[1] - camera[1], image.width, image.height, 0, 0, 0, false)
         }
+    }
+
+    // Since the server doesn't know where the ground is, the y pos of the powerup continues to move down
+    for (const p of state.powerups) {
+        let image = null;
+        if (p.type === "rapidfire") {
+            image = rapidfire;
+        } else if (p.type === "strength") {
+            image = strength;
+        } else if (p.type === "clustershot") {
+            image = clustershot;
+        }
+        drawImage(image, p.pos[0] - camera[0], p.pos[1] - camera[1], image.width, image.height, 0, 0, 0, true);
     }
 }
