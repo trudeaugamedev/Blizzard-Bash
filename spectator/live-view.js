@@ -79,7 +79,7 @@ canvas.addEventListener("touchend", (event) => {
 let camera = [-canvas.width / 2, -canvas.height / 2];
 
 // Load player images in the correct order
-let player_paths = [
+let playerPaths = [
     "../assets/textures/player/player_idle_0.png",
     "../assets/textures/player/player_idle_l_0.png",
     "../assets/textures/player/player_idle_s_0.png",
@@ -117,12 +117,28 @@ let player_paths = [
     "../assets/textures/player/player_throw_s_2.png",
     "../assets/textures/player/player_throw_s_3.png",
 ];
-let player_images = [];
-for (let i = 0; i < player_paths.length; i++) {
-    player_images.push(new Image());
-    player_images[i].src = player_paths[i];
-    player_images[i].width *= 3;
-    player_images[i].height *= 3;
+let playerImages = [];
+for (let i = 0; i < playerPaths.length; i++) {
+    playerImages.push(new Image());
+    playerImages[i].src = playerPaths[i];
+    playerImages[i].width *= 3;
+    playerImages[i].height *= 3;
+}
+
+// Load snowball images
+let smallSnowballImages = [];
+for (let i = 0; i < 8; i++) {
+    smallSnowballImages.push(new Image());
+    smallSnowballImages[i].src = "../assets/textures/snowball/snowball_small_" + i + ".png";
+    smallSnowballImages[i].width *= 3;
+    smallSnowballImages[i].height *= 3;
+}
+let largeSnowballImages = [];
+for (let i = 0; i < 5; i++) {
+    largeSnowballImages.push(new Image());
+    largeSnowballImages[i].src = "../assets/textures/snowball/snowball_large_" + i + ".png";
+    largeSnowballImages[i].width *= 3;
+    largeSnowballImages[i].height *= 3;
 }
 
 // Websocket events
@@ -149,15 +165,20 @@ socket.addEventListener("close", (event) => {
 
 // Textual display of the game state, for debug purposes
 function displayGameState(data) {
-    let str_data = JSON.stringify(data, null, 3);
-    document.getElementById("received").innerHTML = str_data;
+    let strData = JSON.stringify(data, null, 3);
+    document.getElementById("received").innerHTML = strData;
 }
 
 // Draw the game relative to the camera position according to the received game state
 function drawGame(state) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (const p of state.players) {
-        let image = player_images[p.frame];
-        drawImage(image, p.pos[0] - image.width / 2 - camera[0], p.pos[1] - image.height - camera[1], image.width, image.height, p.rot, p.flip, 0, true)
+        let image = playerImages[p.frame];
+        drawImage(image, p.pos[0] - image.width / 2 - camera[0], p.pos[1] - image.height - camera[1], image.width, image.height, p.rot, p.flip, 0, true);
+
+        for (const s of p.snowballs) {
+            let image = (s.type == 0 ? smallSnowballImages : largeSnowballImages)[s.frame];
+            drawImage(image, s.pos[0] - camera[0], s.pos[1] - camera[1], image.width, image.height, 0, 0, 0, true)
+        }
     }
 }
