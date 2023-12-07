@@ -203,7 +203,6 @@ function handleSpectatorConnect(client) {
 	broadcast(JSON.stringify({"type": "dc", "id": client.id}));
 	spectators.set(spectatorId++, client);
 	players.delete(client.id);
-	playerId--;
 }
 
 function handleAdminMessage(msg) {
