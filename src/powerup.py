@@ -20,7 +20,6 @@ class Powerup(VisibleSprite):
         super().__init__(scene, Layers.POWERUP)
         self.id = _id
         self.type = _type
-        self.__class__.instances[self.id] = self
         self.image = assets.powerup_icons[self.type]
         self.shadow_image = shadow(self.image)
         self.size = VEC(self.image.get_size())
@@ -30,6 +29,7 @@ class Powerup(VisibleSprite):
         self.vel = VEC(0, 0)
 
         self.initialized = True # Used to check whether the __init__ function has completed in the thread
+        self.__class__.instances[self.id] = self
 
     def update(self) -> None:
         if not hasattr(self, "initialized"): return
