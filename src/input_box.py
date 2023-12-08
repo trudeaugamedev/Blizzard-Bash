@@ -69,6 +69,12 @@ class InputBox(VisibleSprite):
             self.cursor_blink_time = time.time()
             self.cursor_visible = not self.cursor_visible
 
+        new_text = ""
+        for ch in self.text:
+            if not 32 <= ord(ch) <= 126: continue
+            new_text += ch
+        self.text = new_text
+
     def handle_control(self) -> None:
         for key in self.manager.key_downs.values():
             if key.key == K_BACKSPACE:
@@ -94,7 +100,7 @@ class InputBox(VisibleSprite):
 
     def handle_keys(self) -> None:
         for key in self.manager.key_downs.values():
-            if key.unicode.isprintable() and key.unicode:
+            if key.unicode and 32 <= ord(key.unicode) <= 126:
                 self._printables(key)
             elif key.key == K_BACKSPACE:
                 self._backspace()
