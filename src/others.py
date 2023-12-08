@@ -44,11 +44,11 @@ class OtherPlayer(VisibleSprite):
             self.scene.sprite_manager.remove(self)
             self._layer = Layers.PLAYER3
             self.scene.sprite_manager.add(self)
-        elif self.pos.y < y2 + 12 and self._layer != Layers.PLAYER2:
+        elif y3 + 12 < self.pos.y < y2 + 12 and self._layer != Layers.PLAYER2:
             self.scene.sprite_manager.remove(self)
             self._layer = Layers.PLAYER2
             self.scene.sprite_manager.add(self)
-        elif self.pos.y < y1 + 12 and self._layer != Layers.PLAYER1:
+        elif y2 + 12 < self.pos.y < y1 + 12 and self._layer != Layers.PLAYER1:
             self.scene.sprite_manager.remove(self)
             self._layer = Layers.PLAYER1
             self.scene.sprite_manager.add(self)
