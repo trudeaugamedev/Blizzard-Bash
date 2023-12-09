@@ -202,8 +202,7 @@ class Player(VisibleSprite):
             self.on_ground = False
 
         if self.keys[K_s] and self.on_ground and self.ground_level in {Ground2, Ground3}:
-            self.pos.y = self.ground_level.height_map[int(self.rect.centerx // PIXEL_SIZE * PIXEL_SIZE)] + 5
-            self.pos.y += 10
+            self.ground_level = Ground2 if self.ground_level == Ground3 else Ground1
             self.on_ground = False
 
         if self.keys[K_SPACE]:
@@ -245,34 +244,25 @@ class Player(VisibleSprite):
                 self.can_throw = False
 
     def update_position(self) -> None:
-        self.vel += self.acc * self.manager.dt
-        # _ to catch the successful clamp return value
-        # Baiscally if it clamped to the left it would be -1, right would be 1, if it didn't clamp (value is in range), it's 0
-        # if self.can_move:
-        #     self.vel.x, _ = clamp(self.vel.x, -self.MAX_SPEED, self.MAX_SPEED)
-        # else:
-        #     self.vel.x, _ = clamp(self.vel.x, -self.SMALL_MAX_SPEED, self.SMALL_MAX_SPEED)
-        # If the absolute value of x vel is less than the constant acceleration, snap to 0 so that deceleration doesn't overshoot
-        self.vel.x = snap(self.vel.x, 0, self.CONST_ACC * self.manager.dt)
-        self.pos += self.vel * self.manager.dt
-
         centerx = int(self.rect.centerx // PIXEL_SIZE * PIXEL_SIZE)
-        if self.vel.y > 0:
-            grounds = [Ground1, Ground2, Ground3]
-            highest = min(grounds, key=lambda g: g.height_map[centerx])
-            grounds.remove(highest)
-            middle = min(grounds, key=lambda g: g.height_map[centerx])
-            grounds.remove(middle)
-            lowest = grounds[0]
+        grounds = [Ground1, Ground2, Ground3]
+        highest = min(grounds, key=lambda g: g.height_map[centerx])
+        grounds.remove(highest)
+        middle = min(grounds, key=lambda g: g.height_map[centerx])
+        grounds.remove(middle)
+        lowest = grounds[0]
+        if self.jumping and self.pos.y < self.ground_level.height_map[centerx] - 5 and self.vel.y > 0:
             highest_y, middle_y, _lowest_y = highest.height_map[centerx], middle.height_map[centerx], lowest.height_map[centerx]
             above = lowest # Closest ground it is above
-            if self.pos.y <= highest_y + 12:
+            if self.pos.y < highest_y + 5:
                 above = highest
-            elif self.pos.y <= middle_y + 12:
+            elif self.pos.y < middle_y + 5 and self.ground_level is not highest:
                 above = middle
             self.ground_level = above
-            if highest is Ground1 or highest is Ground2 and above is Ground3:
-                self.ground_level = Ground1
+        if highest is Ground1:
+            self.ground_level = Ground1
+        if highest is Ground2 and self.ground_level is Ground3:
+            self.ground_level = Ground2
 
         if self.ground_level == Ground1 and self._layer != Layers.PLAYER1:
             self.scene.sprite_manager.remove(self)
@@ -286,6 +276,11 @@ class Player(VisibleSprite):
             self.scene.sprite_manager.remove(self)
             self._layer = Layers.PLAYER3
             self.scene.sprite_manager.add(self)
+
+        self.vel += self.acc * self.manager.dt
+        # If the absolute value of x vel is less than the constant acceleration, snap to 0 so that deceleration doesn't overshoot
+        self.vel.x = snap(self.vel.x, 0, self.CONST_ACC * self.manager.dt)
+        self.pos += self.vel * self.manager.dt
 
         ground_y = self.ground_level.height_map[centerx]
         if self.pos.y > ground_y + 5:
