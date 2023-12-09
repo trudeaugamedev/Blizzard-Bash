@@ -236,8 +236,9 @@ function handleAdminMessage(msg) {
 	} else if (command.startsWith("kick")) {
 		let id = parseInt(command.substring(5));
 		if (players.has(id)) {
-			players.get(id).socket.close();
+			players.get(id).socket.send_obj({"type": "kc"});
 			players.delete(id);
+			broadcast(JSON.stringify({"type": "dc", "id": id}));
 		} else {
 			console.log(`Non-existent player id ${id}!`)
 		}

@@ -7,6 +7,8 @@ from src.others import OtherPlayer, OtherSnowball
 from src.powerup import Powerup
 from src.constants import VEC
 
+from websockets.exceptions import ConnectionClosedError
+
 class Parser:
     def __init__(self, client: Client) -> None:
         self.client = client
@@ -37,7 +39,7 @@ class Parser:
             case "tm": # Time
                 self.manager.scene.time_left = data["seconds"]
             case "el": # Eliminated
-                self.manager.scene.player.eliminated = True
+                self.manager.scene.eliminated = True
             case "cn": # Connect
                 self.manager.other_players[data["id"]] = OtherPlayer(self.manager.scene, data["id"], (0, -3000))
             case "dc": # Disconnect
@@ -47,6 +49,9 @@ class Parser:
                 print("GAME OVER")
                 self.manager.scene.score_data = data["data"]
                 self.manager.scene.game_over = True
+            case "kc": # Kick
+                print("KICKED")
+                raise ConnectionClosedError(None, None)
 
     def client_data(self, data: dict, init: bool = False) -> None:
         if not init and not isinstance(self.manager.scene, self.manager.Scenes.MainGame.value): return
