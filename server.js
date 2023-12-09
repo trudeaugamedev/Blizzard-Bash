@@ -87,6 +87,8 @@ const players = new Map();
 const spectators = new Map();
 const powerups = new Map();
 
+const playerScores = new Map();
+
 let seed = randint(0, 99999999);
 let mode = "elimination";
 let playerId = 0;
@@ -288,6 +290,10 @@ function game() {
 				scoreData.push({"id": id, "name": player.data.name, "score": player.data.score});
 			}
 			broadcast(JSON.stringify({"type": "en", "data": scoreData}));
+			for (const [id, player] of players) {
+				playerScores.set(player.data.name, player.data.score);
+			}
+			// Update the database with the data in playerScores here!
 			restart();
 		}
 	}
