@@ -130,9 +130,12 @@ class MainGame(Scene):
             text = FONT[30].render(text_str, False, TEXT_COLOR)
             self.manager.screen.blit(text, (20, 72))
 
-        if self.elim_vignette.flashing:
+        if self.elim_vignette.flashing and not self.eliminated:
             text = FONT[20].render("You have the least number of points and may be eliminated soon.", False, (255, 0, 0))
             self.manager.screen.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT - 50))
+        elif self.eliminated:
+            text = FONT[32].render("You've been eliminated :(", False, (255, 0, 0))
+            self.manager.screen.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT - 80))
 
         if self.player.powerup is not None:
             text_str = f"{self.player.powerup} - {int(self.player.powerup_max_time - (time.time() - self.player.powerup_time))} seconds remaining"
