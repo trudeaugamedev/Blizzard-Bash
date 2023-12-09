@@ -93,7 +93,10 @@ class Snowball(VisibleSprite):
 
     def draw(self) -> None:
         self.manager.screen.blit(shadow(self.image), VEC(self.rect.topleft) - self.scene.player.camera.offset + (3, 3), special_flags=BLEND_RGB_SUB)
+        if self.scene.eliminated:
+            self.image.set_alpha(80)
         self.manager.screen.blit(self.image, VEC(self.rect.topleft) - self.player.camera.offset)
+        self.image.set_alpha(255)
 
     def kill(self) -> None:
         self.landed = True
