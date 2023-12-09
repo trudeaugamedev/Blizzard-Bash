@@ -56,7 +56,7 @@ class StartMenu(Scene):
         if self.button_linear_progress > 1:
             self.button_linear_progress = 1
         self.button_progress = tween.easeOutBounce(max(0, self.button_linear_progress))
-        self.start_button.pos.y = HEIGHT // 2 + 120 + 300 * (1 - self.button_progress)
+        self.start_button.pos.y = HEIGHT // 2 + 120 + 300 * (1 - self.button_progress) - self.start_button.size.y // 2
 
         if K_RETURN in self.manager.key_downs:
             self.start_game()
