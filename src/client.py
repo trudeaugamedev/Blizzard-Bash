@@ -11,6 +11,7 @@ from queue import Queue
 from typing import Any
 import asyncio
 import json
+import time
 
 from src.data_parser import Parser
 
@@ -40,6 +41,7 @@ class Client:
         }
         self.modified_data = {key: True for key in self.pers_data}
         self.irreg_data = Queue() # Occasional data
+        self.send_all_time = time.time()
 
     def restart(self) -> None:
         self.reset()
@@ -85,7 +87,7 @@ class Client:
         final = {}
         for key in self.modified_data:
             if self.pers_data[key] is None: continue
-            if self.modified_data[key]:
+            if self.modified_data[key] or time.time() - self.send_all_time < 5:
                 final[key] = self.pers_data[key]
                 self.modified_data[key] = False
 
