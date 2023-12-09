@@ -185,9 +185,9 @@ class Player(VisibleSprite):
             self.idle = True
 
         if self.can_move:
-            self.vel.x -= sign(self.vel.x) * self.vel.x ** 2 * 0.01 * self.manager.dt
+            self.vel.x -= min(sign(self.vel.x) * self.vel.x ** 2 * 0.01 * self.manager.dt, 1000)
         else:
-            self.vel.x -= sign(self.vel.x) * self.vel.x ** 2 * 0.2 * self.manager.dt
+            self.vel.x -= min(sign(self.vel.x) * self.vel.x ** 2 * 0.2 * self.manager.dt, 1000)
 
         if self.on_ground:
             self.jump_time = time.time()
