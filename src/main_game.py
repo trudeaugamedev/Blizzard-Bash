@@ -6,6 +6,7 @@ if TYPE_CHECKING:
 from pygame.locals import K_RETURN, KEYDOWN
 from random import randint, choice, seed
 import opensimplex as noise
+import pygame
 import time
 
 from .constants import TILE_SIZE, WIDTH, VEC, HEIGHT, FONT, TEXT_COLOR
@@ -141,9 +142,10 @@ class MainGame(Scene):
             text_str = f"{self.player.powerup} - {int(self.player.powerup_max_time - (time.time() - self.player.powerup_time))} seconds remaining"
             text = FONT[30].render(text_str, False, TEXT_COLOR)
             text.set_alpha(70)
-            self.manager.screen.blit(text, VEC(WIDTH // 2 - text.get_width() // 2, HEIGHT - 100) + (3, 3))
+            self.manager.screen.blit(text, VEC(WIDTH // 2 - text.get_width() // 2 + 30, HEIGHT - 100) + (3, 3))
             text = FONT[30].render(text_str, False, TEXT_COLOR)
-            self.manager.screen.blit(text, VEC(WIDTH // 2 - text.get_width() // 2, HEIGHT - 100))
+            self.manager.screen.blit(text, VEC(WIDTH // 2 - text.get_width() // 2 + 30, HEIGHT - 100))
+            self.manager.screen.blit(pygame.transform.scale_by(assets.powerup_icons[self.player.powerup], 2), (WIDTH // 2 - text.get_width() // 2 - 34, HEIGHT - 100))
 
         if self.waiting:
             self.draw_waiting_text()
