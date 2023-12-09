@@ -10,6 +10,7 @@ from .scene import Scene
 from . import assets
 
 from pygame.locals import SRCALPHA, K_RETURN
+import pytweening as tween
 import pygame
 
 class StartMenu(Scene):
@@ -18,6 +19,13 @@ class StartMenu(Scene):
         self.start_button = Button(self, (WIDTH // 2, HEIGHT // 2 + 120), (300, 80), "JOIN GAME", self.start_game, centered=True)
         self.input_box = InputBox(self, (WIDTH // 2 - 105, HEIGHT // 2 - 20), (466, 76))
         self.warning = ""
+
+        self.title_linear_progress = 0
+        self.title_progress = 0
+        self.input_linear_progress = -0.3
+        self.input_progress = 0
+        self.button_linear_progress = -0.5
+        self.button_progress = 0
 
     def start_game(self) -> None:
         text = self.input_box.text
@@ -34,19 +42,36 @@ class StartMenu(Scene):
     def update(self) -> None:
         super().update()
 
+        self.title_linear_progress += 0.9 * self.manager.dt
+        if self.title_linear_progress > 1:
+            self.title_linear_progress = 1
+        self.title_progress = tween.easeOutBounce(self.title_linear_progress)
+        
+        self.input_linear_progress += 0.9 * self.manager.dt
+        if self.input_linear_progress > 1:
+            self.input_linear_progress = 1
+        self.input_progress = tween.easeOutExpo(max(0, self.input_linear_progress))
+        
+        self.button_linear_progress += 0.9 * self.manager.dt
+        if self.button_linear_progress > 1:
+            self.button_linear_progress = 1
+        self.button_progress = tween.easeOutBounce(max(0, self.button_linear_progress))
+        self.start_button.pos.y = HEIGHT // 2 + 120 + 300 * (1 - self.button_progress)
+
         if K_RETURN in self.manager.key_downs:
             self.start_game()
 
     def draw(self) -> None:
         self.manager.screen.blit(assets.background, (0, 0))
 
-        self.manager.screen.blit(assets.title, (WIDTH // 2 - assets.title.get_width() // 2, HEIGHT // 2 - 200))
+        self.manager.screen.blit(assets.title, (WIDTH // 2 - assets.title.get_width() // 2, HEIGHT // 2 - 200 - 300 * (1 - self.title_progress)))
 
-        (surf := pygame.Surface((748, 76), SRCALPHA)).fill((255, 255, 255, 80))
-        self.manager.screen.blit(surf, (WIDTH // 2 - 374, HEIGHT // 2 - 20))
-        pygame.draw.rect(self.manager.screen, (0, 0, 0), (WIDTH // 2 - 374, HEIGHT // 2 - 20, 748, 76), 3)
-        text = FONT[50].render("Username:", False, TEXT_COLOR)
-        self.manager.screen.blit(text, (WIDTH // 2 - 359, HEIGHT // 2 - 20))
+        (surf := pygame.Surface((748 * self.input_progress, 76), SRCALPHA)).fill((255, 255, 255, 80))
+        self.manager.screen.blit(surf, (WIDTH // 2 - 374 * self.input_progress, HEIGHT // 2 - 20))
+        pygame.draw.rect(self.manager.screen, (0, 0, 0), (WIDTH // 2 - 374 * self.input_progress, HEIGHT // 2 - 20, 748 * self.input_progress, 76), 3)
+        if self.input_progress > 0.9:
+            text = FONT[50].render("Username:", False, TEXT_COLOR)
+            self.manager.screen.blit(text, (WIDTH // 2 - 359, HEIGHT // 2 - 20))
 
         text = FONT[24].render(self.warning, False, (255, 0, 0))
         self.manager.screen.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 - 65))
