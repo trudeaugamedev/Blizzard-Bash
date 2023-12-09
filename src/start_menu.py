@@ -9,7 +9,7 @@ from .button import Button
 from .scene import Scene
 from . import assets
 
-from pygame.locals import SRCALPHA
+from pygame.locals import SRCALPHA, K_RETURN
 import pygame
 
 class StartMenu(Scene):
@@ -33,6 +33,9 @@ class StartMenu(Scene):
 
     def update(self) -> None:
         super().update()
+
+        if K_RETURN in self.manager.key_downs:
+            self.start_game()
 
     def draw(self) -> None:
         self.manager.screen.blit(assets.background, (0, 0))
