@@ -5,17 +5,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blizzard Bash Leaderboard</title>
-    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
-    <h1>Blizzard Bash Game Leaderboard</h1>
-    <table>
-        <tr>
-            <th>Username</th>
-            <th>Score</th>
-        </tr>
-    </table>
+    <header>
+        <h1>Blizzard Bash Game Leaderboard</h1>
+    </header>
+    
+    <main>
+        <table>
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Username</th>
+                    <th>Score</th>
+                </tr>
+            </thead>
+            <tbody id="leaderboardBody">
+            </tbody>
+        </table>
+    </main>
 
     <script>
         function generateLeaderboardHTML() {
@@ -27,9 +37,10 @@
 
                 playersWithScores.sort((a, b) => b.score - a.score);
 
-                const tbody = document.querySelector('table tbody');
-                tbody.innerHTML = playersWithScores.map(player => player.name != null ? `
+                const tbody = document.getElementById('leaderboardBody');
+                tbody.innerHTML = playersWithScores.map((player, index) => player.name != null ? `
                     <tr>
+                        <td>${index + 1}</td>
                         <td>${player.name}</td>
                         <td>${player.score}</td>
                     </tr>
@@ -51,7 +62,7 @@
 
         generateLeaderboardHTML();
 
-        setInterval(generateLeaderboardHTML, 1000);
+        setInterval(generateLeaderboardHTML, 60000);
     </script>
 </body>
 
