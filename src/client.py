@@ -87,7 +87,7 @@ class Client:
         final = {}
         for key in self.modified_data:
             if self.pers_data[key] is None: continue
-            if self.modified_data[key] or time.time() - self.send_all_time < 5:
+            if self.modified_data[key] or (time.time() - self.send_all_time < 3 and key == "name"):
                 final[key] = self.pers_data[key]
                 self.modified_data[key] = False
 

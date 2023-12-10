@@ -144,7 +144,6 @@ wss.on("connection", (socket) => {
 			const data = JSON.parse(strMsg);
 			let playerData = players.get(client.id).data;
 			for (const [key, value] of Object.entries(data)) {
-				if (key === "name") console.log(`Username: ${value}`);
 				if (value === null) continue;
 				if (!(key === "name" || key === "score")) continue;
 				playerData[key] = value;
