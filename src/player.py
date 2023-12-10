@@ -259,7 +259,7 @@ class Player(VisibleSprite):
             elif self.pos.y < middle_y + 5 and self.ground_level is not highest:
                 above = middle
             self.ground_level = above
-        if highest is Ground1:
+        if highest is Ground1 or middle is Ground1 and self.ground_level is Ground2:
             self.ground_level = Ground1
         if highest is Ground2 and self.ground_level is Ground3:
             self.ground_level = Ground2
