@@ -1,44 +1,35 @@
-const fs = require('fs');
 
 function generateLeaderboardHTML() {
-    const json_data = JSON.parse(fs.readFileSync('./leaderboard.json'));
-    const playersWithScores = json_data.players.map(player => ({
-        name: player,
-        score: json_data.playersData[player].score
-    }));
+    readTextFile('leaderboard.json', function (json_data) {
+        const playersWithScores = json_data.players.map(player => ({
+            name: player,
+            score: json_data.playersData[player]
+        }));
 
-    playersWithScores.sort((a, b) => b.score - a.score);
+        playersWithScores.sort((a, b) => b.score - a.score);
 
-    const htmlContent = `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blizzard Bash Leaderboard</title>
-    <link rel="stylesheet" href="index.css">
-</head>
-<body>
-    <h1>Blizzard Bash Game Leaderboard</h1>
-    <table>
-        <tr>
-            <th>Username</th>
-            <th>Score</th>
-        </tr>
-        ${playersWithScores.map(player => `
-        <tr>
-            <td>${player.name}</td>
-            <td>${player.score}</td>
-        </tr>`).join('')}
-    </table>
-</body>
-</html>`;
+        const tbody = document.querySelector('table tbody');
+        tbody.innerHTML = playersWithScores.map(player => player.name != null ? `
+            <tr>
+                <td>${player.name}</td>
+                <td>${player.score}</td>
+            </tr>
+        ` : "").join('');
+    });
+}
 
-    fs.writeFileSync('./index.html', htmlContent);
+function readTextFile(fileName, callback) {
+    const xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            const data = JSON.parse(xhr.responseText);
+            callback(data);
+        }
+    };
+    xhr.open('GET', fileName, true);
+    xhr.send();
 }
 
 generateLeaderboardHTML();
 
-setInterval(() => {
-    generateLeaderboardHTML();
-}, 1000);
+setInterval(generateLeaderboardHTML, 1000);
