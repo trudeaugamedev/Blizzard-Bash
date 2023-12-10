@@ -251,17 +251,17 @@ class Player(VisibleSprite):
         middle = min(grounds, key=lambda g: g.height_map[centerx])
         grounds.remove(middle)
         lowest = grounds[0]
+        highest_y, middle_y, _lowest_y = highest.height_map[centerx], middle.height_map[centerx], lowest.height_map[centerx]
         if self.jumping and self.pos.y < self.ground_level.height_map[centerx] - 5 and self.vel.y > 0:
-            highest_y, middle_y, _lowest_y = highest.height_map[centerx], middle.height_map[centerx], lowest.height_map[centerx]
             above = lowest # Closest ground it is above
             if self.pos.y < highest_y + 5:
                 above = highest
-            elif self.pos.y < middle_y + 5 and self.ground_level is not highest:
+            elif self.pos.y < middle_y + 5 and self.ground_level is not highest and highest is not Ground2:
                 above = middle
             self.ground_level = above
         if highest is Ground1 or middle is Ground1 and self.ground_level is Ground2:
             self.ground_level = Ground1
-        if highest is Ground2 and self.ground_level is Ground3:
+        if highest is Ground2 and self.ground_level is Ground3 and self.pos.y < highest_y + 20:
             self.ground_level = Ground2
 
         if self.ground_level == Ground1 and self._layer != Layers.PLAYER1:
