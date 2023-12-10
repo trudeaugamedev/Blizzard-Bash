@@ -5,17 +5,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blizzard Bash Leaderboard</title>
-    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
-    <h1>Blizzard Bash Game Leaderboard</h1>
-    <table>
-        <tr>
-            <th>Username</th>
-            <th>Score</th>
-        </tr>
-    </table>
+    <header>
+        <h1>Blizzard Bash Game Leaderboard</h1>
+    </header>
+    
+    <main>
+        <table>
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Username</th>
+                    <th>Score</th>
+                </tr>
+            </thead>
+            <tbody id="leaderboardBody">
+            </tbody>
+        </table>
+    </main>
 
     <script src="index.js"></script>
 </body>
