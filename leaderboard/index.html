@@ -28,12 +28,12 @@
                 playersWithScores.sort((a, b) => b.score - a.score);
 
                 const tbody = document.querySelector('table tbody');
-                tbody.innerHTML = playersWithScores.map(player => `
+                tbody.innerHTML = playersWithScores.map(player => player.name != null ? `
                     <tr>
                         <td>${player.name}</td>
                         <td>${player.score}</td>
                     </tr>
-                `).join('');
+                ` : "").join('');
             });
         }
 
