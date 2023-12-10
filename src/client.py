@@ -87,9 +87,13 @@ class Client:
         final = {}
         for key in self.modified_data:
             if self.pers_data[key] is None: continue
-            if self.modified_data[key] or (time.time() - self.send_all_time < 3 and key == "name"):
+            if self.modified_data[key]:
                 final[key] = self.pers_data[key]
                 self.modified_data[key] = False
+
+        if time.time() - self.send_all_time > 5:
+            final.update(self.pers_data)
+            self.send_all_time = time.time()
 
         if final:
             await self.socket.send(json.dumps({"id": self.id} | final))
