@@ -12,14 +12,12 @@ function generateLeaderboardHTML() {
     const htmlContent = `
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blizzard Bash Leaderboard</title>
     <link rel="stylesheet" href="index.css">
 </head>
-
 <body>
     <h1>Blizzard Bash Game Leaderboard</h1>
     <table>
@@ -34,11 +32,13 @@ function generateLeaderboardHTML() {
         </tr>`).join('')}
     </table>
 </body>
-
 </html>`;
 
     fs.writeFileSync('./index.html', htmlContent);
 }
 
-// Call the function to generate the leaderboard HTML file
 generateLeaderboardHTML();
+
+setInterval(() => {
+    generateLeaderboardHTML();
+}, 1000);
