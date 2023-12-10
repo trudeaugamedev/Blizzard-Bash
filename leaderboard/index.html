@@ -22,7 +22,7 @@
             readTextFile('leaderboard.json', function (json_data) {
                 const playersWithScores = json_data.players.map(player => ({
                     name: player,
-                    score: json_data.playersData[player].score
+                    score: json_data.playersData[player]
                 }));
 
                 playersWithScores.sort((a, b) => b.score - a.score);
