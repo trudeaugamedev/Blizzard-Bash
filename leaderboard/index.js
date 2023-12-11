@@ -1,30 +1,34 @@
-function generateLeaderboardHTML() {
-    fetch("http://127.0.0.1:3001").then((response) => {
-    // fetch("wss://trudeaugamedev-winter.herokuapp.com").then((response) => {
-        return response.json();
-    }).then((data) => {
-        console.log(data);
-        const players = Object.values(data);
+const WSS_URL = "ws://localhost:3000";
+// const WSS_URL = "wss://trudeaugamedev-winter.herokuapp.com";
 
-        players.sort((a, b) => b.score - a.score);
+const socket = new WebSocket(WSS_URL);
+socket.addEventListener("error", (event) => {
+    console.error("Websocket error: ", event);
+});
+socket.addEventListener("open", (event) => {
+    console.log(`Websocket started on ${WSS_URL}`);
+    socket.send("leaderboard");
+    socket.send("updatelb");
+});
+socket.addEventListener("message", (event) => {
+    let data = JSON.parse(event.data.toString());
+    console.log(data);
+    const players = Object.values(data);
 
-        const tbody = document.querySelector('table tbody');
-        tbody.innerHTML = players.map(player => player.name != null ? `
-            <tr>
-                <td>${player.name}</td>
-                <td>${player.score}</td>
-            </tr>
-        ` : "").join('');
-    }).catch((err) => {
-        console.log("Fetch Error!", err);
-    });
+    players.sort((a, b) => b.score - a.score);
 
-    /*`<tr>
-        <td>${player.name}</td>
-        <td>${player.score}</td>
-    </tr>`*/
-}
+    const tbody = document.querySelector('table tbody');
+    tbody.innerHTML = players.map(player => player.name != null ? `
+        <tr>
+            <td>${player.name}</td>
+            <td>${player.score}</td>
+        </tr>
+    ` : "").join('');
+});
+socket.addEventListener("close", (event) => {
+    console.log("Websocket closed");
+});
 
-generateLeaderboardHTML();
-
-setInterval(generateLeaderboardHTML, 5000);
+setInterval(() => {
+    socket.send("updatelb");
+}, 5000);

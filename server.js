@@ -81,18 +81,6 @@ class Powerup {
 	}
 }
 
-let httpServer = http.createServer((req, res) => {
-	if (req.method === "GET") {
-		res.setHeader('Access-Control-Allow-Origin', '*');
-		res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-		res.writeHead(200);
-		res.end(JSON.stringify(Object.fromEntries(playerScores)));
-	}
-});
-httpServer.listen(parseInt(process.env.PORT, 10) || 3001, "localhost", () => {
-	console.log("HTTP server started");
-});
-
 const wss = new WebSocket.Server({
 	port: parseInt(process.env.PORT, 10) || 3000
 });
@@ -151,6 +139,11 @@ wss.on("connection", (socket) => {
 	});
 
 	socket.on("message", (msg) => {
+		if (msg.toString() === "updatelb") {
+			client.socket.send_obj(Object.fromEntries(playerScores));
+			return;
+		}
+
 		if (players.has(client.id) && players.get(client.id).eliminated) {
 			// set player name and score only
 			const strMsg = msg.toString();
@@ -169,6 +162,9 @@ wss.on("connection", (socket) => {
 			return;
 		} else if (msg.toString() === "spectator") {
 			handleSpectatorConnect(client);
+			return;
+		} else if (msg.toString() === "leaderboard") {
+			handleLeaderboardConnect(client);
 			return;
 		}
 
@@ -209,6 +205,12 @@ function handleAdminConnect(client) {
 	// Change IDs
 	players.get(-1).id = -1;
 	client.id = -1;
+	playerId--;
+}
+
+function handleLeaderboardConnect(client) {
+	console.log("leaderboard connection");
+	players.delete(client.id);
 	playerId--;
 }
 
