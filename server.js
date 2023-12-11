@@ -1,5 +1,5 @@
 const WebSocket = require("ws");
-const fs = require('fs');
+const http = require('http');
 
 function randint(min, max) {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -80,6 +80,18 @@ class Powerup {
 		}
 	}
 }
+
+let httpServer = http.createServer((req, res) => {
+	if (req.method === "GET") {
+		res.setHeader('Access-Control-Allow-Origin', '*');
+		res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+		res.writeHead(200);
+		res.end(JSON.stringify(Object.fromEntries(playerScores)));
+	}
+});
+httpServer.listen(parseInt(process.env.PORT, 10) || 3001, "localhost", () => {
+	console.log("HTTP server started");
+});
 
 const wss = new WebSocket.Server({
 	port: parseInt(process.env.PORT, 10) || 3000
@@ -291,13 +303,7 @@ function game() {
 			}
 			broadcast(JSON.stringify({"type": "en", "data": scoreData}));
 			for (const [id, player] of players) {
-				playerScores.set(player.data.name, player.data.score);
-				const json_data = JSON.parse(fs.readFileSync('./leaderboard/leaderboard.json'));
-				json_data.playersData[player.data.name] = player.data.score;
-				if (!(player.data.name in json_data.players)) {
-				    json_data.players.push(player.data.name);
-				}
-				fs.writeFileSync('./leaderboard/leaderboard.json', JSON.stringify(json_data, null, 2));
+				playerScores.set(player.id, {"name": player.data.name, "score": player.data.score});
 			}
 			restart();
 		}

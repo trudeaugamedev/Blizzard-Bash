@@ -1,35 +1,30 @@
-
 function generateLeaderboardHTML() {
-    readTextFile('leaderboard.json', function (json_data) {
-        const playersWithScores = json_data.players.map(player => ({
-            name: player,
-            score: json_data.playersData[player]
-        }));
+    fetch("http://127.0.0.1:3001").then((response) => {
+    // fetch("wss://trudeaugamedev-winter.herokuapp.com").then((response) => {
+        return response.json();
+    }).then((data) => {
+        console.log(data);
+        const players = Object.values(data);
 
-        playersWithScores.sort((a, b) => b.score - a.score);
+        players.sort((a, b) => b.score - a.score);
 
         const tbody = document.querySelector('table tbody');
-        tbody.innerHTML = playersWithScores.map(player => player.name != null ? `
+        tbody.innerHTML = players.map(player => player.name != null ? `
             <tr>
                 <td>${player.name}</td>
                 <td>${player.score}</td>
             </tr>
         ` : "").join('');
+    }).catch((err) => {
+        console.log("Fetch Error!", err);
     });
-}
 
-function readTextFile(fileName, callback) {
-    const xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-            const data = JSON.parse(xhr.responseText);
-            callback(data);
-        }
-    };
-    xhr.open('GET', fileName, true);
-    xhr.send();
+    /*`<tr>
+        <td>${player.name}</td>
+        <td>${player.score}</td>
+    </tr>`*/
 }
 
 generateLeaderboardHTML();
 
-setInterval(generateLeaderboardHTML, 1000);
+setInterval(generateLeaderboardHTML, 5000);
