@@ -91,7 +91,7 @@ class Client:
                 final[key] = self.pers_data[key]
                 self.modified_data[key] = False
 
-        if time.time() - self.send_all_time > 5:
+        if time.time() - self.send_all_time > 3:
             final.update(self.pers_data)
             self.send_all_time = time.time()
 
