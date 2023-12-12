@@ -17,10 +17,11 @@ class GameLeaderboard(VisibleSprite):
         self.pos = VEC(WIDTH - self.size.x - 20, 20)
 
         self.data = []
+        self.index = 0
 
     def update(self) -> None:
         self.data = [{"name": player.name, "score": player.score} for player in self.manager.other_players.values()]
-        self.data.append({"name": self.scene.name, "score": self.scene.score})
+        self.data.append({"name": self.scene.name, "score": self.scene.score, "self": True})
         self.data.sort(key = lambda d: d["score"], reverse=True)
         self.size.y = len(self.data) * 26 + 9
 
@@ -30,6 +31,8 @@ class GameLeaderboard(VisibleSprite):
         pygame.draw.rect(self.manager.screen, (0, 0, 0), (*self.pos, *self.size), 3)
         pygame.draw.line(self.manager.screen, (0, 0, 0), self.pos + (190, 0), self.pos + (190, self.size.y - 1), 3)
         for i, data in enumerate(self.data):
+            if "self" in data:
+                pygame.draw.polygon(self.manager.screen, (0, 0, 0), [self.pos + (-7, 16 + i * 26), self.pos + (-17, 16 + i * 26 - 5), self.pos + (-17, 16 + i * 26 + 5)])
             text_surf = FONT[20].render(data["name"], True, (0, 0, 0))
             self.manager.screen.blit(text_surf, self.pos + (8, 1 + i * 26))
             text_surf = FONT[20].render(str(data["score"]), True, (0, 0, 0))
