@@ -29,7 +29,7 @@ class OtherPlayer(VisibleSprite):
         self.rotation = 0
         self.flip = False
         self.score = 0
-        self.name = "..."
+        self.name = ""
         self.arrow = OtherArrow(self.scene, self)
 
     def update(self) -> None:
