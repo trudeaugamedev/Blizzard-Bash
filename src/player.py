@@ -3,9 +3,9 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from scene import Scene
 
+from random import uniform, choice
 from math import sin, pi, sqrt
 from pygame.locals import *
-from random import uniform
 import pygame
 import time
 
@@ -295,6 +295,9 @@ class Player(VisibleSprite):
             self.jumping = False
 
         if self.hit_strength != 0:
+            sound = choice(assets.hit_sounds)
+            sound.set_volume(self.hit_strength ** 2 * 0.2)
+            sound.play()
             self.vel.x = sign(self.hit_strength) * sqrt(abs(self.hit_strength)) * 150
             self.hit_strength = 0
 
