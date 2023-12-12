@@ -262,6 +262,12 @@ function handleAdminMessage(msg) {
 		} else {
 			console.log(`Non-existent player id ${id}!`)
 		}
+	} else if (command === "clearlb") {
+		playerScores = [];
+		fs.writeFile("leaderboard.json", JSON.stringify(playerScores), (err) => {
+			if (err) throw err;
+			console.log("Wrote data to leaderboard.json");
+		});
 	}
 }
 
