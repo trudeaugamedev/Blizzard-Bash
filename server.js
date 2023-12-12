@@ -88,7 +88,7 @@ const players = new Map();
 const spectators = new Map();
 const powerups = new Map();
 
-const playerScores = new Map();
+const playerScores = [];
 
 let seed = randint(0, 99999999);
 let mode = "elimination";
@@ -140,7 +140,7 @@ wss.on("connection", (socket) => {
 
 	socket.on("message", (msg) => {
 		if (msg.toString() === "updatelb") {
-			client.socket.send_obj(Object.fromEntries(playerScores));
+			client.socket.send_obj(playerScores);
 			return;
 		}
 
@@ -305,7 +305,7 @@ function game() {
 			}
 			broadcast(JSON.stringify({"type": "en", "data": scoreData}));
 			for (const [id, player] of players) {
-				playerScores.set(player.id, {"name": player.data.name, "score": player.data.score});
+				playerScores.push({"name": player.data.name, "score": player.data.score});
 			}
 			restart();
 		}

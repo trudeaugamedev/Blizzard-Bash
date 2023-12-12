@@ -11,9 +11,9 @@ socket.addEventListener("open", (event) => {
     socket.send("updatelb");
 });
 socket.addEventListener("message", (event) => {
-    let data = JSON.parse(event.data.toString());
-    console.log(data);
-    const players = Object.values(data);
+    let players = JSON.parse(event.data.toString());
+    if (!Array.isArray(players)) return;
+    console.log(players);
 
     players.sort((a, b) => b.score - a.score);
 
