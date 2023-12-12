@@ -1,5 +1,5 @@
 const WebSocket = require("ws");
-const http = require('http');
+const fs = require("fs");
 
 function randint(min, max) {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -88,7 +88,12 @@ const players = new Map();
 const spectators = new Map();
 const powerups = new Map();
 
-const playerScores = [];
+let playerScores = [];
+fs.readFile("leaderboard.json", (err, data) => {
+	if (err) throw err;
+	console.log(JSON.parse(data.toString()));
+	playerScores = JSON.parse(data.toString());
+});
 
 let seed = randint(0, 99999999);
 let mode = "elimination";
@@ -306,6 +311,10 @@ function game() {
 			for (const [id, player] of players) {
 				playerScores.push({"name": player.data.name, "score": player.data.score});
 			}
+			fs.writeFile("leaderboard.json", JSON.stringify(playerScores), (err) => {
+				if (err) throw err;
+				console.log("Wrote data to leaderboard.json");
+			});
 			restart();
 		}
 	}
