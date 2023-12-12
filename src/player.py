@@ -233,6 +233,8 @@ class Player(VisibleSprite):
         if MOUSEBUTTONUP in self.manager.events:
             if self.manager.events[MOUSEBUTTONUP].button == 1 and self.can_throw:
                 self.throwing = False
+                assets.throw_sound.set_volume(0.2)
+                assets.throw_sound.play()
                 if self.powerup == "clustershot":
                     for _ in range(3 if self.dig_iterations < 3 else 7):
                         self.snowballs.append(Snowball(self.scene, self.sb_vel + VEC(uniform(-150, 150), uniform(-150, 150)), assets.snowball_small))

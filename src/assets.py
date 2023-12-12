@@ -85,7 +85,8 @@ snowball_small = Frames("snowball", "snowball_small_")
 
 pygame.display.quit()
 
-pygame.mixer.init()
+pygame.mixer.pre_init(buffer=32)
+pygame.mixer.init(buffer=32)
 
 hit_sounds = [
     pygame.mixer.Sound("assets/audio/hit1.wav"),
@@ -93,3 +94,4 @@ hit_sounds = [
     pygame.mixer.Sound("assets/audio/hit3.wav"),
     pygame.mixer.Sound("assets/audio/hit4.wav"),
 ]
+throw_sound = pygame.mixer.Sound("assets/audio/throw.wav")
