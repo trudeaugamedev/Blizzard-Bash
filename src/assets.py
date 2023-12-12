@@ -84,3 +84,12 @@ snowball_large = Frames("snowball", "snowball_large_")
 snowball_small = Frames("snowball", "snowball_small_")
 
 pygame.display.quit()
+
+pygame.mixer.init()
+
+hit_sounds = [
+    pygame.mixer.Sound("assets/audio/hit1.wav"),
+    pygame.mixer.Sound("assets/audio/hit2.wav"),
+    pygame.mixer.Sound("assets/audio/hit3.wav"),
+    pygame.mixer.Sound("assets/audio/hit4.wav"),
+]

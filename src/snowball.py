@@ -72,6 +72,9 @@ class Snowball(VisibleSprite):
 
         for player in self.manager.other_players.values():
             if player.real_rect.colliderect(self.real_rect):
+                sound = choice(assets.hit_sounds)
+                sound.set_volume(self.score ** 2 * 0.2)
+                sound.play()
                 self.scene.hit = True
                 self.scene.hit_pos = self.pos
                 self.kill()
