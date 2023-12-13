@@ -89,9 +89,9 @@ pygame.mixer.pre_init(buffer=32)
 pygame.mixer.init(buffer=32)
 
 hit_sounds = [
-    pygame.mixer.Sound("assets/audio/hit1.wav"),
-    pygame.mixer.Sound("assets/audio/hit2.wav"),
-    pygame.mixer.Sound("assets/audio/hit3.wav"),
-    pygame.mixer.Sound("assets/audio/hit4.wav"),
+    pygame.mixer.Sound(pathof("assets/audio/hit1.wav")),
+    pygame.mixer.Sound(pathof("assets/audio/hit2.wav")),
+    pygame.mixer.Sound(pathof("assets/audio/hit3.wav")),
+    pygame.mixer.Sound(pathof("assets/audio/hit4.wav")),
 ]
-throw_sound = pygame.mixer.Sound("assets/audio/throw.wav")
+throw_sound = pygame.mixer.Sound(pathof("assets/audio/throw.wav"))
