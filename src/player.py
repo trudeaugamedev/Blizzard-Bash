@@ -213,7 +213,7 @@ class Player(VisibleSprite):
     def update_throw(self) -> None:
         if self.powerup != "rapidfire":
             self.can_throw = self.can_move and self.dig_iterations > 0
-        elif time.time() - self.rapidfire_time > 0.25:
+        elif time.time() - self.rapidfire_time > 0.2:
             self.rapidfire_time = time.time()
             self.can_throw = True
         if pygame.mouse.get_pressed()[0] and self.can_throw:
@@ -379,7 +379,7 @@ class Player(VisibleSprite):
 
     def update_powerup(self) -> None:
         if self.powerup is None: return
-        self.powerup_max_time = {"rapidfire": 5, "strength": 20, "clustershot": 10}[self.powerup]
+        self.powerup_max_time = {"rapidfire": 7, "strength": 20, "clustershot": 10}[self.powerup]
         if time.time() - self.powerup_time > self.powerup_max_time:
             if self.powerup == "rapidfire":
                 self.powerup = None
