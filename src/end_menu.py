@@ -18,8 +18,9 @@ class EndMenu(Scene):
 
         self.background = pygame.transform.gaussian_blur(self.manager.screen, 15)
 
-        scores = sorted(self.previous_scene.score_data, key = lambda d: d["score"], reverse=True)
+        scores = sorted(self.previous_scene.score_data, key = lambda d: d["score"] if "score" in d else -1, reverse=True)
         for i, data in enumerate(scores):
+            if "score" not in data: continue
             EndLeaderboard(self, i, data["name"], data["score"], self.client.id == data["id"])
 
         self.manager.other_players = {}
