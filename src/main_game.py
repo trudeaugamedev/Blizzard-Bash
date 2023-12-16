@@ -124,7 +124,7 @@ class MainGame(Scene):
                 self.manager.screen.blit(text, pos - (text.get_width() // 2, 0))
 
         if self.time_left is not None:
-            text_str = f"Time Left: {self.time_left // 60}:{'0' if self.time_left % 60 < 10 else ''}{self.time_left % 60}"
+            text_str = f"Time Left: {max(self.time_left // 60, 0)}:{'0' if self.time_left % 60 < 10 else ''}{self.time_left % 60}"
             text = FONT[30].render(text_str, False, TEXT_COLOR)
             text.set_alpha(70)
             self.manager.screen.blit(text, VEC(20, 72) + (3, 3))
