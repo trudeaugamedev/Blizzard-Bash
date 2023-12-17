@@ -19,7 +19,8 @@ class OtherPlayer(VisibleSprite):
         self.size = VEC(45, 60)
         self.pos = VEC(pos)
         self.frame = 0
-        self.orig_image = assets.player[self.frame]
+        self.assets = assets
+        self.orig_image = self.assets.player[self.frame]
         self.upright_image = self.orig_image
         self.image = self.upright_image
         self.rect = pygame.Rect(self.pos, self.size)
@@ -53,9 +54,12 @@ class OtherPlayer(VisibleSprite):
             self._layer = Layers.PLAYER1
             self.scene.sprite_manager.add(self)
 
-        self.orig_image = assets.player[self.frame]
+        self.orig_image = self.assets.player[self.frame]
         self.upright_image = pygame.transform.flip(self.orig_image, self.flip, False)
         self.image = pygame.transform.rotate(self.upright_image, self.rotation)
+
+    def set_colors(self, clothes, hat, skin):
+        self.assets = assets.PlayerAssets(clothes, hat, skin)
 
     def draw(self) -> None:
         if self.rect.right - self.scene.player.camera.offset.x < -20 or self.rect.left - self.scene.player.camera.offset.x > WIDTH + 20: return

@@ -32,6 +32,7 @@ class Client:
         self.id = -2
         self.pers_data = { # Persistent data
             "name": None,
+            "colors": None,
             "pos": None,
             "rot": None,
             "flip": None,

@@ -58,9 +58,9 @@ class Player(VisibleSprite):
         self.vel = VEC(0, 0)
         self.acc = VEC(0, 0)
         self.speed = 150
-        self.clothes_hue = 135
-        self.hat_hue = 0
-        self.skin_tone = 70
+        self.clothes_hue = 0
+        self.hat_hue = 200
+        self.skin_tone = 230
         self.assets = assets.PlayerAssets(self.clothes_hue, self.hat_hue, self.skin_tone)
         self.orig_image = self.assets.player_idle[0]
         self.upright_image = self.orig_image
@@ -122,6 +122,7 @@ class Player(VisibleSprite):
         self.first_start = False
 
     def sync_data(self) -> None:
+        self.client.queue_data("colors", [self.clothes_hue, self.hat_hue, self.skin_tone])
         self.client.queue_data("pos", inttup(self.pos))
         self.client.queue_data("rot", int(self.rotation))
         self.client.queue_data("flip", self.flip)

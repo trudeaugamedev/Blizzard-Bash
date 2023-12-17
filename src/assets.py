@@ -23,8 +23,9 @@ def hue_shift(color, hue):
 f_r = lambda x: -0.004509 * x ** 2 + 2.130 * x - 4.847
 f_g = lambda x: -0.003080 * x ** 2 + 1.822 * x - 33.08
 f_b = lambda x: 0.8975 * x - 5.025
-def lightness_shift(lightness):
-    rgb = (clamp(f_r(lightness), 0, 255)[0], clamp(f_g(lightness), 0, 255)[0], clamp(f_b(lightness), 0, 255)[0])
+def lightness_shift(color, lightness):
+    shade = 0.9 if color == PlayerAssets.skin_colors[0] else 1
+    rgb = (clamp(f_r(lightness) * shade, 0, 255)[0], clamp(f_g(lightness) * shade, 0, 255)[0], clamp(f_b(lightness) * shade, 0, 255)[0])
     return rgb
 
 def palette_swap(surf, old, new):
@@ -97,8 +98,9 @@ def palette_swap_frames(frames, old, new):
 
 def deepcopy(frames):
     frames_copy = copy(frames)
+    frames_copy.elements = []
     for i in range(frames.length):
-        frames_copy.elements[i] = frames[i].copy()
+        frames_copy.elements.append(frames[i].copy())
     return frames_copy
 
 class PlayerAssets:
@@ -147,7 +149,7 @@ class PlayerAssets:
             for color in self.hat_colors:
                 palette_swap_frames(frames, color, hue_shift(color, self.hat_hue))
             for color in self.skin_colors:
-                palette_swap_frames(frames, color, lightness_shift(self.skin_tone))
+                palette_swap_frames(frames, color, lightness_shift(color, self.skin_tone))
         self.player = self.player_idle.elements + self.player_idle_l.elements + self.player_idle_s.elements + self.player_dig.elements + self.player_run.elements + self.player_run_s.elements + self.player_run_l.elements + self.player_throw_l.elements + self.player_throw_s.elements
 
 player_idle = Frames("player", "player_idle_")
@@ -159,7 +161,7 @@ player_run_s = Frames("player", "player_run_s_")
 player_run_l = Frames("player", "player_run_l_")
 player_throw_l = Frames("player", "player_throw_l_")
 player_throw_s = Frames("player", "player_throw_s_")
-# player = player_idle.elements + player_idle_l.elements + player_idle_s.elements + player_dig.elements + player_run.elements + player_run_s.elements + player_run_l.elements + player_throw_l.elements + player_throw_s.elements
+player = player_idle.elements + player_idle_l.elements + player_idle_s.elements + player_dig.elements + player_run.elements + player_run_s.elements + player_run_l.elements + player_throw_l.elements + player_throw_s.elements
 
 snowball_large = Frames("snowball", "snowball_large_")
 snowball_small = Frames("snowball", "snowball_small_")
