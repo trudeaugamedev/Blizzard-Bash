@@ -11,7 +11,7 @@ class Button(VisibleSprite):
     mouse_down_in = None
     mouse_up_in = None
 
-    def __init__(self, scene: Scene, pos: tuple[int, int], size: tuple[int, int], text: str, command: Callable, centered: bool = False) -> None:
+    def __init__(self, scene: Scene, pos: tuple[int, int], size: tuple[int, int], text: str, command: Callable, centered: bool = False, style: bool = True, font_size: int = 36, font_color: tuple[int, int, int] = TEXT_COLOR) -> None:
         super().__init__(scene, Layers.GUI)
         self.size = VEC(size)
         self.pos = VEC(pos)
@@ -19,8 +19,9 @@ class Button(VisibleSprite):
             self.pos = self.pos - self.size // 2
         self.rect = pygame.Rect(self.pos, self.size)
         self.text = text
-        self.text_surf = FONT[36].render(self.text, False, TEXT_COLOR)
+        self.text_surf = FONT[font_size].render(self.text, False, font_color)
         self.text_size = VEC(self.text_surf.get_size())
+        self.style = style
         self.command = command
 
     def update(self) -> None:
@@ -41,7 +42,8 @@ class Button(VisibleSprite):
             self.command()
 
     def draw(self) -> None:
-        (surf := pygame.Surface(self.size, SRCALPHA)).fill((255, 255, 255, 80))
-        self.manager.screen.blit(surf, self.pos)
-        pygame.draw.rect(self.manager.screen, (0, 0, 0), (*self.pos, *self.size), 3)
+        if self.style:
+            (surf := pygame.Surface(self.size, SRCALPHA)).fill((255, 255, 255, 80))
+            self.manager.screen.blit(surf, self.pos)
+            pygame.draw.rect(self.manager.screen, (0, 0, 0), (*self.pos, *self.size), 3)
         self.manager.screen.blit(self.text_surf, self.pos + self.size // 2 - (self.text_size.x // 2, self.text_size.y // 2 * 1.1))

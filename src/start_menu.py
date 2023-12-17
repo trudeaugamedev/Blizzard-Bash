@@ -4,6 +4,7 @@ if TYPE_CHECKING:
     from manager import GameManager
 
 from .constants import WIDTH, HEIGHT, FONT, TEXT_COLOR
+from .skin_selector import SkinSelector
 from .input_box import InputBox
 from .button import Button
 from .scene import Scene
@@ -16,8 +17,9 @@ import pygame
 class StartMenu(Scene):
     def __init__(self, manager: GameManager, previous_scene: Scene) -> None:
         super().__init__(manager, previous_scene)
-        self.start_button = Button(self, (WIDTH // 2, HEIGHT // 2 + 120), (300, 80), "JOIN GAME", self.start_game, centered=True)
-        self.input_box = InputBox(self, (WIDTH // 2 - 105, HEIGHT // 2 - 20), (466, 76))
+        self.start_button = Button(self, (WIDTH // 2 - 310, HEIGHT // 2 + 70), (400, 80), "JOIN GAME", self.start_game)
+        self.input_box = InputBox(self, (WIDTH // 2 - 105, HEIGHT // 2 - 60), (466, 76))
+        self.skin_selector = SkinSelector(self)
         self.warning = ""
 
         self.title_linear_progress = 0
@@ -56,7 +58,7 @@ class StartMenu(Scene):
         if self.button_linear_progress > 1:
             self.button_linear_progress = 1
         self.button_progress = tween.easeOutBounce(max(0, self.button_linear_progress))
-        self.start_button.pos.y = HEIGHT // 2 + 120 + 300 * (1 - self.button_progress) - self.start_button.size.y // 2
+        self.start_button.pos.y = HEIGHT // 2 + 70 + 300 * (1 - self.button_progress)
 
         if K_RETURN in self.manager.key_downs:
             self.start_game()
@@ -64,16 +66,16 @@ class StartMenu(Scene):
     def draw(self) -> None:
         self.manager.screen.blit(assets.background, (0, 0))
 
-        self.manager.screen.blit(assets.title, (WIDTH // 2 - assets.title.get_width() // 2, HEIGHT // 2 - 200 - 300 * (1 - self.title_progress)))
+        self.manager.screen.blit(assets.title, (WIDTH // 2 - assets.title.get_width() // 2, HEIGHT // 2 - 240 - 300 * (1 - self.title_progress)))
 
         (surf := pygame.Surface((748 * self.input_progress, 76), SRCALPHA)).fill((255, 255, 255, 80))
-        self.manager.screen.blit(surf, (WIDTH // 2 - 374 * self.input_progress, HEIGHT // 2 - 20))
-        pygame.draw.rect(self.manager.screen, (0, 0, 0), (WIDTH // 2 - 374 * self.input_progress, HEIGHT // 2 - 20, 748 * self.input_progress, 76), 3)
+        self.manager.screen.blit(surf, (WIDTH // 2 - 374 * self.input_progress, HEIGHT // 2 - 60))
+        pygame.draw.rect(self.manager.screen, (0, 0, 0), (WIDTH // 2 - 374 * self.input_progress, HEIGHT // 2 - 60, 748 * self.input_progress, 76), 3)
         if self.input_progress > 0.9:
             text = FONT[50].render("Username:", False, TEXT_COLOR)
-            self.manager.screen.blit(text, (WIDTH // 2 - 359, HEIGHT // 2 - 20))
+            self.manager.screen.blit(text, (WIDTH // 2 - 359, HEIGHT // 2 - 60))
 
         text = FONT[24].render(self.warning, False, (255, 0, 0))
-        self.manager.screen.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 - 65))
+        self.manager.screen.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 - 105))
 
         super().draw()

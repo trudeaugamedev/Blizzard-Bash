@@ -58,9 +58,9 @@ class Player(VisibleSprite):
         self.vel = VEC(0, 0)
         self.acc = VEC(0, 0)
         self.speed = 150
-        self.clothes_hue = 135
-        self.hat_hue = 0
-        self.skin_tone = 110
+        self.clothes_hue = self.scene.previous_scene.skin_selector.clothes_hue
+        self.hat_hue = self.scene.previous_scene.skin_selector.hat_hue
+        self.skin_tone = self.scene.previous_scene.skin_selector.skin_tone
         self.assets = assets.PlayerAssets(self.clothes_hue, self.hat_hue, self.skin_tone)
         self.orig_image = self.assets.player_idle[0]
         self.upright_image = self.orig_image
