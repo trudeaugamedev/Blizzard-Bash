@@ -73,7 +73,7 @@ class Parser:
             if "flip" in player_data: other.flip = player_data["flip"]
             if "frame" in player_data: other.frame = player_data["frame"]
             if "score" in player_data: other.score = player_data["score"]
-            if "colors" in player_data: other.set_colors(*player_data["colors"])
+            if "colors" in player_data and player_data["colors"]: other.set_colors(*player_data["colors"])
 
             if "snowballs" in player_data:
                 # Parse data of snowballs

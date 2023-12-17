@@ -19,6 +19,9 @@ class OtherPlayer(VisibleSprite):
         self.size = VEC(45, 60)
         self.pos = VEC(pos)
         self.frame = 0
+        self.clothes_hue = 135
+        self.hat_hue = 0
+        self.skin_tone = 230
         self.assets = assets
         self.orig_image = self.assets.player[self.frame]
         self.upright_image = self.orig_image
@@ -59,6 +62,10 @@ class OtherPlayer(VisibleSprite):
         self.image = pygame.transform.rotate(self.upright_image, self.rotation)
 
     def set_colors(self, clothes, hat, skin):
+        if clothes == self.clothes_hue and hat == self.hat_hue and skin == self.skin_tone: return
+        self.clothes_hue = clothes
+        self.hat_hue = hat
+        self.skin_tone = skin
         self.assets = assets.PlayerAssets(clothes, hat, skin)
 
     def draw(self) -> None:

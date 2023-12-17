@@ -70,6 +70,7 @@ class MainGame(Scene):
 
         self.name = self.previous_scene.input_box.text
         self.client.queue_data("name", self.name)
+        self.client.queue_data("colors", [self.player.clothes_hue, self.player.hat_hue, self.player.skin_tone])
         self.game_over = False
         self.score_data = []
 
