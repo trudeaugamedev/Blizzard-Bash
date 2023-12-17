@@ -58,7 +58,11 @@ class Player(VisibleSprite):
         self.vel = VEC(0, 0)
         self.acc = VEC(0, 0)
         self.speed = 150
-        self.orig_image = assets.player_idle[0]
+        self.clothes_hue = 135
+        self.hat_hue = 0
+        self.skin_tone = 70
+        self.assets = assets.PlayerAssets(self.clothes_hue, self.hat_hue, self.skin_tone)
+        self.orig_image = self.assets.player_idle[0]
         self.upright_image = self.orig_image
         self.image = self.upright_image
         self.rect = pygame.Rect(self.pos, self.size)
@@ -90,7 +94,7 @@ class Player(VisibleSprite):
         self.snowballs: list[Snowball] = []
         self.rapidfire_time = time.time()
 
-        self.frame_group = assets.player_idle
+        self.frame_group = self.assets.player_idle
         self.frame = 0
         self.frame_time = time.time()
 
@@ -121,7 +125,7 @@ class Player(VisibleSprite):
         self.client.queue_data("pos", inttup(self.pos))
         self.client.queue_data("rot", int(self.rotation))
         self.client.queue_data("flip", self.flip)
-        self.client.queue_data("frame", assets.player.index(self.orig_image))
+        self.client.queue_data("frame", self.assets.player.index(self.orig_image))
 
         snowballs = []
         for snowball in self.snowballs:
@@ -145,7 +149,7 @@ class Player(VisibleSprite):
         self.manager.screen.blit(self.image, (*(VEC(self.rect.topleft) - self.camera.offset), *self.size))
         self.image.set_alpha(255)
 
-        if self.dig_iterations >= 2 and self.frame_group == assets.player_dig and 2 < self.frame < 9:
+        if self.dig_iterations >= 2 and self.frame_group == self.assets.player_dig and 2 < self.frame < 9:
             alpha = (sin((time.time() - self.powerup_flash_time) * pi * 3) * 0.5 + 0.5) * 140
             mask = pygame.mask.from_surface(self.image)
             self.manager.screen.blit(mask.to_surface(setcolor=(255, 255, 255, alpha), unsetcolor=(0, 0, 0, 0)), VEC(self.rect.topleft) - self.camera.offset)
@@ -158,11 +162,11 @@ class Player(VisibleSprite):
             self.acc.x -= self.CONST_ACC
             self.flip = True
             if self.can_move:
-                self.frame_group = assets.player_run
+                self.frame_group = self.assets.player_run
                 if self.can_throw and self.dig_iterations < 3:
-                    self.frame_group = assets.player_run_s
+                    self.frame_group = self.assets.player_run_s
                 elif self.can_throw:
-                    self.frame_group = assets.player_run_l
+                    self.frame_group = self.assets.player_run_l
                 self.idle = False
         elif self.vel.x < 0: # Deceleration
             self.acc.x += self.CONST_ACC
@@ -171,11 +175,11 @@ class Player(VisibleSprite):
             self.acc.x += self.CONST_ACC
             self.flip = False
             if self.can_move:
-                self.frame_group = assets.player_run
+                self.frame_group = self.assets.player_run
                 if self.can_throw and self.dig_iterations < 3:
-                    self.frame_group = assets.player_run_s
+                    self.frame_group = self.assets.player_run_s
                 elif self.can_throw:
-                    self.frame_group = assets.player_run_l
+                    self.frame_group = self.assets.player_run_l
                 self.idle = False
         elif self.vel.x > 0:
             self.acc.x -= self.CONST_ACC
@@ -220,9 +224,9 @@ class Player(VisibleSprite):
             m_pos = VEC(pygame.mouse.get_pos())
             self.throwing = True
             if self.can_throw and self.dig_iterations < 3:
-                self.frame_group = assets.player_throw_s
+                self.frame_group = self.assets.player_throw_s
             elif self.can_throw:
-                self.frame_group = assets.player_throw_l
+                self.frame_group = self.assets.player_throw_l
             # Use camera offset to convert screen-space pos to in-world pos
             try:
                 self.sb_vel = ((m_pos - self.SB_OFFSET + self.camera.offset) - self.pos) * 8 * (1.4 if self.powerup == "strength" else 1)
@@ -305,18 +309,18 @@ class Player(VisibleSprite):
 
         self.pos.x, _ = clamp(self.pos.x, -2400, 2400)
 
-        self.can_move = self.frame_group != assets.player_dig and not self.digging
+        self.can_move = self.frame_group != self.assets.player_dig and not self.digging
 
     def update_image(self) -> None:
         if self.throwing:
             self.flip = self.sb_vel.x < 0
 
-        if self.idle and not self.throwing and self.frame_group not in {assets.player_throw_l, assets.player_throw_s}:
-            self.frame_group = assets.player_idle
+        if self.idle and not self.throwing and self.frame_group not in {self.assets.player_throw_l, self.assets.player_throw_s}:
+            self.frame_group = self.assets.player_idle
             if self.can_throw and self.dig_iterations < 3:
-                self.frame_group = assets.player_idle_s
+                self.frame_group = self.assets.player_idle_s
             elif self.can_throw:
-                self.frame_group = assets.player_idle_l
+                self.frame_group = self.assets.player_idle_l
 
         try:
             self.ground = self.ground_level.instances[int(self.rect.centerx // TILE_SIZE * TILE_SIZE)]
@@ -327,7 +331,7 @@ class Player(VisibleSprite):
 
         # Play digging animations
         if self.digging and self.on_ground:
-            self.frame_group = assets.player_dig
+            self.frame_group = self.assets.player_dig
             if time.time() - self.frame_time > 0.1:
                 # 0 - 9 frames, repeat fram 4 - 8
                 self.frame_time = time.time()
@@ -340,24 +344,24 @@ class Player(VisibleSprite):
                         self.frame = 4
                     self.dig_iterations += 1
         # End player animations
-        elif self.frame_group == assets.player_dig:
+        elif self.frame_group == self.assets.player_dig:
             if time.time() - self.frame_time > 0.1:
                 self.frame_time = time.time()
                 self.frame += 1
                 if self.frame >= self.frame_group.length:
-                    self.frame_group = assets.player_idle
+                    self.frame_group = self.assets.player_idle
                     self.idle = True
                     self.frame = 0
                     self.digging = False
         # Play running animations
-        elif self.frame_group in {assets.player_run, assets.player_run_l, assets.player_run_s}:
+        elif self.frame_group in {self.assets.player_run, self.assets.player_run_l, self.assets.player_run_s}:
             if time.time() - self.frame_time > 0.1:
                 self.frame_time = time.time()
                 self.frame += 1
                 if self.frame >= self.frame_group.length:
                     self.frame = 0
         # Play throwing animations
-        elif self.frame_group in {assets.player_throw_l, assets.player_throw_s}:
+        elif self.frame_group in {self.assets.player_throw_l, self.assets.player_throw_s}:
             if self.throwing:
                 self.frame = 0
             else:
