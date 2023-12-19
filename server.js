@@ -9,6 +9,9 @@ function broadcast(msg) {
 	for (const player of players.values()) {
 		player.socket.send(msg);
 	}
+	for (const spectator of spectators.values()) {
+		spectator.socket.send(msg);
+	}
 }
 
 function getPlayerData(x_id, init) {
