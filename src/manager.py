@@ -11,6 +11,7 @@ from .end_menu import EndMenu
 from .client import Client
 from .sprite import Layers
 from .scene import Scene
+from . import assets
 
 class AbortScene(Exception):
     def __str__(self):
@@ -20,6 +21,7 @@ class GameManager:
     def __init__(self) -> None:
         pygame.init()
         pygame.key.set_repeat(500, 25)
+        pygame.mouse.set_cursor((12, 12), assets.crosshair)
 
         self.client = Client(self)
 
