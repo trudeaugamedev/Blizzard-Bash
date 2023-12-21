@@ -16,7 +16,7 @@ It may be evident that the code is completely undocumented and an absolute mess 
 This repository will be archived once Blizzards Bash is over, and the server will likely be closed down as well. It is licensed under the LGPL-2.1, please read [LICENSE](https://github.com/trudeaugamedev/Blizzard-Bash/blob/master/LICENSE) for more information on how you may use the contents of this repository. 
 
 ## Installation
-If for whatever reason you wish to play the game after the event, you may follow the instructions below. Again, note that the server will likely not be up after the event, so you would have to run the server locally using Node.js. 
+If for whatever reason you wish to play the game after the event, you may follow the instructions below. Again, note that **the server will not be up after the even**t, so you would have to run the server locally using Node.js. 
 
 ### Windows
 The game is built and distributed for Windows, download either version's executable by going under [Releases](https://github.com/trudeaugamedev/Blizzard-Bash/releases) and double click to run.
