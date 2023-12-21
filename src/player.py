@@ -249,10 +249,10 @@ class Player(VisibleSprite):
                 assets.throw_sound.set_volume(0.2)
                 assets.throw_sound.play()
                 if self.powerup == "clustershot":
-                    for _ in range(3 if self.dig_iterations < 3 else 7):
-                        self.snowballs.append(Snowball(self.scene, self.sb_vel + VEC(uniform(-150, 150), uniform(-150, 150)), assets.snowball_small))
-                    for _ in range(2 if self.dig_iterations < 3 else 5):
-                        self.snowballs.append(Snowball(self.scene, self.sb_vel + VEC(uniform(-150, 150), uniform(-150, 150)), assets.snowball_large))
+                    for _ in range(4 if self.dig_iterations < 3 else 7):
+                        self.snowballs.append(Snowball(self.scene, self.sb_vel + VEC(uniform(-180, 180), uniform(-180, 180)), assets.snowball_small))
+                    for _ in range(1 if self.dig_iterations < 3 else 3):
+                        self.snowballs.append(Snowball(self.scene, self.sb_vel + VEC(uniform(-180, 180), uniform(-180, 180)), assets.snowball_large))
                 else:
                     self.snowballs.append(Snowball(self.scene, self.sb_vel, assets.snowball_small if self.dig_iterations < 3 or self.powerup == "rapidfire" else assets.snowball_large))
                 self.dig_iterations = 0
