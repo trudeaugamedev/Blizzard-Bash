@@ -91,13 +91,6 @@ const players = new Map();
 const spectators = new Map();
 const powerups = new Map();
 
-let playerScores = [];
-fs.readFile("leaderboard.json", (err, data) => {
-	if (err) throw err;
-	console.log(JSON.parse(data.toString()));
-	playerScores = JSON.parse(data.toString());
-});
-
 let seed = randint(0, 99999999);
 let mode = "elimination";
 let playerId = 0;
@@ -147,15 +140,15 @@ wss.on("connection", (socket) => {
 	});
 
 	socket.on("message", (msg) => {
-		if (msg.toString() === "updatelb") {
-			client.socket.send_obj(playerScores);
-			return;
-		}
-
 		if (players.has(client.id) && players.get(client.id).eliminated) {
 			// set player name and score only
 			const strMsg = msg.toString();
-			const data = JSON.parse(strMsg);
+			let data = "";
+			try {
+				data = JSON.parse(strMsg);
+			} catch (err) {
+				return;
+			}
 			let playerData = players.get(client.id).data;
 			for (const [key, value] of Object.entries(data)) {
 				if (value === null) continue;
@@ -170,9 +163,6 @@ wss.on("connection", (socket) => {
 			return;
 		} else if (msg.toString() === "spectator") {
 			handleSpectatorConnect(client);
-			return;
-		} else if (msg.toString() === "leaderboard") {
-			handleLeaderboardConnect(client);
 			return;
 		}
 
@@ -212,12 +202,6 @@ function handleAdminConnect(client) {
 	// Change IDs
 	players.get(-1).id = -1;
 	client.id = -1;
-	playerId--;
-}
-
-function handleLeaderboardConnect(client) {
-	console.log("leaderboard connection");
-	players.delete(client.id);
 	playerId--;
 }
 
@@ -265,12 +249,6 @@ function handleAdminMessage(msg) {
 		} else {
 			console.log(`Non-existent player id ${id}!`)
 		}
-	} else if (command === "clearlb") {
-		playerScores = [];
-		fs.writeFile("leaderboard.json", JSON.stringify(playerScores), (err) => {
-			if (err) throw err;
-			console.log("Wrote data to leaderboard.json");
-		});
 	}
 }
 
@@ -317,13 +295,6 @@ function game() {
 				scoreData.push({"id": id, "name": player.data.name, "score": player.data.score});
 			}
 			broadcast(JSON.stringify({"type": "en", "data": scoreData}));
-			for (const [id, player] of players) {
-				playerScores.push({"name": player.data.name, "score": player.data.score});
-			}
-			fs.writeFile("leaderboard.json", JSON.stringify(playerScores), (err) => {
-				if (err) throw err;
-				console.log("Wrote data to leaderboard.json");
-			});
 			restart();
 		}
 	}

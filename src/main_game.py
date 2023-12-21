@@ -27,6 +27,8 @@ class MainGame(Scene):
         # MainGame object must exist before initialization or sprites might get added to the previous scene (StartMenu)
 
     def setup(self) -> None:
+        self.manager.other_players.clear()
+
         self.waiting = True
         self.eliminated = False
         self.client.restart()

@@ -28,7 +28,7 @@ class Snowball(VisibleSprite):
         self.frame = 0
         self.frame_time = time.time()
         self.type = sb_type
-        self.score = 1 if self.type == assets.snowball_small else 3
+        self.score = 1 if self.type == assets.snowball_small else 4
         self.image = self.type[self.frame]
         self.rect = self.image.get_rect(center=self.pos)
         self.real_rect = pygame.Rect(0, 0, *(10, 10) if self.type == assets.snowball_large else (7, 7))
