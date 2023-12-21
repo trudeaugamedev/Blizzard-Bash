@@ -154,15 +154,6 @@ class Player(VisibleSprite):
             mask = pygame.mask.from_surface(self.image)
             self.manager.screen.blit(mask.to_surface(setcolor=(255, 255, 255, alpha), unsetcolor=(0, 0, 0, 0)), VEC(self.rect.topleft) - self.camera.offset)
 
-        if self.can_throw and self.dig_iterations < 3:
-            assets.snowball_small[0].set_alpha(180)
-            self.manager.screen.blit(assets.snowball_small[0], VEC(pygame.mouse.get_pos()) - VEC(assets.snowball_small[0].get_size()) / 2 + (20, 20))
-            assets.snowball_small[0].set_alpha(255)
-        elif self.can_throw:
-            assets.snowball_large[0].set_alpha(180)
-            self.manager.screen.blit(assets.snowball_large[0], VEC(pygame.mouse.get_pos()) - VEC(assets.snowball_large[0].get_size()) / 2 + (24, 24))
-            assets.snowball_large[0].set_alpha(255)
-
     def update_keys(self) -> None:
         self.keys = pygame.key.get_pressed()
 

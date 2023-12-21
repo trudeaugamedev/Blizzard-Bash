@@ -153,6 +153,15 @@ class MainGame(Scene):
         if self.waiting:
             self.draw_waiting_text()
 
+        if 0 < self.player.dig_iterations < 3 or self.player.powerup == "rapidfire":
+            assets.snowball_small[0].set_alpha(180)
+            self.manager.screen.blit(assets.snowball_small[0], VEC(pygame.mouse.get_pos()) - VEC(assets.snowball_small[0].get_size()) / 2 + (20, 20))
+            assets.snowball_small[0].set_alpha(255)
+        elif self.player.dig_iterations >= 3:
+            assets.snowball_large[0].set_alpha(180)
+            self.manager.screen.blit(assets.snowball_large[0], VEC(pygame.mouse.get_pos()) - VEC(assets.snowball_large[0].get_size()) / 2 + (24, 24))
+            assets.snowball_large[0].set_alpha(255)
+
     def draw_waiting_text(self) -> None:
         text = FONT[54].render("Waiting for game to start...", False, (0, 0, 0))
         self.manager.screen.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 - text.get_height() // 2))
