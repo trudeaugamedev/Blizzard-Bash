@@ -35,3 +35,4 @@ If you have Python and the necessary modules installed, you may run `main.py` us
 ## Credits
 - Programming by Andrew Wang
 - Art by Richard Zhang
+- Programming help from Martin Baldwin
