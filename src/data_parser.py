@@ -59,10 +59,13 @@ class Parser:
         for player_data in data["players"]:
             if not player_data: continue
 
-            if init: self.manager.other_players[player_data["id"]] = OtherPlayer(self.manager.scene, player_data["id"], player_data["pos"])
+            if init:
+                player = OtherPlayer(self.manager.scene, player_data["id"], player_data["pos"])
+                self.manager.other_players[player_data["id"]] = player
             if player_data["id"] not in self.manager.other_players:
                 try:
-                    self.manager.other_players[player_data["id"]] = OtherPlayer(self.manager.scene, player_data["id"], player_data["pos"])
+                    player = OtherPlayer(self.manager.scene, player_data["id"], player_data["pos"])
+                    self.manager.other_players[player_data["id"]] = player
                 except KeyError:
                     continue
             other = self.manager.other_players[player_data["id"]]
