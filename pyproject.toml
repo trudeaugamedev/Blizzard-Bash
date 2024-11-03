@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "blizzard-bash"
+version = "0.1.0"
+description = "Blizzard Bash game."
+authors = ["DaNubCoding"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+pygame-ce = "^2.5.2"
+multipledispatch = "^1.0.0"
+pyperclip = "^1.9.0"
+pytweening = "^1.2.0"
+opensimplex = "^0.4.5.1"
+websockets = "^13.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

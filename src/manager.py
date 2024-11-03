@@ -1,5 +1,6 @@
 from pygame.locals import *
 from enum import Enum
+import asyncio
 import pygame
 import sys
 
@@ -25,7 +26,7 @@ class GameManager:
 
         self.client = Client(self)
 
-        self.flags = HWSURFACE | DOUBLEBUF | RESIZABLE | SCALED | FULLSCREEN
+        self.flags = HWSURFACE | DOUBLEBUF | RESIZABLE | SCALED# | FULLSCREEN
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT), self.flags)
         self.clock = pygame.time.Clock()
         self.dt = self.clock.tick_busy_loop(FPS) / 1000
