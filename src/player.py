@@ -81,7 +81,7 @@ class Player(VisibleSprite):
         self.dig_iterations = 0
 
         self.jump_time = time.time()
-        
+
         self.powerup = None
         self.powerup_time = time.time()
         self.powerup_max_time = 0
@@ -100,6 +100,7 @@ class Player(VisibleSprite):
 
         self.first_start = True
         self.hit_strength = 0 # The strength another player's snowball hit the player
+        self.hit_size = 0
 
         self.CONST_ACC = 500 # 500 pixels per second squared (physics :P)
         self.SMALL_MAX_SPEED = 30
@@ -300,12 +301,13 @@ class Player(VisibleSprite):
             self.on_ground = True
             self.jumping = False
 
-        if self.hit_strength != 0:
+        if self.hit_strength != 0 or self.hit_size != 0:
             sound = choice(assets.hit_sounds)
             sound.set_volume(self.hit_strength ** 2 * 0.2)
             sound.play()
             self.vel.x = sign(self.hit_strength) * sqrt(abs(self.hit_strength)) * 150
-            self.hit_strength = 0
+            self.scene.score -= 1 # Penalty for getting hit (1 for now, may depend on self.hit_size)
+            self.hit_strength = self.hit_size = 0
 
         self.pos.x, _ = clamp(self.pos.x, -2400, 2400)
 

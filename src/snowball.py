@@ -82,7 +82,7 @@ class Snowball(VisibleSprite):
                     self.scene.score += self.score * (3 if self.player.powerup == "strength" else 1)
                     self.client.queue_data("score", self.scene.score)
                 hit_strength = self.score * sign(self.vel.x) * (40 if self.player.powerup == "strength" else 1)
-                self.client.irreg_data.put({"hit": hit_strength, "id": player.id})
+                self.client.irreg_data.put({"hit": hit_strength, "hit_size": 1 if self.type == assets.snowball_small else 2, "id": player.id})
                 return
 
         for powerup in Powerup.instances.values():
