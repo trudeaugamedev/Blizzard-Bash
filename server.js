@@ -85,7 +85,7 @@ class Powerup {
 }
 
 const wss = new WebSocket.Server({
-	port: parseInt(process.env.PORT, 10) || 3000
+	port: parseInt(process.env.PORT, 10) || 1200
 });
 const players = new Map();
 const spectators = new Map();
@@ -157,7 +157,7 @@ wss.on("connection", (socket) => {
 			}
 			return;
 		}
-		
+
 		if (msg.toString() === "admin") {
 			handleAdminConnect(client);
 			return;
@@ -181,7 +181,7 @@ wss.on("connection", (socket) => {
 			}
 			return;
 		}
-		
+
 		if (!players.has(client.id)) return;
 		players.get(client.id).received = data;
 		players.get(client.id).sent = 0;
