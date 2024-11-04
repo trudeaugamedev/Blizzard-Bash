@@ -1,38 +1,38 @@
 "use strict";
 
-// const WSS_URL = "ws://localhost:3000";
-const WSS_URL = "wss://trudeaugamedev-winter.herokuapp.com";
+// const WSS_URL = "ws://localhost:1200";
+const WSS_URL = "wss://blizzard-bash-e8a3a44e5011.herokuapp.com";
 
 // From https://stackoverflow.com/a/37388113
 // draws an image with rotation + x/y flip + centering or not centering
 function drawImage(img, x, y, width, height, deg, flip, flop, center) {
     ctx.save();
-    
+
     if(typeof width === "undefined") width = img.width;
     if(typeof height === "undefined") height = img.height;
     if(typeof center === "undefined") center = false;
-    
+
     // Set rotation point to center of image, instead of top/left
     if(center) {
         x -= width/2;
         y -= height/2;
     }
-    
+
     // Set the origin to the center of the image
     ctx.translate(x + width/2, y + height/2);
-    
+
     // Rotate the canvas around the origin
-    let rad = 2 * Math.PI - deg * Math.PI / 180;    
+    let rad = 2 * Math.PI - deg * Math.PI / 180;
     ctx.rotate(rad);
-    
+
     // Flip/flop the canvas
     let flipScale = flip ? -1 : 1;
     let flopScale = flop ? -1 : 1;
     ctx.scale(flipScale, flopScale);
-    
-    // Draw the image    
+
+    // Draw the image
     ctx.drawImage(img, -width/2, -height/2, width, height);
-    
+
     ctx.restore();
 }
 

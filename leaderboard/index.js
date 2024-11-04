@@ -1,5 +1,5 @@
-// const WSS_URL = "ws://localhost:3000";
-const WSS_URL = "wss://trudeaugamedev-winter.herokuapp.com";
+// const WSS_URL = "ws://localhost:1200";
+const WSS_URL = "wss://blizzard-bash-e8a3a44e5011.herokuapp.com";
 
 const socket = new WebSocket(WSS_URL);
 socket.addEventListener("error", (event) => {

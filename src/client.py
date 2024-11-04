@@ -105,8 +105,8 @@ class Client:
 
     async def connect(self) -> None:
         print("Coroutine 'connect' started")
-        self.socket = await ws_client.connect("ws://localhost:1200")
-        # self.socket = await ws_client.connect("wss://trudeaugamedev-winter.herokuapp.com")
+        # self.socket = await ws_client.connect("ws://localhost:1200")
+        self.socket = await ws_client.connect("wss://blizzard-bash-e8a3a44e5011.herokuapp.com")
         print("Coroutine 'connect' completed")
 
     async def main(self) -> None:
