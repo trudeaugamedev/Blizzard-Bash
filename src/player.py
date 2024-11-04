@@ -389,7 +389,7 @@ class Player(VisibleSprite):
 
     def update_powerup(self) -> None:
         if self.powerup is None: return
-        self.powerup_max_time = {"rapidfire": 7, "strength": 20, "clustershot": 10}[self.powerup]
+        self.powerup_max_time = {"rapidfire": 7, "strength": 16, "clustershot": 10}[self.powerup]
         if time.time() - self.powerup_time > self.powerup_max_time:
             if self.powerup == "rapidfire":
                 self.powerup = None
