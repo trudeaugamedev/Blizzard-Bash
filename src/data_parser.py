@@ -108,4 +108,5 @@ class Parser:
         if "hit" in data:
             self.manager.scene.player.hit_size = data["hit_size"]
             self.manager.scene.player.hit_strength = data["hit"]
+            self.manager.scene.player.hit_powerup = data["hit_powerup"]
             self.manager.scene.frost_vignette.opacity += 70 * abs(data["hit"])

@@ -100,7 +100,8 @@ class Player(VisibleSprite):
 
         self.first_start = True
         self.hit_strength = 0 # The strength another player's snowball hit the player
-        self.hit_size = 0
+        self.hit_size = 0 # The size of the snowball that hit the player (1 for small, 2 for large)
+        self.hit_powerup = None # The powerup the thrower of the snowball had when it hit the player
 
         self.CONST_ACC = 500 # 500 pixels per second squared (physics :P)
         self.SMALL_MAX_SPEED = 30
@@ -307,8 +308,10 @@ class Player(VisibleSprite):
             sound.play()
             self.vel.x = sign(self.hit_strength) * sqrt(abs(self.hit_strength)) * 150
             if not self.scene.waiting and not self.scene.eliminated:
-                self.scene.score -= 1 # Penalty for getting hit (1 for now, may depend on self.hit_size)
+                if self.hit_powerup not in {"rapidfire", "clustershot"}:
+                    self.scene.score -= 1 # Penalty for getting hit (1 for now, may depend on self.hit_size)
             self.hit_strength = self.hit_size = 0
+            self.hit_powerup = None
 
         self.pos.x, _ = clamp(self.pos.x, -2400, 2400)
 
