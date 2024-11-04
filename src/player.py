@@ -306,7 +306,8 @@ class Player(VisibleSprite):
             sound.set_volume(self.hit_strength ** 2 * 0.2)
             sound.play()
             self.vel.x = sign(self.hit_strength) * sqrt(abs(self.hit_strength)) * 150
-            self.scene.score -= 1 # Penalty for getting hit (1 for now, may depend on self.hit_size)
+            if not self.scene.waiting and not self.scene.eliminated:
+                self.scene.score -= 1 # Penalty for getting hit (1 for now, may depend on self.hit_size)
             self.hit_strength = self.hit_size = 0
 
         self.pos.x, _ = clamp(self.pos.x, -2400, 2400)
