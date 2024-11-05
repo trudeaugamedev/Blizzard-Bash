@@ -369,6 +369,7 @@ class Player(VisibleSprite):
                         self.can_throw = True
                     else:
                         self.frame = 4
+                        self.dig_progress.progress = 0
                     self.dig_iterations += 1
         # End player animations
         elif self.frame_group == self.assets.player_dig:
