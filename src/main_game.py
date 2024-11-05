@@ -62,6 +62,7 @@ class MainGame(Scene):
         self.wind_vel = VEC(0, 0)
         self.time_left = None
         self.total_time = 0
+        self.crosshair = 0
 
         self.score = 0
         self.lost = False
@@ -154,13 +155,17 @@ class MainGame(Scene):
             self.draw_waiting_text()
 
         if 0 < self.player.dig_iterations < 3 or self.player.powerup == "rapidfire":
-            assets.snowball_small[0].set_alpha(180)
-            self.manager.screen.blit(assets.snowball_small[0], VEC(pygame.mouse.get_pos()) - VEC(assets.snowball_small[0].get_size()) / 2 + (20, 20))
-            assets.snowball_small[0].set_alpha(255)
+            if self.crosshair != 1:
+                pygame.mouse.set_cursor((7, 7), assets.crosshair_small)
+            self.crosshair = 1
         elif self.player.dig_iterations >= 3:
-            assets.snowball_large[0].set_alpha(180)
-            self.manager.screen.blit(assets.snowball_large[0], VEC(pygame.mouse.get_pos()) - VEC(assets.snowball_large[0].get_size()) / 2 + (24, 24))
-            assets.snowball_large[0].set_alpha(255)
+            if self.crosshair != 2:
+                pygame.mouse.set_cursor((8, 8), assets.crosshair_large)
+            self.crosshair = 2
+        else:
+            if self.crosshair != 0:
+                pygame.mouse.set_cursor((6, 6), assets.crosshair)
+            self.crosshair = 0
 
     def draw_waiting_text(self) -> None:
         text = FONT[54].render("Waiting for game to start...", False, (0, 0, 0))
