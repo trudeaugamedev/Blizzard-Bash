@@ -371,6 +371,13 @@ class Player(VisibleSprite):
                         self.frame = 4
                         self.dig_progress.progress = 0
                     self.dig_iterations += 1
+                elif self.frame <= 7:
+                    if not self.keys[K_SPACE]:
+                        self.frame_group = self.assets.player_idle
+                        self.idle = True
+                        self.frame = 0
+                        self.digging = False
+                        self.can_throw = True
         # End player animations
         elif self.frame_group == self.assets.player_dig:
             if time.time() - self.frame_time > 0.1:
