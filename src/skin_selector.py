@@ -4,6 +4,7 @@ from .button import Button
 from .scene import Scene
 from . import assets
 
+from random import randint
 import pygame
 
 class SkinSelector(VisibleSprite):
@@ -18,16 +19,25 @@ class SkinSelector(VisibleSprite):
         self.skin_tone = self.skin_tones[self.skin_tone_idx]
         self.hat_button_left = Button(self.scene, self.pos + (-35, 5), (30, 30), "<", self.prev_hat, style=False, font_size=32, font_color=(0, 0, 0))
         self.skin_button_left = Button(self.scene, self.pos + (-35, 40), (30, 30), "<", self.prev_skin, style=False, font_size=32, font_color=(0, 0, 0))
-        self.clothes_button_left = Button(self.scene, self.pos + (-35, 85), (30, 30), "<", self.prev_clothe, style=False, font_size=32, font_color=(0, 0, 0))
+        self.clothes_button_left = Button(self.scene, self.pos + (-35, 85), (30, 30), "<", self.prev_clothes, style=False, font_size=32, font_color=(0, 0, 0))
         self.hat_button_right = Button(self.scene, self.pos + (110, 5), (30, 30), ">", self.next_hat, style=False, font_size=32, font_color=(0, 0, 0))
         self.skin_button_right = Button(self.scene, self.pos + (110, 40), (30, 30), ">", self.next_skin, style=False, font_size=32, font_color=(0, 0, 0))
-        self.clothes_button_right = Button(self.scene, self.pos + (110, 85), (30, 30), ">", self.next_clothe, style=False, font_size=32, font_color=(0, 0, 0))
+        self.clothes_button_right = Button(self.scene, self.pos + (110, 85), (30, 30), ">", self.next_clothes, style=False, font_size=32, font_color=(0, 0, 0))
+
+        for _ in range(randint(0, 7)):
+            self.next_hat()
+
+        for _ in range(randint(0, 7)):
+            self.next_clothes()
+
+        for _ in range(randint(0, 4)):
+            self.next_skin()
 
     def next_hat(self) -> None:
         self.hat_hue += 32
         self.hat_hue %= 256
 
-    def next_clothe(self) -> None:
+    def next_clothes(self) -> None:
         self.clothes_hue += 32
         self.clothes_hue %= 256
 
@@ -40,7 +50,7 @@ class SkinSelector(VisibleSprite):
         self.hat_hue -= 32
         self.hat_hue %= 256
 
-    def prev_clothe(self) -> None:
+    def prev_clothes(self) -> None:
         self.clothes_hue -= 32
         self.clothes_hue %= 256
 
