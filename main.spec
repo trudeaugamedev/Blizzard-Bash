@@ -1,8 +1,15 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+from PyInstaller.utils.hooks import collect_all
+import sys
 
 block_cipher = None
-
+if sys.platform == "win32":
+    exe_name = 'blizzard-bash-windows-x64.exe'
+elif sys.platform == "darwin":
+    exe_name = 'blizzard-bash-macos-x64'
+else:
+    exe_name = 'blizzard-bash-linux-x64'
 
 a = Analysis(['main.py'],
              pathex=[],
@@ -24,9 +31,9 @@ exe = EXE(pyz,
           a.scripts,
           a.binaries,
           a.zipfiles,
-          a.datas,  
+          a.datas,
           [],
-          name='main',
+          name=exe_name,
           debug=False,
           bootloader_ignore_signals=False,
           strip=False,
