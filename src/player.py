@@ -50,6 +50,26 @@ class ThrowTrail(VisibleSprite):
             if i % 3: continue # For every 4 calculated points, we draw 1 point
             pygame.draw.circle(self.manager.screen, (0, 0, 0), pos - self.player.camera.offset, 3)
 
+class DigProgress(VisibleSprite):
+    def __init__(self, scene: Scene, player: Player) -> None:
+        super().__init__(scene, Layers.GUI)
+        self.player = player
+        self.pos = player.pos + (0, 25)
+        self.progress = 0
+
+    def update(self) -> None:
+        self.pos = self.player.pos + (0, 25) - (50, 3)
+        if self.player.frame_group == self.player.assets.player_dig:
+            progress = min((self.player.frame - 2) / 6, 1)
+            self.progress += (progress - self.progress) * 15 * self.manager.dt
+        else:
+            self.progress -= self.progress * 25 * self.manager.dt
+
+    def draw(self) -> None:
+        pygame.draw.rect(self.manager.screen, (0, 0, 0), (self.pos - (2, 2) - self.player.camera.offset, (104, 10)), 2)
+        pygame.draw.rect(self.manager.screen, (255, 255, 255), (self.pos - self.player.camera.offset, (100, 6)))
+        pygame.draw.rect(self.manager.screen, (0, 100, 220), (self.pos - self.player.camera.offset, (self.progress * 100, 6)))
+
 class Player(VisibleSprite):
     def __init__(self, scene: Scene) -> None:
         super().__init__(scene, Layers.PLAYER1)
@@ -79,6 +99,7 @@ class Player(VisibleSprite):
         self.digging = False
         self.can_move = True # Actually means if the player is digging
         self.dig_iterations = 0
+        self.dig_progress = DigProgress(self.scene, self)
 
         self.jump_time = time.time()
 
