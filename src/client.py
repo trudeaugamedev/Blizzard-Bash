@@ -12,6 +12,7 @@ from typing import Any
 import asyncio
 import json
 import time
+import sys
 
 from src.data_parser import Parser
 
@@ -105,8 +106,12 @@ class Client:
 
     async def connect(self) -> None:
         print("Coroutine 'connect' started")
-        # self.socket = await ws_client.connect("ws://localhost:1200")
-        self.socket = await ws_client.connect("wss://blizzard-bash-e8a3a44e5011.herokuapp.com")
+        if "--local" in sys.argv or "-l" in sys.argv:
+            self.socket = await ws_client.connect("ws://localhost:1200")
+            print("Connected to local server")
+        else:
+            self.socket = await ws_client.connect("wss://blizzard-bash-e8a3a44e5011.herokuapp.com")
+            print("Connected to remote server")
         print("Coroutine 'connect' completed")
 
     async def main(self) -> None:
