@@ -172,11 +172,6 @@ class Player(VisibleSprite):
         self.manager.screen.blit(self.image, (*(VEC(self.rect.topleft) - self.camera.offset), *self.size))
         self.image.set_alpha(255)
 
-        if self.dig_iterations >= 2 and self.frame_group == self.assets.player_dig and 2 < self.frame < 9:
-            alpha = (sin((time.time() - self.powerup_flash_time) * pi * 3) * 0.5 + 0.5) * 140
-            mask = pygame.mask.from_surface(self.image)
-            self.manager.screen.blit(mask.to_surface(setcolor=(255, 255, 255, alpha), unsetcolor=(0, 0, 0, 0)), VEC(self.rect.topleft) - self.camera.offset)
-
     def update_keys(self) -> None:
         self.keys = pygame.key.get_pressed()
 
