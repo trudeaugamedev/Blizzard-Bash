@@ -232,7 +232,7 @@ class Player(VisibleSprite):
             self.ground_level = Ground2 if self.ground_level == Ground3 else Ground1
             self.on_ground = False
 
-        if self.keys[K_SPACE]:
+        if self.keys[K_SPACE] and self.on_ground:
             self.digging = True
             self.idle = False
             self.throwing = False
