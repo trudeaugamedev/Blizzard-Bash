@@ -48,12 +48,12 @@ class StartMenu(Scene):
         if self.title_linear_progress > 1:
             self.title_linear_progress = 1
         self.title_progress = tween.easeOutBounce(self.title_linear_progress)
-        
+
         self.input_linear_progress += 0.9 * self.manager.dt
         if self.input_linear_progress > 1:
             self.input_linear_progress = 1
         self.input_progress = tween.easeOutExpo(max(0, self.input_linear_progress))
-        
+
         self.button_linear_progress += 0.9 * self.manager.dt
         if self.button_linear_progress > 1:
             self.button_linear_progress = 1
