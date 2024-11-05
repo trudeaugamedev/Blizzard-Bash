@@ -160,7 +160,7 @@ class MainGame(Scene):
             self.crosshair = 1
         elif self.player.dig_iterations >= 3:
             if self.crosshair != 2:
-                pygame.mouse.set_cursor((8, 8), assets.crosshair_large)
+                pygame.mouse.set_cursor((7, 7), assets.crosshair_large)
             self.crosshair = 2
         else:
             if self.crosshair != 0:
