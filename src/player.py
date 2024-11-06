@@ -64,7 +64,7 @@ class DigProgress(VisibleSprite):
 
     def update(self) -> None:
         if self.progress < 0.01:
-            self.snowball_img = assets.snowball_large[0] if self.player.dig_iterations >= 2 else assets.snowball_small[0]
+            self.snowball_img = assets.snowball_large[0] if (self.player.dig_iterations + 1) % 3 == 0 else assets.snowball_small[0]
 
         self.pos = self.player.pos + (0, 25) - (50, 3)
         if self.player.frame_group == self.player.assets.player_dig:
