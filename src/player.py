@@ -62,6 +62,8 @@ class DigProgress(VisibleSprite):
     def update(self) -> None:
         if self.progress < 0.01:
             self.snowball_img = assets.snowball_large[0] if (self.player.dig_iterations + 1) % 3 == 0 else assets.snowball_small[0]
+        if self.player.powerup == "rapidfire":
+            self.snowball_img = assets.snowball_small[0]
 
         self.pos = self.player.pos + (0, 25) - (50, 3)
         if self.player.frame_group == self.player.assets.player_dig:
@@ -80,18 +82,21 @@ class DigProgress(VisibleSprite):
         right = self.pos + (max(self.progress * 100, 0), 3) - self.player.camera.offset
         self.manager.screen.blit(self.snowball_img, right - VEC(self.snowball_img.size) // 2)
 
-        width_sum = 0
-        images = []
-        for frames in self.player.snowball_queue:
-            bound = frames[0].get_bounding_rect()
-            width_sum += bound.width + 6
-            images.append(frames[0].subsurface(bound))
-        width_sum -= 6
-        x = rect.midbottom[0] - width_sum / 2
-        for img in images:
-            size = img.get_size()
-            self.manager.screen.blit(img, (x, rect.midbottom[1] - size[1] // 2 + 24))
-            x += size[0] + 6
+        if self.player.powerup != "rapidfire":
+            width_sum = 0
+            images = []
+            for frames in self.player.snowball_queue:
+                bound = frames[0].get_bounding_rect()
+                width_sum += bound.width + 6
+                images.append(frames[0].subsurface(bound))
+            width_sum -= 6
+            x = rect.midbottom[0] - width_sum / 2
+            for img in images:
+                size = img.get_size()
+                self.manager.screen.blit(img, (x, rect.midbottom[1] - size[1] // 2 + 24))
+                x += size[0] + 6
+        else:
+            self.manager.screen.blit(assets.infinite_snowballs, rect.midbottom - VEC(assets.infinite_snowballs.get_width() // 2, 0) + (0, 16))
 
 class Player(VisibleSprite):
     def __init__(self, scene: Scene) -> None:
@@ -261,7 +266,7 @@ class Player(VisibleSprite):
             self.ground_level = Ground2 if self.ground_level == Ground3 else Ground1
             self.on_ground = False
 
-        if self.keys[K_SPACE] and self.on_ground:
+        if self.keys[K_SPACE] and self.on_ground and self.powerup != "rapidfire":
             self.digging = True
             self.idle = False
             self.throwing = False
@@ -474,6 +479,8 @@ class Player(VisibleSprite):
         if time.time() - self.powerup_time > self.powerup_max_time:
             if self.powerup == "rapidfire":
                 self.powerup = None
+                self.snowball_queue = []
+                self.dig_iterations = 0
                 self.throwing = False
             if self.powerup == "strength":
                 self.powerup = None
