@@ -293,13 +293,13 @@ class Player(VisibleSprite):
                 assets.throw_sound.set_volume(0.2)
                 assets.throw_sound.play()
                 if self.powerup == "clustershot":
-                    size = self.snowball_queue.pop(0)
+                    size = self.snowball_queue.pop()
                     for _ in range(4 if size == assets.snowball_small else 7):
                         self.snowballs.append(Snowball(self.scene, self.sb_vel + VEC(uniform(-180, 180), uniform(-180, 180)), assets.snowball_small))
                     for _ in range(1 if size == assets.snowball_small else 3):
                         self.snowballs.append(Snowball(self.scene, self.sb_vel + VEC(uniform(-180, 180), uniform(-180, 180)), assets.snowball_large))
                 else:
-                    self.snowballs.append(Snowball(self.scene, self.sb_vel, self.snowball_queue.pop(0) if self.powerup != "rapidfire" else assets.snowball_small))
+                    self.snowballs.append(Snowball(self.scene, self.sb_vel, self.snowball_queue.pop() if self.powerup != "rapidfire" else assets.snowball_small))
                 self.dig_iterations -= 1 if self.dig_iterations < 3 else 3
                 self.can_throw = bool(self.snowball_queue)
 
@@ -418,11 +418,11 @@ class Player(VisibleSprite):
                         self.frame = 4
                         self.dig_progress.progress = 0
                     self.dig_iterations += 1
-                    if self.dig_iterations < 3:
+                    if self.dig_iterations % 3 != 0:
                         self.snowball_queue.append(assets.snowball_small)
                     else:
-                        self.snowball_queue.pop(0)
-                        self.snowball_queue.pop(0)
+                        self.snowball_queue.pop()
+                        self.snowball_queue.pop()
                         self.snowball_queue.append(assets.snowball_large)
                 elif self.frame <= 7:
                     if not self.keys[K_SPACE]:
