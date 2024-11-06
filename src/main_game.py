@@ -166,15 +166,15 @@ class MainGame(Scene):
 
         if 0 < self.player.dig_iterations < 3 or self.player.powerup == "rapidfire":
             if self.crosshair != 1:
-                pygame.mouse.set_cursor((7, 7), assets.crosshair_small)
+                pygame.mouse.set_cursor((21, 21), assets.crosshair_small)
             self.crosshair = 1
         elif self.player.dig_iterations >= 3:
             if self.crosshair != 2:
-                pygame.mouse.set_cursor((7, 7), assets.crosshair_large)
+                pygame.mouse.set_cursor((21, 21), assets.crosshair_large)
             self.crosshair = 2
         else:
             if self.crosshair != 0:
-                pygame.mouse.set_cursor((6, 6), assets.crosshair)
+                pygame.mouse.set_cursor((18, 18), assets.crosshair)
             self.crosshair = 0
 
     def draw_waiting_text(self) -> None:
