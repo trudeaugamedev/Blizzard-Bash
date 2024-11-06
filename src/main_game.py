@@ -164,19 +164,6 @@ class MainGame(Scene):
         if self.waiting:
             self.draw_waiting_text()
 
-        if 0 < self.player.dig_iterations < 3 or self.player.powerup == "rapidfire":
-            if self.crosshair != 1:
-                pygame.mouse.set_cursor((21, 21), assets.crosshair_small)
-            self.crosshair = 1
-        elif self.player.dig_iterations >= 3:
-            if self.crosshair != 2:
-                pygame.mouse.set_cursor((21, 21), assets.crosshair_large)
-            self.crosshair = 2
-        else:
-            if self.crosshair != 0:
-                pygame.mouse.set_cursor((18, 18), assets.crosshair)
-            self.crosshair = 0
-
     def draw_waiting_text(self) -> None:
         text = FONT[54].render("Waiting for game to start...", False, (0, 0, 0))
         self.manager.screen.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 - text.get_height() // 2))
