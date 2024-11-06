@@ -405,7 +405,7 @@ class Player(VisibleSprite):
         # Play digging animations
         if self.digging and self.on_ground:
             self.frame_group = self.assets.player_dig
-            if time.time() - self.frame_time > 0.1:
+            if time.time() - self.frame_time > (0.1 if self.dig_iterations < 3 else (self.dig_iterations - 2) * 0.05 + 0.1):
                 # 0 - 9 frames, repeat fram 4 - 8
                 self.frame_time = time.time()
                 self.frame += 1
