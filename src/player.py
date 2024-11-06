@@ -215,9 +215,9 @@ class Player(VisibleSprite):
             self.idle = True
 
         if self.can_move:
-            self.vel.x -= clamp(sign(self.vel.x) * self.vel.x ** 2 * 0.01 * self.manager.dt, -1000, 1000)[0]
+            self.vel.x *= 0.12 ** self.manager.dt
         else:
-            self.vel.x -= clamp(sign(self.vel.x) * self.vel.x ** 2 * 0.2 * self.manager.dt, -1000, 1000)[0]
+            self.vel.x *= 0.0001 ** self.manager.dt
 
         if self.on_ground:
             self.jump_time = time.time()
@@ -330,7 +330,7 @@ class Player(VisibleSprite):
             sound = choice(assets.hit_sounds)
             sound.set_volume(self.hit_strength ** 2 * 0.2)
             sound.play()
-            self.vel.x = sign(self.hit_strength) * sqrt(abs(self.hit_strength)) * 150
+            self.vel.x = sign(self.hit_strength) * abs(self.hit_strength) * 100
             if not self.scene.waiting and not self.scene.eliminated:
                 if self.hit_powerup not in {"rapidfire", "clustershot"}:
                     self.scene.score -= 1 # Penalty for getting hit (1 for now, may depend on self.hit_size)
