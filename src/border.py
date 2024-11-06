@@ -25,9 +25,9 @@ class Border(VisibleSprite):
         self.image = pygame.Surface((30, 4000), SRCALPHA)
         for i in range(0, 4000, 30):
             self.image.blit(self.segment, (0, i))
-        self.image.set_alpha(70)
+        self.image.set_alpha(120)
 
-        self.pos = VEC(side * 2400 - self.segment.get_height() // 2, -2000)
+        self.pos = VEC(2400 - self.segment.get_height() // 2, -2000)
         Border.x = self.pos.x
 
     def update(self) -> None:

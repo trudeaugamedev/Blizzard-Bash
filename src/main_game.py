@@ -108,20 +108,14 @@ class MainGame(Scene):
     def draw(self) -> None:
         self.manager.screen.blit(assets.background, (0, 0))
 
-        screen_x = Border.x + assets.border.width // 2 - self.player.camera.offset.x
-        if screen_x < WIDTH:
-            alpha_surf = pygame.Surface((WIDTH - screen_x, HEIGHT))
-            alpha_surf.fill((180, 0, 0))
-            alpha_surf.set_alpha(40)
-            self.manager.screen.blit(alpha_surf, (screen_x, 0))
-        screen_x = -Border.x + assets.border.width // 2 - self.player.camera.offset.x
-        if screen_x > 0:
-            alpha_surf = pygame.Surface((screen_x, HEIGHT))
-            alpha_surf.fill((180, 0, 0))
-            alpha_surf.set_alpha(40)
-            self.manager.screen.blit(alpha_surf, (0, 0))
-
         super().draw()
+
+        screen_x = int(Border.x - self.player.camera.offset.x)
+        for i, x in enumerate(range(screen_x, WIDTH, 15)):
+            self.manager.screen.fill((0, min(255, 20 + i * 2), min(255, 20 + i * 2)), (x, 0, 15, HEIGHT), special_flags=pygame.BLEND_SUB)
+        screen_x = int(-Border.x + assets.border.width - self.player.camera.offset.x)
+        for i, x in enumerate(range(screen_x - 15, -30, -15)):
+            self.manager.screen.fill((0, min(255, 20 + i * 2), min(255, 20 + i * 2)), (x, 0, 15, HEIGHT), special_flags=pygame.BLEND_SUB)
 
         self.manager.screen.blit(FONT[60].render(f"Score: {self.score}", False, TEXT_COLOR), (20, 0))
         text = FONT[60].render(f"Score: {self.score}", False, TEXT_COLOR)

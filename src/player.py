@@ -12,8 +12,8 @@ import time
 from .utils import intvec, snap, clamp, clamp_max, snap, sign, shadow, inttup
 from .constants import VEC, SCR_DIM, GRAVITY, PIXEL_SIZE, TILE_SIZE
 from .ground import Ground1, Ground2, Ground3
+from .snowball import Snowball, SelfSnowball
 from .sprite import VisibleSprite, Layers
-from .snowball import Snowball
 from .border import Border
 from . import assets
 
@@ -124,6 +124,8 @@ class Player(VisibleSprite):
         self.hit_strength = 0 # The strength another player's snowball hit the player
         self.hit_size = 0 # The size of the snowball that hit the player (1 for small, 2 for large)
         self.hit_powerup = None # The powerup the thrower of the snowball had when it hit the player
+
+        self.self_snowball_time = time.time()
 
         self.CONST_ACC = 500 # 500 pixels per second squared (physics :P)
         self.SMALL_MAX_SPEED = 30
@@ -338,7 +340,23 @@ class Player(VisibleSprite):
             self.hit_strength = self.hit_size = 0
             self.hit_powerup = None
 
-        self.pos.x, _ = clamp(self.pos.x, -Border.x, Border.x)
+        if self.pos.x > Border.x:
+            diff = self.pos.x - Border.x
+            self.vel.x *= max(1 - diff / 800, 0) ** self.manager.dt
+            if self.pos.x > Border.x + 800:
+                self.pos.x = Border.x + 800
+                self.vel.x = 0
+        elif self.pos.x < -Border.x:
+            diff = -self.pos.x - Border.x
+            self.vel.x *= max(1 - diff / 800, 0) ** self.manager.dt
+            if self.pos.x < -Border.x - 800:
+                self.pos.x = -Border.x - 800
+                self.vel.x = 0
+        if self.pos.x > Border.x or self.pos.x < -Border.x:
+            if time.time() - self.self_snowball_time > 800 / diff * 0.06:
+                self.snowballs.append(SelfSnowball(self.scene, VEC(0, 0), choice([assets.snowball_small, assets.snowball_large])))
+                self.snowballs[-1].pos = self.pos - (0, 400) - self.scene.wind_vel * 0.25 + (self.vel.x * 0.4, 0) + (uniform(-80, 80), 0)
+                self.self_snowball_time = time.time()
 
         self.can_move = self.frame_group != self.assets.player_dig and not self.digging
 
@@ -434,14 +452,22 @@ class Player(VisibleSprite):
 
     def update_camera(self) -> None:
         if self.snowballs:
-            self.camera.follow = 1.5
-            self.camera.extra_offset = VEC((self.snowballs[-1].pos - self.pos) * self.snowballs[-1].pos.distance_to(self.pos) / 2500)
-            self.camera.extra_offset.x -= self.vel.x * 2 if sign(self.camera.tick_offset.x) == -sign(self.vel.x) else 0
-            self.camera.update(self.snowballs[-1].pos)
-        else:
+            i = len(self.snowballs) - 1
+            last = self.snowballs[i]
+            while isinstance(last, SelfSnowball):
+                i -= 1
+                if i < 0:
+                    break
+                last = self.snowballs[i]
+        if not self.snowballs or isinstance(last, SelfSnowball):
             self.camera.follow = 3
             if self.throwing:
                 self.camera.extra_offset = -VEC(self.sb_vel.x * 0.15, 0)
             else:
                 self.camera.extra_offset = VEC(0, self.pos.y * 0.3 + 80)
             self.camera.update(self.pos - (0, self.pos.y * 0.3 + 80))
+        else:
+            self.camera.follow = 1.5
+            self.camera.extra_offset = VEC((last.pos - self.pos) * last.pos.distance_to(self.pos) / 2500)
+            self.camera.extra_offset.x -= self.vel.x * 2 if sign(self.camera.tick_offset.x) == -sign(self.vel.x) else 0
+            self.camera.update(last.pos)

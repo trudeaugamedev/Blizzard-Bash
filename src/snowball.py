@@ -70,6 +70,19 @@ class Snowball(VisibleSprite):
             self.kill()
             return
 
+        if self.collide():
+            return
+
+        for powerup in Powerup.instances.values():
+            if powerup.rect.colliderect(self.real_rect):
+                self.player.powerup = powerup.type
+                self.player.powerup_time = time.time()
+                self.client.irreg_data.put({"id": powerup.id, "powerup": 1}) # powerup key to uniquify the message
+
+        if self.pos.y > 1000:
+            self.kill()
+
+    def collide(self) -> bool:
         for player in self.manager.other_players.values():
             if player.real_rect.colliderect(self.real_rect):
                 sound = choice(assets.hit_sounds)
@@ -88,16 +101,8 @@ class Snowball(VisibleSprite):
                     "hit_powerup": self.player.powerup,
                     "id": player.id
                 })
-                return
-
-        for powerup in Powerup.instances.values():
-            if powerup.rect.colliderect(self.real_rect):
-                self.player.powerup = powerup.type
-                self.player.powerup_time = time.time()
-                self.client.irreg_data.put({"id": powerup.id, "powerup": 1}) # powerup key to uniquify the message
-
-        if self.pos.y > 1000:
-            self.kill()
+                return True
+        return False
 
     def draw(self) -> None:
         self.manager.screen.blit(shadow(self.image), VEC(self.rect.topleft) - self.scene.player.camera.offset + (3, 3), special_flags=BLEND_RGB_SUB)
@@ -108,3 +113,16 @@ class Snowball(VisibleSprite):
 
     def kill(self) -> None:
         self.landed = True
+
+class SelfSnowball(Snowball):
+    def collide(self) -> bool:
+        if self.scene.player.real_rect.colliderect(self.real_rect):
+            sound = choice(assets.hit_sounds)
+            sound.set_volume(self.score ** 2 * 0.2)
+            sound.play()
+            self.kill()
+            self.scene.player.vel.x = self.score * choice([-1, 1]) * 100
+            if not self.scene.waiting and not self.scene.eliminated:
+                self.scene.score -= 1
+            return True
+        return False
