@@ -13,6 +13,9 @@ from .sprite import VisibleSprite, Layers
 from . import assets
 
 class Border(VisibleSprite):
+    shrink = 0
+    x = 0
+
     def __init__(self, scene: Scene, side: int) -> None:
         super().__init__(scene, Layers.BORDER)
         self.side = side
@@ -25,11 +28,18 @@ class Border(VisibleSprite):
         self.image.set_alpha(70)
 
         self.pos = VEC(side * 2400 - self.segment.get_height() // 2, -2000)
+        Border.x = self.pos.x
 
     def update(self) -> None:
         self.offset += 60 * self.manager.dt
         if self.offset > 30:
             self.offset = 0
+        self.pos.x = Border.x * self.side
+
+    @classmethod
+    def update_x(cls, dt: float) -> None:
+        target_x = (2400 - Border.shrink) - assets.border.get_height() // 2
+        Border.x += (target_x - Border.x) * 5 * dt
 
     def draw(self) -> None:
         self.manager.screen.blit(self.image, self.pos + (0, self.offset) - self.scene.player.camera.offset)

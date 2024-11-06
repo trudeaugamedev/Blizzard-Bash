@@ -94,6 +94,8 @@ class MainGame(Scene):
 
         if self.time_left is not None:
             self.total_time = max(self.total_time, self.time_left)
+            Border.shrink = (1 - self.time_left / self.total_time) * 1600
+            Border.update_x(self.manager.dt)
 
         if KEYDOWN in self.manager.events and self.manager.events[KEYDOWN].key == K_RETURN:
             self.manager.ready = True

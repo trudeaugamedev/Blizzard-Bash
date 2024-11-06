@@ -14,6 +14,7 @@ from .constants import VEC, SCR_DIM, GRAVITY, PIXEL_SIZE, TILE_SIZE
 from .ground import Ground1, Ground2, Ground3
 from .sprite import VisibleSprite, Layers
 from .snowball import Snowball
+from .border import Border
 from . import assets
 
 class Camera:
@@ -337,7 +338,7 @@ class Player(VisibleSprite):
             self.hit_strength = self.hit_size = 0
             self.hit_powerup = None
 
-        self.pos.x, _ = clamp(self.pos.x, -2400, 2400)
+        self.pos.x, _ = clamp(self.pos.x, -Border.x, Border.x)
 
         self.can_move = self.frame_group != self.assets.player_dig and not self.digging
 
