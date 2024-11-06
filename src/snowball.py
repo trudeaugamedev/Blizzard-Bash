@@ -81,7 +81,7 @@ class Snowball(VisibleSprite):
                 if not self.scene.waiting and not self.scene.eliminated:
                     self.scene.score += self.score * (2 if self.player.powerup == "strength" else 1)
                     self.client.queue_data("score", self.scene.score)
-                hit_strength = self.score * sign(self.vel.x) * (3 if self.player.powerup == "strength" else 1)
+                hit_strength = (2 + self.score + (self.score + 6 if self.player.powerup == "strength" else 0)) * sign(self.vel.x)
                 self.client.irreg_data.put({
                     "hit": hit_strength,
                     "hit_size": 1 if self.type == assets.snowball_small else 2,
