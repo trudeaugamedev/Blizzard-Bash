@@ -73,12 +73,25 @@ class DigProgress(VisibleSprite):
             self.progress -= self.progress * 25 * self.manager.dt
 
     def draw(self) -> None:
-        pygame.draw.rect(self.manager.screen, (0, 0, 0), (self.pos - (2, 2) - self.player.camera.offset, (104, 10)), 2)
+        rect = pygame.draw.rect(self.manager.screen, (0, 0, 0), (self.pos - (2, 2) - self.player.camera.offset, (104, 10)), 2)
         pygame.draw.rect(self.manager.screen, (255, 255, 255), (self.pos - self.player.camera.offset, (100, 6)))
         pygame.draw.rect(self.manager.screen, (0, 100, 220), (self.pos - self.player.camera.offset, (self.progress * 100, 6)))
 
         right = self.pos + (max(self.progress * 100, 0), 3) - self.player.camera.offset
         self.manager.screen.blit(self.snowball_img, right - VEC(self.snowball_img.size) // 2)
+
+        width_sum = 0
+        images = []
+        for frames in self.player.snowball_queue:
+            bound = frames[0].get_bounding_rect()
+            width_sum += bound.width + 6
+            images.append(frames[0].subsurface(bound))
+        width_sum -= 6
+        x = rect.midbottom[0] - width_sum / 2
+        for img in images:
+            size = img.get_size()
+            self.manager.screen.blit(img, (x, rect.midbottom[1] - size[1] // 2 + 24))
+            x += size[0] + 6
 
 class Player(VisibleSprite):
     def __init__(self, scene: Scene) -> None:
