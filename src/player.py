@@ -18,15 +18,14 @@ from .border import Border
 from . import assets
 
 class Camera:
-    def __init__(self, scene: Scene, pos: tuple[int, int], extra_offset: tuple[int, int], follow: int):
+    def __init__(self, scene: Scene, pos: tuple[int, int], follow: int):
         self.manager = scene.manager
-        self.extra_offset = VEC(extra_offset)
         self.follow = follow
-        self.float_offset = VEC(pos) - SCR_DIM // 2 - extra_offset
+        self.float_offset = VEC(pos) - SCR_DIM // 2
         self.offset = intvec(self.float_offset)
 
     def update(self, pos: tuple[int, int]):
-        self.tick_offset = pos - self.offset - SCR_DIM // 2 - self.extra_offset
+        self.tick_offset = pos - self.offset - SCR_DIM // 2
         self.tick_offset = snap(self.tick_offset, VEC(), VEC(1, 1))
         self.float_offset += self.tick_offset * self.follow * self.manager.dt
         self.offset = intvec(self.float_offset)
@@ -159,7 +158,7 @@ class Player(VisibleSprite):
         self.THROW_SPEED = 900
         self.SB_OFFSET = self.size // 2 - (0, 10)
 
-        self.camera = Camera(self.scene, self.pos, (0, 100), 5)
+        self.camera = Camera(self.scene, self.pos, 5)
 
     def update(self) -> None:
         self.update_keys()
@@ -492,13 +491,12 @@ class Player(VisibleSprite):
                 last = self.snowballs[i]
         if not self.snowballs or isinstance(last, SelfSnowball):
             self.camera.follow = 3
+            pos = self.pos - (0, self.pos.y * 0.4 + 140)
             if self.throwing:
-                self.camera.extra_offset = -VEC(self.sb_vel.x * 0.15, 0)
-            else:
-                self.camera.extra_offset = VEC(0, self.pos.y * 0.3 + 80)
-            self.camera.update(self.pos - (0, self.pos.y * 0.3 + 80))
+                pos += VEC(self.sb_vel.x * 0.15, 0)
+            self.camera.update(pos)
         else:
-            self.camera.follow = 1.5
-            self.camera.extra_offset = VEC((last.pos - self.pos) * last.pos.distance_to(self.pos) / 2500)
-            self.camera.extra_offset.x -= self.vel.x * 2 if sign(self.camera.tick_offset.x) == -sign(self.vel.x) else 0
-            self.camera.update(last.pos)
+            self.camera.follow = 2
+            diff = (last.pos - self.pos) / 2
+            pos = self.pos + diff.clamp_magnitude(450)
+            self.camera.update(pos)
