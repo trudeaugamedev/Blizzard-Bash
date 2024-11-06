@@ -13,6 +13,7 @@ import asyncio
 import json
 import time
 import sys
+import ssl
 
 from src.data_parser import Parser
 
@@ -23,6 +24,7 @@ class ManualExit(Exception):
 class Client:
     def __init__(self, manager: GameManager) -> None:
         self.manager = manager
+        ssl._create_default_https_context = ssl._create_unverified_context
         self.reset()
 
     def reset(self) -> None:
