@@ -89,7 +89,8 @@ class DigProgress(VisibleSprite):
         right = self.pos + (max(self.progress * 100, 0), 3) - self.player.camera.offset
         self.manager.screen.blit(self.snowball_img, right - VEC(self.snowball_img.size) // 2)
 
-        # if not self.started_seek: return
+        if not self.started_seek: return
+        right = self.pos + (100, 3) - self.player.camera.offset
         seek_pos = right + (pygame.mouse.get_pos() - right) * self.seek_progress
         self.manager.screen.blit(self.snowball_img, seek_pos - VEC(self.snowball_img.size) // 2)
 
