@@ -58,8 +58,6 @@ class DigProgress(VisibleSprite):
         self.progress = 0
 
         self.snowball_img = assets.snowball_small[0]
-        self.started_seek = False
-        self.seek_progress = 0
 
     def update(self) -> None:
         if self.progress < 0.01:
@@ -74,12 +72,6 @@ class DigProgress(VisibleSprite):
         else:
             self.progress -= self.progress * 25 * self.manager.dt
 
-        if self.started_seek:
-            self.seek_progress += (1 - self.seek_progress) * 12 * self.manager.dt
-            if self.seek_progress > 0.95:
-                self.seek_progress = 0
-                self.started_seek = False
-
     def draw(self) -> None:
         pygame.draw.rect(self.manager.screen, (0, 0, 0), (self.pos - (2, 2) - self.player.camera.offset, (104, 10)), 2)
         pygame.draw.rect(self.manager.screen, (255, 255, 255), (self.pos - self.player.camera.offset, (100, 6)))
@@ -87,11 +79,6 @@ class DigProgress(VisibleSprite):
 
         right = self.pos + (max(self.progress * 100, 0), 3) - self.player.camera.offset
         self.manager.screen.blit(self.snowball_img, right - VEC(self.snowball_img.size) // 2)
-
-        if not self.started_seek: return
-        right = self.pos + (100, 3) - self.player.camera.offset
-        seek_pos = right + (pygame.mouse.get_pos() - right) * self.seek_progress
-        self.manager.screen.blit(self.snowball_img, seek_pos - VEC(self.snowball_img.size) // 2)
 
 class Player(VisibleSprite):
     def __init__(self, scene: Scene) -> None:
