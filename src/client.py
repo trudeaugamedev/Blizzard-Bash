@@ -39,6 +39,7 @@ class Client:
             "flip": None,
             "frame": None,
             "snowballs": None,
+            "powerup": None,
             "score": None,
         }
         self.modified_data = {key: True for key in self.pers_data}

@@ -4,7 +4,9 @@ if TYPE_CHECKING:
     from scene import Scene
 
 from pygame.locals import BLEND_RGB_SUB
+from math import sin, pi
 import pygame
+import time
 
 from .constants import VEC, FONT, PIXEL_SIZE, WIDTH
 from .ground import Ground1, Ground2, Ground3
@@ -35,6 +37,8 @@ class OtherPlayer(VisibleSprite):
         self.score = 0
         self.name = ""
         self.arrow = OtherArrow(self.scene, self)
+        self.powerup = -1
+        self.powerup_flash_time = time.time()
 
     def update(self) -> None:
         self.rect = self.image.get_rect(midbottom=self.pos)
@@ -72,7 +76,19 @@ class OtherPlayer(VisibleSprite):
         if self.rect.right - self.scene.player.camera.offset.x < -20 or self.rect.left - self.scene.player.camera.offset.x > WIDTH + 20: return
 
         self.manager.screen.blit(shadow(self.image), VEC(self.rect.topleft) - self.scene.player.camera.offset + (3, 3), special_flags=BLEND_RGB_SUB)
+
+        if self.powerup != -1:
+            color = [(63, 134, 165), (233, 86, 86), (78, 180, 93)][self.powerup]
+            alpha = (sin((time.time() - self.powerup_flash_time) * pi * 3) * 0.5 + 0.5) * 255
+            mask = pygame.mask.from_surface(self.image)
+            powerup_overlay = mask.scale(VEC(mask.get_size()) + (20, 14)).to_surface(setcolor=(*color, alpha), unsetcolor=(0, 0, 0, 0))
+            self.manager.screen.blit(powerup_overlay, VEC(self.rect.topleft) - (10, 7) - self.scene.player.camera.offset)
+
         self.manager.screen.blit(self.image, VEC(self.rect.topleft) - self.scene.player.camera.offset)
+
+        if self.powerup != -1:
+            powerup_overlay.set_alpha(100)
+            self.manager.screen.blit(powerup_overlay, VEC(self.rect.topleft) - (10, 7) - self.scene.player.camera.offset)
 
         text = FONT[28].render(f"{self.score}", False, (0, 0, 0))
         pos = VEC(self.rect.midtop) - (text.get_width() // 2, text.get_height() + 5)

@@ -149,6 +149,7 @@ class Player(VisibleSprite):
         self.client.queue_data("rot", int(self.rotation))
         self.client.queue_data("flip", self.flip)
         self.client.queue_data("frame", self.assets.player.index(self.orig_image))
+        self.client.queue_data("powerup", ["rapidfire", "strength", "clustershot"].index(self.powerup) if self.powerup else -1)
 
         snowballs = []
         for snowball in self.snowballs:
@@ -161,16 +162,23 @@ class Player(VisibleSprite):
         self.client.queue_data("snowballs", snowballs)
 
     def draw(self) -> None:
+        self.manager.screen.blit(shadow(self.image), VEC(self.rect.topleft) - self.camera.offset + (3, 3), special_flags=BLEND_RGB_SUB)
+
         if self.powerup:
+            color = {"rapidfire": (63, 134, 165), "strength": (233, 86, 86), "clustershot": (78, 180, 93)}[self.powerup]
             alpha = (sin((time.time() - self.powerup_flash_time) * pi * 3) * 0.5 + 0.5) * 255
             mask = pygame.mask.from_surface(self.image)
-            self.manager.screen.blit(mask.scale(VEC(mask.get_size()) + (20, 14)).to_surface(setcolor=(140, 230, 255, alpha), unsetcolor=(0, 0, 0, 0)), VEC(self.rect.topleft) - (10, 7) - self.camera.offset)
+            powerup_overlay = mask.scale(VEC(mask.get_size()) + (20, 14)).to_surface(setcolor=(*color, alpha), unsetcolor=(0, 0, 0, 0))
+            self.manager.screen.blit(powerup_overlay, VEC(self.rect.topleft) - (10, 7) - self.camera.offset)
 
-        self.manager.screen.blit(shadow(self.image), VEC(self.rect.topleft) - self.camera.offset + (3, 3), special_flags=BLEND_RGB_SUB)
         if self.scene.eliminated:
             self.image.set_alpha(80)
         self.manager.screen.blit(self.image, (*(VEC(self.rect.topleft) - self.camera.offset), *self.size))
         self.image.set_alpha(255)
+
+        if self.powerup:
+            powerup_overlay.set_alpha(100)
+            self.manager.screen.blit(powerup_overlay, VEC(self.rect.topleft) - (10, 7) - self.camera.offset)
 
     def update_keys(self) -> None:
         self.keys = pygame.key.get_pressed()
