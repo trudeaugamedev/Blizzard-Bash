@@ -47,6 +47,8 @@ class Powerup(VisibleSprite):
 
         self.rect = pygame.Rect(self.pos - (12, 12), self.size + (24, 24))
         if self.rect.colliderect(self.scene.player.real_rect):
+            if self.scene.player.powerup == "rapidfire":
+                self.scene.player.throwing = False
             self.scene.player.powerup = self.type
             self.scene.player.powerup_time = time.time()
             self.client.irreg_data.put({"id": self.id, "powerup": 1}) # powerup key to uniquify the message

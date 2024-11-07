@@ -4,7 +4,7 @@ if TYPE_CHECKING:
     from scene import Scene
 
 from random import uniform, choice
-from math import sin, pi, sqrt
+from math import sin, pi, ceil
 from pygame.locals import *
 import pygame
 import time
@@ -35,20 +35,24 @@ class ThrowTrail(VisibleSprite):
         super().__init__(scene, Layers.THROW_TRAIL)
         self.player = player
 
+
     def update(self) -> None:
         ...
 
     def draw(self) -> None:
         if not self.player.throwing: return
-        factor = 0.015 # Basically how accurate we want the calculation to be, the distance factor between two points
+        factor = 0.01 # Basically how accurate we want the calculation to be, the distance factor between two points
         pos = VEC(self.player.rect.topleft) + self.player.SB_OFFSET
         vel = self.player.sb_vel.copy()
-        for i in range(60): # Number of points on the parabola that will be calculated
+        for i in range(100): # Number of points on the parabola that will be calculated
             vel.y += GRAVITY * factor
             vel += self.scene.wind_vel * factor
             pos += vel * factor
             if i % 3: continue # For every 4 calculated points, we draw 1 point
-            pygame.draw.circle(self.manager.screen, (0, 0, 0), pos - self.player.camera.offset, 3)
+            r = int((1 - i / 100) * 8)
+            circle = pygame.Surface((r * 2 + 1, r * 2 + 1))
+            pygame.draw.aacircle(circle, (i / 100 * 140 + 30,) * 3, (r, r), r, 3)
+            self.manager.screen.blit(circle, pos - self.player.camera.offset - (r, r), special_flags=BLEND_RGB_SUB)
 
 class DigProgress(VisibleSprite):
     def __init__(self, scene: Scene, player: Player) -> None:
@@ -304,8 +308,11 @@ class Player(VisibleSprite):
                         self.snowballs.append(Snowball(self.scene, self.sb_vel + VEC(uniform(-180, 180), uniform(-180, 180)), assets.snowball_large))
                 else:
                     self.snowballs.append(Snowball(self.scene, self.sb_vel, self.snowball_queue.pop() if self.powerup != "rapidfire" else assets.snowball_small))
-                self.dig_iterations -= 1 if self.dig_iterations < 3 else 3
-                self.can_throw = bool(self.snowball_queue)
+                if self.powerup != "rapidfire":
+                    self.dig_iterations -= 1 if self.dig_iterations < 3 else 3
+                    self.can_throw = bool(self.snowball_queue)
+                else:
+                    self.can_throw = True
 
     def update_position(self) -> None:
         centerx = int(self.rect.centerx // PIXEL_SIZE * PIXEL_SIZE)
@@ -479,8 +486,6 @@ class Player(VisibleSprite):
         if time.time() - self.powerup_time > self.powerup_max_time:
             if self.powerup == "rapidfire":
                 self.powerup = None
-                self.snowball_queue = []
-                self.dig_iterations = 0
                 self.throwing = False
             if self.powerup == "strength":
                 self.powerup = None
