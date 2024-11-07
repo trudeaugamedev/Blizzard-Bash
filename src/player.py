@@ -308,8 +308,11 @@ class Player(VisibleSprite):
                         self.snowballs.append(Snowball(self.scene, self.sb_vel + VEC(uniform(-180, 180), uniform(-180, 180)), assets.snowball_large))
                 else:
                     self.snowballs.append(Snowball(self.scene, self.sb_vel, self.snowball_queue.pop() if self.powerup != "rapidfire" else assets.snowball_small))
-                self.dig_iterations -= 1 if self.dig_iterations < 3 else 3
-                self.can_throw = bool(self.snowball_queue)
+                if self.powerup != "rapidfire":
+                    self.dig_iterations -= 1 if self.dig_iterations < 3 else 3
+                    self.can_throw = bool(self.snowball_queue)
+                else:
+                    self.can_throw = True
 
     def update_position(self) -> None:
         centerx = int(self.rect.centerx // PIXEL_SIZE * PIXEL_SIZE)
@@ -483,8 +486,6 @@ class Player(VisibleSprite):
         if time.time() - self.powerup_time > self.powerup_max_time:
             if self.powerup == "rapidfire":
                 self.powerup = None
-                self.snowball_queue = []
-                self.dig_iterations = 0
                 self.throwing = False
             if self.powerup == "strength":
                 self.powerup = None
