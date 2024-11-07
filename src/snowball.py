@@ -136,8 +136,8 @@ class SelfSnowball(Snowball):
 # A new class of snowball that calls an airstrike    
 class AirstrikeSnowball(Snowball):
     def kill(self) -> None:
-        for _ in range(10):
-            self.player.snowballs.append(Snowball(self.scene, VEC(uniform(-180, 180), uniform(-180, 180)), choice([assets.snowball_small, assets.snowball_large])))
+        for _ in range(30):
+            self.player.snowballs.append(Snowball(self.scene, VEC(uniform(-180, 180), uniform(0, 600)), assets.snowball_airstrike))
             self.player.snowballs[-1].pos = self.pos - (0, 1600) - self.scene.wind_vel * 1 + (uniform(-80, 80), 0)
             self.player.powerup = None
         self.landed = True
