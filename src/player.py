@@ -307,9 +307,9 @@ class Player(VisibleSprite):
                     for _ in range(1 if size == assets.snowball_small else 3):
                         self.snowballs.append(Snowball(self.scene, self.sb_vel + VEC(uniform(-180, 180), uniform(-180, 180)), assets.snowball_large))
                 else:
-                    if self.dig_iterations >= 9:
-                        self.snowballs.append(AirstrikeSnowball(self.scene, self.sb_vel, self.snowball_queue.pop() if self.powerup != "rapidfire" else assets.snowball_small))
-                        self.dig_iterations -= 9
+                    if self.snowball_queue[-1] == assets.snowball_airstrike and self.powerup != "rapidfire":
+                        self.snowballs.append(AirstrikeSnowball(self.scene, self.sb_vel, self.snowball_queue.pop()))
+                        self.dig_iterations -= 6
                     else:
                         self.snowballs.append(Snowball(self.scene, self.sb_vel, self.snowball_queue.pop() if self.powerup != "rapidfire" else assets.snowball_small))
                 if self.powerup != "rapidfire":
@@ -439,7 +439,7 @@ class Player(VisibleSprite):
                         self.snowball_queue.pop()
                         self.snowball_queue.pop()
                         self.snowball_queue.append(assets.snowball_large)
-                    else:
+                    elif self.dig_iterations % 9 == 0:
                         self.snowball_queue.pop()
                         self.snowball_queue.pop()
                         self.snowball_queue.pop()
