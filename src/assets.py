@@ -167,6 +167,7 @@ player = player_idle.elements + player_idle_l.elements + player_idle_s.elements 
 
 snowball_large = Frames("snowball", "snowball_large_")
 snowball_small = Frames("snowball", "snowball_small_")
+snowball_airstrike = Frames("snowball", "snowball_air_")
 
 pygame.display.quit()
 

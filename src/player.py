@@ -12,7 +12,7 @@ import time
 from .utils import intvec, snap, clamp, clamp_max, snap, sign, shadow, inttup
 from .constants import VEC, SCR_DIM, GRAVITY, PIXEL_SIZE, TILE_SIZE
 from .ground import Ground1, Ground2, Ground3
-from .snowball import Snowball, SelfSnowball
+from .snowball import Snowball, SelfSnowball, AirstrikeSnowball
 from .sprite import VisibleSprite, Layers
 from .border import Border
 from . import assets
@@ -307,7 +307,11 @@ class Player(VisibleSprite):
                     for _ in range(1 if size == assets.snowball_small else 3):
                         self.snowballs.append(Snowball(self.scene, self.sb_vel + VEC(uniform(-180, 180), uniform(-180, 180)), assets.snowball_large))
                 else:
-                    self.snowballs.append(Snowball(self.scene, self.sb_vel, self.snowball_queue.pop() if self.powerup != "rapidfire" else assets.snowball_small))
+                    if self.dig_iterations >= 9:
+                        self.snowballs.append(AirstrikeSnowball(self.scene, self.sb_vel, self.snowball_queue.pop() if self.powerup != "rapidfire" else assets.snowball_small))
+                        self.dig_iterations -= 9
+                    else:
+                        self.snowballs.append(Snowball(self.scene, self.sb_vel, self.snowball_queue.pop() if self.powerup != "rapidfire" else assets.snowball_small))
                 if self.powerup != "rapidfire":
                     self.dig_iterations -= 1 if self.dig_iterations < 3 else 3
                     self.can_throw = bool(self.snowball_queue)
@@ -431,10 +435,16 @@ class Player(VisibleSprite):
                     self.dig_iterations += 1
                     if self.dig_iterations % 3 != 0:
                         self.snowball_queue.append(assets.snowball_small)
-                    else:
+                    elif self.dig_iterations % 9 != 0:
                         self.snowball_queue.pop()
                         self.snowball_queue.pop()
                         self.snowball_queue.append(assets.snowball_large)
+                    else:
+                        self.snowball_queue.pop()
+                        self.snowball_queue.pop()
+                        self.snowball_queue.pop()
+                        self.snowball_queue.pop()
+                        self.snowball_queue.append(assets.snowball_airstrike)
                 elif self.frame <= 7:
                     if not self.keys[K_SPACE]:
                         self.frame_group = self.assets.player_idle
