@@ -68,6 +68,7 @@ powerup_icons = {
     "rapidfire": load_img(f"{TEXTURES}/powerup/rapidfire.png", alpha=False),
     "strength": load_img(f"{TEXTURES}/powerup/strength.png", alpha=False),
     "clustershot": load_img(f"{TEXTURES}/powerup/clustershot.png", alpha=False),
+    "hailstorm": load_img(f"{TEXTURES}/powerup/hailstorm.png", alpha=False),
 }
 gradient = pygame.transform.scale((load_img(f"{TEXTURES}/misc/gradient.png", factor=1)), (TILE_SIZE, 800))
 background = load_img(f"{TEXTURES}/misc/background.png", alpha=False)
@@ -77,6 +78,7 @@ frost_vignette = load_img(f"{TEXTURES}/vignette/frost_vignette.png", alpha=True)
 elim_vignette = load_img(f"{TEXTURES}/vignette/elim_vignette.png", alpha=True)
 crosshair = load_img(f"{TEXTURES}/misc/crosshair.png", alpha=True)
 infinite_snowballs = load_img(f"{TEXTURES}/misc/infinity.png", alpha=True)
+storm_gradient = load_img(f"{TEXTURES}/misc/storm_alpha_gradient.png", alpha=False)
 
 class Frames:
     def __init__(self, path: str, prefix: str) -> None:
@@ -167,7 +169,6 @@ player = player_idle.elements + player_idle_l.elements + player_idle_s.elements 
 
 snowball_large = Frames("snowball", "snowball_large_")
 snowball_small = Frames("snowball", "snowball_small_")
-snowball_airstrike = Frames("snowball", "snowball_air_")
 
 pygame.display.quit()
 

@@ -11,13 +11,15 @@ import time
 
 from .constants import VEC, GRAVITY, PIXEL_SIZE
 from .sprite import VisibleSprite, Layers
+from .storm import Storm
 from .utils import shadow, sign
 from .powerup import Powerup
 from .ground import Ground1
+from .swirl import Swirl
 from . import assets
 
 class Snowball(VisibleSprite):
-    def __init__(self, scene: Scene, vel: tuple[float, float], sb_type) -> None:
+    def __init__(self, scene: Scene, vel: tuple[float, float], sb_type: int) -> None:
         super().__init__(scene, Layers.SNOWBALL)
 
         self.player: Player = self.scene.player # Type annotation just bcs I need intellisense lol
@@ -28,30 +30,34 @@ class Snowball(VisibleSprite):
         self.frame = 0
         self.frame_time = time.time()
         self.type = sb_type
-        self.score = 1 if self.type == assets.snowball_small else 4
-        self.image = self.type[self.frame]
+        self.frames = [assets.snowball_small, assets.snowball_large, assets.snowball_large][sb_type]
+        self.score = 1 if self.frames == assets.snowball_small else 4
+        self.image = self.frames[self.frame]
         self.rect = self.image.get_rect(center=self.pos)
-        self.real_rect = pygame.Rect(0, 0, *(10, 10) if self.type == assets.snowball_large else (7, 7))
+        self.real_rect = pygame.Rect(0, 0, *(10, 10) if self.frames == assets.snowball_large else (7, 7))
         self.real_rect.center = self.rect.center
         self.landed = False
         self.rotation = 0
         self.rot_speed = choice([randint(-400, -100), randint(100, 400)])
 
+        if self.type == 2:
+            self.swirl = Swirl(self.scene, Layers.SNOWBALL, 64)
+
     def update(self) -> None:
-        self.image = self.type[self.frame]
+        self.image = self.frames[self.frame]
         self.rect = self.image.get_rect(center=self.pos)
 
         if self.landed:
             if time.time() - self.frame_time > 0.08:
                 self.frame_time = time.time()
                 self.frame += 1
-                if self.frame == self.type.length:
+                if self.frame == self.frames.length:
                     self.scene.player.snowballs.remove(self)
                     super().kill()
             return
 
         self.rotation += self.rot_speed * self.manager.dt
-        self.image = pygame.transform.rotate(self.type[self.frame], self.rotation)
+        self.image = pygame.transform.rotate(self.frames[self.frame], self.rotation)
 
         self.acc = VEC(0, GRAVITY)
         self.acc += self.scene.wind_vel
@@ -74,10 +80,18 @@ class Snowball(VisibleSprite):
             return
 
         for powerup in Powerup.instances.values():
-            if powerup.rect.colliderect(self.real_rect):
-                self.player.powerup = powerup.type
-                self.player.powerup_time = time.time()
+            if powerup.rect.colliderect(self.real_rect) and not powerup.touched:
+                if powerup.type == "hailstorm":
+                    self.scene.player.add_snowball(2)
+                    self.scene.player.dig_iterations += 1
+                else:
+                    self.player.powerup = powerup.type
+                    self.player.powerup_time = time.time()
                 self.client.irreg_data.put({"id": powerup.id, "powerup": 1}) # powerup key to uniquify the message
+                powerup.touched = True
+
+        if self.type == 2:
+            self.swirl.pos = self.pos - VEC(32, 32)
 
         if self.pos.y > 1000:
             self.kill()
@@ -97,7 +111,7 @@ class Snowball(VisibleSprite):
                 hit_strength = (2 + self.score + (self.score + 6 if self.player.powerup == "strength" else 0)) * sign(self.vel.x)
                 self.client.irreg_data.put({
                     "hit": hit_strength,
-                    "hit_size": 1 if self.type == assets.snowball_small else 2,
+                    "hit_size": 1 if self.frames == assets.snowball_small else 2,
                     "hit_powerup": self.player.powerup,
                     "id": player.id
                 })
@@ -112,12 +126,10 @@ class Snowball(VisibleSprite):
         self.image.set_alpha(255)
 
     def kill(self) -> None:
-        ### if player has airstrike powerup (currently strength), summon a bunch of snowballs above point of impact, while removing powerup status
-        # if (self.player.powerup == "strength"):
-        #     for _ in range(10):
-        #         self.player.snowballs.append(Snowball(self.scene, VEC(uniform(-180, 180), uniform(-180, 180)), choice([assets.snowball_small, assets.snowball_large])))
-        #         self.player.snowballs[-1].pos = self.pos - (0, 800) - self.scene.wind_vel * 0.5 + (uniform(-80, 80), 0)
-        #         self.player.powerup = None
+        if self.type == 2:
+            self.swirl.kill()
+            for _ in range(3):
+                Storm(self.scene, self.pos - (0, 500) + VEC(randint(-80, 80), randint(-20, 20)), VEC(600 + randint(-50, 50), 250 + randint(-50, 50)))
         self.landed = True
 
 class SelfSnowball(Snowball):
@@ -132,12 +144,3 @@ class SelfSnowball(Snowball):
                 self.scene.score -= 1
             return True
         return False
-
-# A new class of snowball that calls an airstrike    
-class AirstrikeSnowball(Snowball):
-    def kill(self) -> None:
-        for _ in range(30):
-            self.player.snowballs.append(Snowball(self.scene, VEC(uniform(-180, 180), uniform(0, 600)), assets.snowball_airstrike))
-            self.player.snowballs[-1].pos = self.pos - (0, 1600) - self.scene.wind_vel * 1 + (uniform(-80, 80), 0)
-            self.player.powerup = None
-        self.landed = True
