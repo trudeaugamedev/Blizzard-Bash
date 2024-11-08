@@ -56,5 +56,6 @@ class Powerup(VisibleSprite):
     def draw(self) -> None:
         if not hasattr(self, "initialized"): return
         while self.image.get_locked(): pass
+        if self.rect.right - self.scene.player.camera.offset.x < -20 or self.rect.left - self.scene.player.camera.offset.x > WIDTH + 20: return
         self.manager.screen.blit(self.shadow_image, self.pos - self.size // 2 - self.scene.player.camera.offset + (3, 3), special_flags=BLEND_RGB_SUB)
         self.manager.screen.blit(self.image, self.pos - self.size // 2 - self.scene.player.camera.offset)
