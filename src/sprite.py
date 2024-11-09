@@ -23,6 +23,7 @@ class Layers(Enum):
     DECOR1 = auto()
     SNOWFLAKE1 = auto()
     GROUND1 = auto()
+    STORM_ANIM = auto()
     STORM = auto()
     SNOWBALL = auto()
     POWERUP = auto()

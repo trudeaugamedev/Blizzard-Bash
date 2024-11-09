@@ -11,11 +11,11 @@ import time
 
 from .constants import VEC, GRAVITY, PIXEL_SIZE
 from .sprite import VisibleSprite, Layers
-from .storm import Storm
+from .swirl import Swirl, StormSwirl
 from .utils import shadow, sign
 from .powerup import Powerup
 from .ground import Ground1
-from .swirl import Swirl
+from .storm import Storm
 from . import assets
 
 class Snowball(VisibleSprite):
@@ -128,7 +128,8 @@ class Snowball(VisibleSprite):
     def kill(self) -> None:
         if self.type == 2:
             self.swirl.kill()
-            Storm(self.scene, self.pos - (0, 500) + VEC(randint(-80, 80), randint(-20, 20)), VEC(600 + randint(-50, 50), 250 + randint(-50, 50)))
+            storm = Storm(self.scene, self.pos - (0, 500) + VEC(randint(-80, 80), randint(-20, 20)), VEC(600 + randint(-50, 50), 250 + randint(-50, 50)))
+            StormSwirl(self.scene, Layers.SNOWBALL, storm, 128, 12).pos = self.pos - (64, 64)
         self.landed = True
 
 class SelfSnowball(Snowball):

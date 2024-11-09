@@ -4,6 +4,7 @@ if TYPE_CHECKING:
     from scene import Scene
 
 from .sprite import VisibleSprite, Layers
+from .storm import Storm, StormAnim
 from .constants import VEC
 
 from random import randint, uniform, choice
@@ -13,7 +14,7 @@ import pygame
 import time
 
 class Swirl(VisibleSprite):
-    def __init__(self, scene: Scene, layer: Layers, size: int) -> None:
+    def __init__(self, scene: Scene, layer: Layers, size: int, density: int = 6, dot_sizes=[1, 2, 2]) -> None:
         super().__init__(scene, layer)
         self.size = size
         self.pos = VEC(0, 0)
@@ -21,7 +22,7 @@ class Swirl(VisibleSprite):
         self.image = pygame.Surface((self.size, self.size))
         self.image.fill((255, 255, 255))
         self.dots = []
-        for _ in range(6):
+        for _ in range(density):
             size = self.size / 2
             b = uniform(size / 3, size * 2 / 3)
             rot = uniform(0, 2 * pi)
@@ -32,7 +33,7 @@ class Swirl(VisibleSprite):
                 (randint(90, 160),) * 3, # color
                 uniform(0, 2 * pi), # phase
                 uniform(7, 12), # speed
-                choice([1, 2, 2]) # radius
+                choice(dot_sizes) # radius
             ])
 
     def update(self) -> None:
@@ -43,3 +44,22 @@ class Swirl(VisibleSprite):
     def draw(self) -> None:
         self.image.fill((2, 2, 2), special_flags=BLEND_ADD)
         self.scene.manager.screen.blit(self.image, self.pos - self.scene.player.camera.offset, special_flags=BLEND_MULT)
+
+class StormSwirl(Swirl):
+    def __init__(self, scene: Scene, layer: Layers, storm: Storm, size: int, density: int = 6) -> None:
+        super().__init__(scene, layer, size, density, range(2, 4))
+        self.storm = storm
+        self.timer = time.time()
+        self.orig_img = self.image.copy()
+
+    def update(self) -> None:
+        super().update()
+
+        if time.time() - self.timer > 0.1:
+            self.timer = time.time()
+            StormAnim(self.scene, self.pos + (self.size / 2,) * 2, randint(50, 80), self.storm)
+
+        self.image.fill((self.storm.alpha * 0.15,) * 3, special_flags=BLEND_ADD)
+
+        if self.storm.alpha == 255:
+            self.kill()
