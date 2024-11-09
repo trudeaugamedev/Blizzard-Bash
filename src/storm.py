@@ -23,6 +23,7 @@ class Storm(VisibleSprite):
     def __init__(self, scene: Scene, pos: VEC, size: VEC) -> None:
         super().__init__(scene, Layers.STORM)
         self.pos = pos
+        self.vel = VEC(0, 0)
         self.size = size / PIXEL_SIZE
         self.blobs = []
         self.image = pygame.Surface(self.size + (MAX_R * 2, MAX_R * 2), pygame.SRCALPHA)
@@ -43,10 +44,16 @@ class Storm(VisibleSprite):
         self.size *= PIXEL_SIZE
         self.alpha = 0
         self.image.set_alpha(self.alpha)
-        self.speed_factor = uniform(0.5, 1.5)
+        self.center_pos = self.pos + VEC(self.image.size) / 2
 
     def update(self) -> None:
-        self.pos.x += self.scene.wind_vel.x * self.speed_factor * 0.05 * self.manager.dt
+        self.center_pos = self.pos + VEC(self.image.size) / 2
+
+        if self.manager.other_players:
+            nearest_player = min(self.manager.other_players.values(), key=lambda p: self.center_pos.distance_to(p.pos))
+            self.vel.x = (nearest_player.pos.x - self.center_pos.x) * 1.0
+
+        self.pos += self.vel * self.manager.dt
 
         self.alpha += 80 * self.manager.dt
         if self.alpha > 255:
