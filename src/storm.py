@@ -11,6 +11,7 @@ from random import randint, uniform, choice
 import pytweening as tween
 from math import sqrt
 import pygame
+import time
 
 MIN_R = 15
 MAX_R = 28
@@ -45,6 +46,9 @@ class Storm(VisibleSprite):
         self.alpha = 0
         self.image.set_alpha(self.alpha)
         self.center_pos = self.pos + VEC(self.image.size) / 2
+        self.lifetime = 13
+        self.lifetime_timer = time.time()
+        self.disappearing = False
 
     def update(self) -> None:
         self.center_pos = self.pos + VEC(self.image.size) / 2
@@ -59,6 +63,14 @@ class Storm(VisibleSprite):
         if self.alpha > 255:
             self.alpha = 255
         self.image.set_alpha(self.alpha)
+
+        if time.time() - self.lifetime_timer > self.lifetime:
+            self.disappearing = True
+
+        if self.disappearing:
+            self.alpha -= 600 * self.manager.dt
+            if self.alpha <= 0:
+                self.kill()
 
     def draw(self) -> None:
         self.scene.manager.screen.blit(self.image, self.pos - self.scene.player.camera.offset)
