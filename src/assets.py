@@ -78,7 +78,6 @@ frost_vignette = load_img(f"{TEXTURES}/vignette/frost_vignette.png", alpha=True)
 elim_vignette = load_img(f"{TEXTURES}/vignette/elim_vignette.png", alpha=True)
 crosshair = load_img(f"{TEXTURES}/misc/crosshair.png", alpha=True)
 infinite_snowballs = load_img(f"{TEXTURES}/misc/infinity.png", alpha=True)
-storm_gradient = load_img(f"{TEXTURES}/misc/storm_alpha_gradient.png", alpha=False)
 
 class Frames:
     def __init__(self, path: str, prefix: str) -> None:
