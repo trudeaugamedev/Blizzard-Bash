@@ -55,9 +55,9 @@ class StormSwirl(Swirl):
     def update(self) -> None:
         super().update()
 
-        if time.time() - self.timer > 0.1:
+        if time.time() - self.timer > 0.08:
             self.timer = time.time()
-            StormAnim(self.scene, self.pos + (self.size / 2,) * 2, randint(50, 80), self.storm)
+            StormAnim(self.scene, self.pos + (self.size / 2,) * 2, self.storm)
 
         self.image.fill((self.storm.alpha * 0.15,) * 3, special_flags=BLEND_ADD)
 
