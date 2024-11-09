@@ -128,8 +128,7 @@ class Snowball(VisibleSprite):
     def kill(self) -> None:
         if self.type == 2:
             self.swirl.kill()
-            for _ in range(3):
-                Storm(self.scene, self.pos - (0, 500) + VEC(randint(-80, 80), randint(-20, 20)), VEC(600 + randint(-50, 50), 250 + randint(-50, 50)))
+            Storm(self.scene, self.pos - (0, 500) + VEC(randint(-80, 80), randint(-20, 20)), VEC(600 + randint(-50, 50), 250 + randint(-50, 50)))
         self.landed = True
 
 class SelfSnowball(Snowball):
