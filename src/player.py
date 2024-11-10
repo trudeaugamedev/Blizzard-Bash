@@ -357,10 +357,10 @@ class Player(VisibleSprite):
                 if self.powerup == "clustershot":
                     size = self.pop_snowball()
                     for _ in range(4 if size == 0 else 7):
-                        sb = Snowball(self.scene, self.sb_vel + VEC(uniform(-180, 180), uniform(-180, 180)), 1)
+                        sb = Snowball(self.scene, self.sb_vel + VEC(uniform(-180, 180), uniform(-180, 180)), 0)
                         self.snowballs[sb.id] = sb
                     for _ in range(1 if size == 0 else 3):
-                        sb = Snowball(self.scene, self.sb_vel + VEC(uniform(-180, 180), uniform(-180, 180)), 2)
+                        sb = Snowball(self.scene, self.sb_vel + VEC(uniform(-180, 180), uniform(-180, 180)), 1)
                         self.snowballs[sb.id] = sb
                 else:
                     size = self.pop_snowball()
