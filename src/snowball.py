@@ -85,16 +85,17 @@ class Snowball(VisibleSprite):
         if self.collide():
             return
 
-        for powerup in Powerup.instances.values():
-            if powerup.rect.colliderect(self.real_rect) and not powerup.touched:
-                if powerup.type == "hailstorm":
-                    self.scene.player.add_snowball(2)
-                    self.scene.player.dig_iterations += 1
-                else:
-                    self.player.powerup = powerup.type
-                    self.player.powerup_time = time.time()
-                self.client.irreg_data.put({"id": powerup.id, "powerup": 1}) # powerup key to uniquify the message
-                powerup.touched = True
+        if not self.is_storm:
+            for powerup in Powerup.instances.values():
+                if powerup.rect.colliderect(self.real_rect) and not powerup.touched:
+                    if powerup.type == "hailstorm":
+                        self.scene.player.add_snowball(2)
+                        self.scene.player.dig_iterations += 1
+                    else:
+                        self.player.powerup = powerup.type
+                        self.player.powerup_time = time.time()
+                    self.client.irreg_data.put({"id": powerup.id, "powerup": 1}) # powerup key to uniquify the message
+                    powerup.touched = True
 
         if self.type == 2:
             self.swirl.pos = self.pos - VEC(32, 32)
