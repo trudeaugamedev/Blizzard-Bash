@@ -76,8 +76,8 @@ class StormSwirl(Swirl):
 
         if self.suck:
             if (dist := self.scene.player.pos.distance_to(self.pos)) < 250:
-                vel = (1 - dist / 250) * (self.pos - self.scene.player.pos).normalize() * 32
-                vel.y *= 0.5
+                vel = (1 - dist / 250) * (self.pos - self.scene.player.pos).normalize() * 50
+                vel.y *= 0.3
                 self.scene.player.vel += vel
 
         self.image.fill((max(self.storm.alpha * 0.15 - 20, 0),) * 3, special_flags=BLEND_ADD)
