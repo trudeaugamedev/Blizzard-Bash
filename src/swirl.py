@@ -75,8 +75,8 @@ class StormSwirl(Swirl):
                 StormAnim(self.scene, self.pos + (self.size / 2,) * 2, self.storm)
 
         if self.suck:
-            if (dist := self.scene.player.pos.distance_to(self.pos)) < 250:
-                vel = (1 - dist / 250) * (self.pos - self.scene.player.pos).normalize() * 50
+            if (dist := self.scene.player.pos.distance_to(self.pos + (self.size / 2,) * 2)) < 250:
+                vel = (1 - dist / 250) * (self.pos + (self.size / 2,) * 2 - self.scene.player.pos).normalize() * 50
                 vel.y *= 0.3
                 self.scene.player.vel += vel
 
