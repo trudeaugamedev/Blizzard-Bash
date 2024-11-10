@@ -323,6 +323,9 @@ class Player(VisibleSprite):
             self.ground_level = Ground2 if self.ground_level == Ground3 else Ground1
             self.on_ground = False
 
+        if self.keys[K_s] and not self.on_ground:
+            self.acc.y += GRAVITY
+
         if self.keys[K_SPACE] and self.on_ground and self.powerup != "rapidfire":
             self.digging = True
             self.idle = False
