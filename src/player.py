@@ -469,6 +469,7 @@ class Player(VisibleSprite):
         self.can_move = self.frame_group != self.assets.player_dig and not self.digging
 
     def add_snowball(self, size: int) -> None:
+        size = 2
         self.snowball_queue.append(size)
         self.dig_progress.snowballs_displays.append(self.dig_progress.SnowballDisplay(self.scene, self, size))
 
