@@ -462,7 +462,8 @@ class Player(VisibleSprite):
         if self.pos.x > Border.x or self.pos.x < -Border.x:
             if time.time() - self.self_snowball_time > 800 / diff * 0.06:
                 pos = self.pos - (0, 400) - self.scene.wind_vel * 0.25 + (self.vel.x * 0.4, 0) + (uniform(-80, 80), 0)
-                self.spawn_snowball(0, pos, VEC(0, 0))
+                sb = SelfSnowball(self.scene, VEC(0, 0), randint(0, 1), pos=pos, follow=False)
+                self.snowballs[sb.id] = sb
                 self.self_snowball_time = time.time()
 
         self.can_move = self.frame_group != self.assets.player_dig and not self.digging
