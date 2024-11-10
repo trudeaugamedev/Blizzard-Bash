@@ -32,6 +32,10 @@ class Parser:
                 if data["command"].startswith("start"):
                     self.manager.scene.waiting = False
                     self.manager.scene.player.powerup = None
+                    self.manager.scene.player.powerup_time = 0
+                    while self.manager.scene.player.snowball_queue:
+                        self.manager.scene.player.pop_snowball()
+                    self.manager.scene.player.dig_iterations = 0
                 elif data["command"] == "stop":
                     self.manager.scene.time_left = -1
             case "wd": # Wind
