@@ -53,6 +53,8 @@ class Storm(VisibleSprite):
         self.lifetime_timer = time.time()
         self.disappearing = False
 
+        self.snowball_timer = time.time()
+
         # for data transmission to other clients
         self.offsets = [inttup(blob.offset) for blob in self.blobs]
         self.radii = [blob.radius for blob in self.blobs]
@@ -71,6 +73,12 @@ class Storm(VisibleSprite):
         if self.alpha > 255:
             self.alpha = 255
         self.image.set_alpha(self.alpha)
+
+        if self.alpha >= 255:
+            if time.time() - self.snowball_timer > 0.18:
+                offset = VEC(choice(self.offsets)) * PIXEL_SIZE
+                self.scene.player.spawn_snowball(randint(0, 1), self.pos + offset, VEC(0, 0), follow=False)
+                self.snowball_timer = time.time()
 
         if time.time() - self.lifetime_timer > self.lifetime:
             self.disappearing = True

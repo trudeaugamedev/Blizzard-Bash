@@ -20,12 +20,12 @@ from .storm import Storm
 from . import assets
 
 class Snowball(VisibleSprite):
-    def __init__(self, scene: Scene, vel: tuple[float, float], sb_type: int) -> None:
+    def __init__(self, scene: Scene, vel: tuple[float, float], sb_type: int, pos: VEC = None, follow: bool = True) -> None:
         super().__init__(scene, Layers.SNOWBALL)
         self.id = uuid4().hex
 
         self.player: Player = self.scene.player # Type annotation just bcs I need intellisense lol
-        self.pos = self.player.rect.topleft + self.player.SB_OFFSET
+        self.pos = self.player.rect.topleft + self.player.SB_OFFSET if pos is None else pos
         self.vel = VEC(vel)
         self.acc = VEC(0, 0)
         self.size = VEC(0, 0)
@@ -41,6 +41,7 @@ class Snowball(VisibleSprite):
         self.landed = False
         self.rotation = 0
         self.rot_speed = choice([randint(-400, -100), randint(100, 400)])
+        self.follow = follow
 
         if self.type == 2:
             self.swirl = Swirl(self.scene, Layers.SNOWBALL, 64)

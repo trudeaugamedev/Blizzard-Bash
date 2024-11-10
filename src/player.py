@@ -448,9 +448,8 @@ class Player(VisibleSprite):
                 self.vel.x = 0
         if self.pos.x > Border.x or self.pos.x < -Border.x:
             if time.time() - self.self_snowball_time > 800 / diff * 0.06:
-                sb = SelfSnowball(self.scene, VEC(0, 0), randint(0, 1))
-                self.snowballs[sb.id] = sb
-                sb.pos = self.pos - (0, 400) - self.scene.wind_vel * 0.25 + (self.vel.x * 0.4, 0) + (uniform(-80, 80), 0)
+                pos = self.pos - (0, 400) - self.scene.wind_vel * 0.25 + (self.vel.x * 0.4, 0) + (uniform(-80, 80), 0)
+                self.spawn_snowball(0, pos, VEC(0, 0))
                 self.self_snowball_time = time.time()
 
         self.can_move = self.frame_group != self.assets.player_dig and not self.digging
@@ -458,6 +457,10 @@ class Player(VisibleSprite):
     def add_snowball(self, size: int) -> None:
         self.snowball_queue.append(size)
         self.dig_progress.snowballs_displays.append(self.dig_progress.SnowballDisplay(self.scene, self, size))
+
+    def spawn_snowball(self, size: int, pos: tuple[int, int], vel: tuple[int, int], follow: bool = True) -> None:
+        sb = Snowball(self.scene, VEC(vel), size, pos=pos, follow=follow)
+        self.snowballs[sb.id] = sb
 
     def pop_snowball(self) -> int:
         size = self.snowball_queue.pop()
@@ -565,12 +568,12 @@ class Player(VisibleSprite):
             snowballs = list(self.snowballs.values())
             i = len(snowballs) - 1
             last = snowballs[i]
-            while isinstance(last, SelfSnowball):
+            while isinstance(last, SelfSnowball) or not last.follow:
                 i -= 1
                 if i < 0:
                     break
                 last = snowballs[i]
-        if not self.snowballs or isinstance(last, SelfSnowball):
+        if not self.snowballs or isinstance(last, SelfSnowball) or not last.follow:
             self.camera.follow = 3
             pos = self.pos - (0, self.pos.y * 0.4 + 140)
             if self.throwing:
