@@ -41,6 +41,7 @@ class Snowball(VisibleSprite):
         self.landed = False
         self.rotation = 0
         self.rot_speed = choice([randint(-400, -100), randint(100, 400)])
+        self.hit_player = None
         self.follow = follow
 
         if self.type == 2:
@@ -108,6 +109,7 @@ class Snowball(VisibleSprite):
                 sound.play()
                 self.scene.hit = True
                 self.scene.hit_pos = self.pos
+                self.hit_player = player
                 self.kill()
                 if not self.scene.waiting and not self.scene.eliminated:
                     self.scene.score += self.score * (2 if self.player.powerup == "strength" else 1)
@@ -134,7 +136,7 @@ class Snowball(VisibleSprite):
             self.swirl.kill()
             size = VEC(600 + randint(-50, 50), 250 + randint(-50, 50))
             y = 800 + (self.pos.y - 40) * 0.6
-            storm = Storm(self.scene, self.id, self.pos - (size.x / 2, y) + VEC(randint(-80, 80), randint(-20, 20)), size)
+            storm = Storm(self.scene, self.id, self.pos - (size.x / 2, y) + VEC(randint(-80, 80), randint(-20, 20)), size, self.hit_player)
             StormSwirl(self.scene, Layers.SNOWBALL, storm, self.pos - (64, 64), 128, 20)
         self.landed = True
 

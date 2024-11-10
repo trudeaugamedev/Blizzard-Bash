@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from .player import Player
     from .scene import Scene
 
 from .sprite import VisibleSprite, Sprite, Layers
@@ -23,12 +24,13 @@ class Storm(VisibleSprite):
     for img in edge_imgs:
         pygame.draw.circle(img, (2, 2, 2), (img.width // 2, img.height // 2), img.width // 2)
 
-    def __init__(self, scene: Scene, id: str, pos: VEC, size: VEC) -> None:
+    def __init__(self, scene: Scene, id: str, pos: VEC, size: VEC, target: Player = None) -> None:
         super().__init__(scene, Layers.STORM)
         self.id = id
         self.pos = pos
         self.vel = VEC(0, 0)
         self.size = size / PIXEL_SIZE
+        self.target = target
         self.blobs = []
         self.image = pygame.Surface(self.size + (MAX_R * 2, MAX_R * 2), pygame.SRCALPHA)
         for _ in range(int(sqrt(self.size.x * self.size.y) / 2)):
@@ -61,13 +63,13 @@ class Storm(VisibleSprite):
         self.scene.player.storms.append(self)
 
     def update(self) -> None:
-        self.center_pos = self.pos + VEC(self.image.size) / 2
-
-        if self.manager.other_players:
-            nearest_player = min(self.manager.other_players.values(), key=lambda p: self.center_pos.distance_to(p.pos))
-            self.vel.x = (nearest_player.pos.x - self.center_pos.x) * 1.0
+        if self.target:
+            self.vel.x = (self.target.pos.x - self.center_pos.x) * 1.0
+        else:
+            self.vel.x = self.scene.wind_vel.x * 0.07
 
         self.pos += self.vel * self.manager.dt
+        self.center_pos = self.pos + VEC(self.image.size) / 2
 
         self.alpha += 80 * self.manager.dt
         if self.alpha > 255:
