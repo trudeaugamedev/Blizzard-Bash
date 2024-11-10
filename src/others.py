@@ -168,7 +168,7 @@ class OtherSnowball(VisibleSprite):
     def kill(self) -> None:
         if self.type == 2:
             self.swirl.kill()
-            StormSwirl(self.scene, Layers.SNOWBALL, None, self.pos - (64, 64), 128, 20, self.id)
+            StormSwirl(self.scene, Layers.SNOWBALL, None, self.pos - (64, 64), 128, 20, self.id, suck=True)
         __class__.killed.add(self.id)
         super().kill()
 
