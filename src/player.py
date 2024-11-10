@@ -364,6 +364,9 @@ class Player(VisibleSprite):
                     for _ in range(1 if size == 0 else 3):
                         sb = Snowball(self.scene, self.sb_vel + VEC(uniform(-180, 180), uniform(-180, 180)), 1)
                         self.snowballs[sb.id] = sb
+                elif self.powerup == "rapidfire":
+                    sb = Snowball(self.scene, self.sb_vel, 0)
+                    self.snowballs[sb.id] = sb
                 else:
                     size = self.pop_snowball()
                     sb = Snowball(self.scene, self.sb_vel, size)
