@@ -139,6 +139,9 @@ class OtherArrow(VisibleSprite):
             pygame.draw.polygon(self.manager.screen, (0, 0, 0), points, 3)
 
 class OtherSnowball(VisibleSprite):
+    # Sometimes snowball data can get sent marginally after the snowball is killed, this set is used to prevent that data from being processed
+    killed = set()
+
     def __init__(self, scene: Scene, id: str, pos: tuple[int, int], frame: int, type: int) -> None:
         super().__init__(scene, Layers.SNOWBALL)
         self.id = id
@@ -166,6 +169,7 @@ class OtherSnowball(VisibleSprite):
         if self.type == 2:
             self.swirl.kill()
             StormSwirl(self.scene, Layers.SNOWBALL, None, self.pos - (64, 64), 128, 20, self.id)
+        __class__.killed.add(self.id)
         super().kill()
 
 class OtherStorm(VisibleSprite):

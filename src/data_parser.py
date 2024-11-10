@@ -82,6 +82,7 @@ class Parser:
             if "snowballs" in player_data and player_data["snowballs"]:
                 # Parse data of snowballs
                 for snowball_data in player_data["snowballs"]:
+                    if snowball_data["id"] in OtherSnowball.killed: continue
                     if snowball_data["id"] in other.snowballs:
                         snowball = other.snowballs[snowball_data["id"]]
                         snowball.pos = VEC(snowball_data["pos"])
