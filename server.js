@@ -14,6 +14,16 @@ function broadcast(msg) {
 	}
 }
 
+function xbroadcast(msg, x_id) {
+	for (const [id, player] of players) {
+		if (id === x_id) continue;
+		player.socket.send(msg);
+	}
+	for (const [id, spectator] of spectators) {
+		spectator.socket.send(msg);
+	}
+}
+
 function getPlayerData(x_id, init) {
 	let playerDataArray = [];
 	for (const [id, player] of players) {
@@ -70,7 +80,7 @@ class Powerup {
 		powerupId++;
 		this.vel = [0, 0]
 		this.pos = [randint(-2400, 2400), -1200];
-		this.type = ["rapidfire", "strength", "clustershot"][randint(0, 2)]
+		this.type = ["rapidfire", "strength", "clustershot", "hailstorm"][randint(0, 3)];
 		this.startTime = Date.now();
 	}
 
@@ -178,6 +188,10 @@ wss.on("connection", (socket) => {
 				players.get(data.id).socket.send(strMsg);
 			} else if (data.powerup) {
 				powerups.delete(data.id);
+			} else if (data.storm_id) {
+				xbroadcast(strMsg, data.player_id);
+			} else if (data.landed) {
+				xbroadcast(strMsg, data.player_id);
 			}
 			return;
 		}

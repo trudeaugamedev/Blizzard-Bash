@@ -4,6 +4,7 @@ if TYPE_CHECKING:
     from scene import Scene
 
 from pygame.locals import BLEND_RGB_SUB
+from random import choice
 from math import sin, pi
 import pygame
 import time
@@ -11,6 +12,7 @@ import time
 from .constants import VEC, FONT, PIXEL_SIZE, WIDTH
 from .ground import Ground1, Ground2, Ground3
 from .sprite import VisibleSprite, Layers
+from .swirl import Swirl, StormSwirl
 from .utils import shadow
 from . import assets
 
@@ -31,7 +33,7 @@ class OtherPlayer(VisibleSprite):
         self.rect = pygame.Rect(self.pos, self.size)
         self.real_rect = self.rect.copy()
         self.real_rect.size = (10 * PIXEL_SIZE, 20 * PIXEL_SIZE)
-        self.snowballs = []
+        self.snowballs = {}
         self.rotation = 0
         self.flip = False
         self.score = 0
@@ -137,19 +139,84 @@ class OtherArrow(VisibleSprite):
             pygame.draw.polygon(self.manager.screen, (0, 0, 0), points, 3)
 
 class OtherSnowball(VisibleSprite):
-    def __init__(self, scene: Scene, pos: tuple[int, int], frame: int, _type: int) -> None:
+    def __init__(self, scene: Scene, id: str, pos: tuple[int, int], frame: int, type: int) -> None:
         super().__init__(scene, Layers.SNOWBALL)
+        self.id = id
         self.pos = VEC(pos)
         self.frame = frame
-        self.type = assets.snowball_large if _type else assets.snowball_small
-        self.image = self.type[self.frame]
+        self.type = type
+        self.frames = assets.snowball_small if type == 0 else assets.snowball_large
+        self.image = self.frames[self.frame]
         self.rect = self.image.get_rect(center=self.pos)
+        if self.type == 2:
+            self.swirl = Swirl(self.scene, Layers.SNOWBALL, 64)
 
     def update(self) -> None:
-        self.image = self.type[self.frame]
+        self.image = self.frames[self.frame]
         self.rect = self.image.get_rect(center=self.pos)
+        if self.type == 2:
+            self.swirl.pos = self.pos - (32, 32)
 
     def draw(self) -> None:
         if self.rect.right - self.scene.player.camera.offset.x < -20 or self.rect.left - self.scene.player.camera.offset.x > WIDTH + 20: return
         self.manager.screen.blit(shadow(self.image), VEC(self.rect.topleft) - self.scene.player.camera.offset + (3, 3), special_flags=BLEND_RGB_SUB)
         self.manager.screen.blit(self.image, VEC(self.rect.topleft) - self.scene.player.camera.offset)
+
+    def kill(self) -> None:
+        if self.type == 2:
+            self.swirl.kill()
+            StormSwirl(self.scene, Layers.SNOWBALL, None, self.pos - (64, 64), 128, 20, self.id)
+        super().kill()
+
+class OtherStorm(VisibleSprite):
+    instances = {}
+    edge_imgs = [pygame.Surface((32, 32)), pygame.Surface((48, 48)), pygame.Surface((64, 64)), pygame.Surface((80, 80))]
+    for img in edge_imgs:
+        pygame.draw.circle(img, (2, 2, 2), (img.width // 2, img.height // 2), img.width // 2)
+
+    def __init__(self, scene: Scene, id: str, pos: tuple[int, int], alpha: int) -> None:
+        # why tf does this sometimes not get initialized :sob:
+        self.image = None
+        super().__init__(scene, Layers.STORM)
+        self.id = id
+        self.pos = VEC(pos) if pos is not None else VEC(0, 0)
+        self.alpha = alpha
+        self.size = VEC(0, 0)
+        self.blobs = []
+
+    def create_image(self, size: tuple[int, int], offsets: list[tuple[int, int]], radii: list[int]) -> None:
+        if self.image is not None: return
+        self.size = VEC(size) // PIXEL_SIZE
+        self.image = pygame.Surface(self.size, pygame.SRCALPHA)
+        for offset, radius in zip(offsets, radii):
+            blob = OtherStormBlob(self.scene, self, offset, radius)
+            blob.draw()
+            self.blobs.append(blob)
+        for pos in pygame.mask.from_surface(self.image).outline(3):
+            img = choice(self.edge_imgs)
+            self.image.blit(img, VEC(pos) - VEC(img.size) // 2, special_flags=pygame.BLEND_ADD)
+        self.image = pygame.transform.scale_by(self.image, PIXEL_SIZE)
+        self.image.set_alpha(0)
+        self.size *= PIXEL_SIZE
+
+    def update(self) -> None:
+        if self.image is None: return
+        self.image.set_alpha(self.alpha)
+
+        if self.id in StormSwirl.instances:
+            StormSwirl.instances[self.id].storm = self
+
+    def draw(self) -> None:
+        if self.image is None: return
+        while self.image.get_locked(): pass
+        self.manager.screen.blit(self.image, VEC(self.pos) - self.scene.player.camera.offset)
+
+class OtherStormBlob:
+    def __init__(self, scene: Scene, storm: OtherStorm, offset: tuple[int, int], radius: int) -> None:
+        self.scene = scene
+        self.storm = storm
+        self.offset = VEC(offset)
+        self.radius = radius
+
+    def draw(self) -> None:
+        pygame.draw.circle(self.storm.image, (138, 155, 178), self.offset, self.radius)

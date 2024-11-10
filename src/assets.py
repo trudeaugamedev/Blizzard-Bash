@@ -68,6 +68,7 @@ powerup_icons = {
     "rapidfire": load_img(f"{TEXTURES}/powerup/rapidfire.png", alpha=False),
     "strength": load_img(f"{TEXTURES}/powerup/strength.png", alpha=False),
     "clustershot": load_img(f"{TEXTURES}/powerup/clustershot.png", alpha=False),
+    "hailstorm": load_img(f"{TEXTURES}/powerup/hailstorm.png", alpha=False),
 }
 gradient = pygame.transform.scale((load_img(f"{TEXTURES}/misc/gradient.png", factor=1)), (TILE_SIZE, 800))
 background = load_img(f"{TEXTURES}/misc/background.png", alpha=False)

@@ -43,10 +43,13 @@ class Client:
             "snowballs": None,
             "powerup": None,
             "score": None,
+            "storm_blobs": None,
+            "storms": None,
         }
         self.modified_data = {key: True for key in self.pers_data}
         self.irreg_data = Queue() # Occasional data
         self.send_all_time = time.time()
+        self.initial_sends = 0
 
     def restart(self) -> None:
         self.reset()
@@ -96,9 +99,10 @@ class Client:
                 final[key] = self.pers_data[key]
                 self.modified_data[key] = False
 
-        if time.time() - self.send_all_time > 3:
+        if time.time() - self.send_all_time > (0.25 if self.initial_sends < 12 else 3):
             final.update(self.pers_data)
             self.send_all_time = time.time()
+            self.initial_sends += 1
 
         if final:
             await self.socket.send(json.dumps({"id": self.id} | final))

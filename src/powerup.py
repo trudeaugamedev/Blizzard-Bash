@@ -7,7 +7,7 @@ from pygame.locals import BLEND_RGB_SUB
 import pygame
 import time
 
-from .constants import VEC, PIXEL_SIZE
+from .constants import VEC, PIXEL_SIZE, WIDTH
 from .sprite import VisibleSprite, Layers
 from .ground import Ground1
 from .utils import shadow
@@ -27,6 +27,7 @@ class Powerup(VisibleSprite):
         self.rect = pygame.Rect(self.pos - (12, 12), self.size + (24, 24))
         self.recv_pos = VEC(0, -2500)
         self.vel = VEC(0, 0)
+        self.touched = False
 
         self.initialized = True # Used to check whether the __init__ function has completed in the thread
         self.__class__.instances[self.id] = self
@@ -46,15 +47,22 @@ class Powerup(VisibleSprite):
             self.vel.x *= 0.85
 
         self.rect = pygame.Rect(self.pos - (12, 12), self.size + (24, 24))
-        if self.rect.colliderect(self.scene.player.real_rect):
-            if self.scene.player.powerup == "rapidfire":
-                self.scene.player.throwing = False
-            self.scene.player.powerup = self.type
-            self.scene.player.powerup_time = time.time()
+        if self.rect.colliderect(self.scene.player.real_rect) and not self.touched:
+            # MODIFICATIONS TO THIS SECTION SHOULD BE REFLECTED IN snowball.py AS WELL or else throwing a snowball at the powerup will crash the game!!!
+            if self.type == "hailstorm":
+                self.scene.player.add_snowball(2)
+                self.scene.player.dig_iterations += 1
+            else:
+                if self.scene.player.powerup == "rapidfire":
+                    self.scene.player.throwing = False
+                self.scene.player.powerup = self.type
+                self.scene.player.powerup_time = time.time()
             self.client.irreg_data.put({"id": self.id, "powerup": 1}) # powerup key to uniquify the message
+            self.touched = True
 
     def draw(self) -> None:
         if not hasattr(self, "initialized"): return
         while self.image.get_locked(): pass
+        if self.rect.right - self.scene.player.camera.offset.x < -20 or self.rect.left - self.scene.player.camera.offset.x > WIDTH + 20: return
         self.manager.screen.blit(self.shadow_image, self.pos - self.size // 2 - self.scene.player.camera.offset + (3, 3), special_flags=BLEND_RGB_SUB)
         self.manager.screen.blit(self.image, self.pos - self.size // 2 - self.scene.player.camera.offset)
