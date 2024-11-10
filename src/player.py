@@ -129,9 +129,14 @@ class DigProgress(VisibleSprite):
 
         if self.player.powerup != "rapidfire":
             for snowball in self.snowballs_displays:
+                if snowball.type == 2:
+                    snowball.swirl.visible = True
                 snowball.draw()
         else:
             self.manager.screen.blit(assets.infinite_snowballs, rect.midbottom - VEC(assets.infinite_snowballs.get_width() // 2, 0) + (0, 16))
+            for display in self.snowballs_displays:
+                if display.type == 2:
+                    display.swirl.visible = False
 
 class Player(VisibleSprite):
     def __init__(self, scene: Scene) -> None:

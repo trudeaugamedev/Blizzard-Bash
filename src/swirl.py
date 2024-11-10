@@ -36,6 +36,7 @@ class Swirl(VisibleSprite):
                 uniform(7, 12), # speed
                 choice(dot_sizes) # radius
             ])
+        self.visible = True
 
     def update(self) -> None:
         for dot in self.dots:
@@ -43,6 +44,7 @@ class Swirl(VisibleSprite):
             pygame.draw.aacircle(self.image, dot[2], pos, dot[5])
 
     def draw(self) -> None:
+        if not self.visible: return
         self.image.fill((2, 2, 2), special_flags=BLEND_ADD)
         self.scene.manager.screen.blit(self.image, self.pos - self.scene.player.camera.offset, special_flags=BLEND_MULT)
 
