@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .client import Client
 
-from src.others import OtherPlayer, OtherSnowball
+from src.others import OtherPlayer, OtherSnowball, OtherStorm
 from src.powerup import Powerup
 from src.constants import VEC
 
@@ -70,28 +70,48 @@ class Parser:
                     continue
             other = self.manager.other_players[player_data["id"]]
 
-            if "name" in player_data: other.name = player_data["name"]
-            if "pos" in player_data: other.pos = VEC(player_data["pos"])
-            if "rot" in player_data: other.rotation = player_data["rot"]
-            if "flip" in player_data: other.flip = player_data["flip"]
-            if "frame" in player_data: other.frame = player_data["frame"]
-            if "score" in player_data: other.score = player_data["score"]
-            if "powerup" in player_data: other.powerup = player_data["powerup"]
+            if "name" in player_data and player_data["name"]: other.name = player_data["name"]
+            if "pos" in player_data and player_data["pos"]: other.pos = VEC(player_data["pos"])
+            if "rot" in player_data and player_data["rot"]: other.rotation = player_data["rot"]
+            if "flip" in player_data and player_data["flip"]: other.flip = player_data["flip"]
+            if "frame" in player_data and player_data["frame"]: other.frame = player_data["frame"]
+            if "score" in player_data and player_data["score"]: other.score = player_data["score"]
+            if "powerup" in player_data and player_data["powerup"]: other.powerup = player_data["powerup"]
             if "colors" in player_data and player_data["colors"]: other.set_colors(*player_data["colors"])
 
-            if "snowballs" in player_data:
+            if "snowballs" in player_data and player_data["snowballs"]:
                 # Parse data of snowballs
-                for snowball in other.snowballs:
-                    snowball.kill()
-                other.snowballs = []
                 for snowball_data in player_data["snowballs"]:
-                    other.snowballs.append(
-                        OtherSnowball(self.manager.scene, snowball_data["pos"], snowball_data["frame"], snowball_data["type"])
-                    )
+                    if snowball_data["id"] in other.snowballs:
+                        snowball = other.snowballs[snowball_data["id"]]
+                        snowball.pos = VEC(snowball_data["pos"])
+                        snowball.frame = snowball_data["frame"]
+                    else:
+                        other.snowballs[snowball_data["id"]] = OtherSnowball(self.manager.scene, snowball_data["id"], snowball_data["pos"], snowball_data["frame"], snowball_data["type"])
+
+            # contains data for the image of the storm
+            if "storm_blobs" in player_data and player_data["storm_blobs"]:
+                for data in player_data["storm_blobs"]:
+                    id = data["id"]
+                    if id in OtherStorm.instances:
+                        storm = OtherStorm.instances[id]
+                    else:
+                        OtherStorm.instances[id] = OtherStorm(self.manager.scene, id, None, None) # pos, alpha
+                        OtherStorm.instances[id].create_image(data["size"], data["offsets"], data["radii"])
+
+            # continuous data for the storm
+            if "storms" in player_data and player_data["storms"]:
+                for storm_data in player_data["storms"]:
+                    if storm_data["id"] in OtherStorm.instances:
+                        storm = OtherStorm.instances[storm_data["id"]]
+                        storm.pos = VEC(storm_data["pos"])
+                        storm.alpha = storm_data["alpha"]
+                    else:
+                        OtherStorm.instances[storm_data["id"]] = OtherStorm(self.manager.scene, storm_data["id"], storm_data["pos"], storm_data["alpha"])
 
         all_ids = set(Powerup.instances.keys())
         # Parse powerup position
-        if "powerups" not in data: return
+        if "powerups" not in data or not data["powerups"]: return
         for powerup_data in data["powerups"]:
             if powerup_data["id"] in all_ids:
                 all_ids.remove(powerup_data["id"])
@@ -106,8 +126,14 @@ class Parser:
             Powerup.instances.pop(_id).kill()
 
     def irregular_client_data(self, data: dict) -> None:
-        if "hit" in data:
+        if "landed" in data:
+            self.manager.other_players[data["player_id"]].snowballs.pop(data["snowball_id"]).kill()
+
+        elif "hit" in data:
             self.manager.scene.player.hit_size = data["hit_size"]
             self.manager.scene.player.hit_strength = data["hit"]
             self.manager.scene.player.hit_powerup = data["hit_powerup"]
             self.manager.scene.frost_vignette.opacity += 70 * abs(data["hit"])
+
+        elif "storm_id" in data:
+            OtherStorm.instances.pop(data["storm_id"]).kill()

@@ -5,10 +5,12 @@ if TYPE_CHECKING:
 
 from .sprite import VisibleSprite, Sprite, Layers
 from .constants import VEC, PIXEL_SIZE
+from .utils import inttup
 from . import assets
 
 from random import randint, uniform, choice
 import pytweening as tween
+from uuid import uuid4
 from math import sqrt
 import pygame
 import time
@@ -21,15 +23,16 @@ class Storm(VisibleSprite):
     for img in edge_imgs:
         pygame.draw.circle(img, (2, 2, 2), (img.width // 2, img.height // 2), img.width // 2)
 
-    def __init__(self, scene: Scene, pos: VEC, size: VEC) -> None:
+    def __init__(self, scene: Scene, id: str, pos: VEC, size: VEC) -> None:
         super().__init__(scene, Layers.STORM)
+        self.id = id
         self.pos = pos
         self.vel = VEC(0, 0)
         self.size = size / PIXEL_SIZE
         self.blobs = []
         self.image = pygame.Surface(self.size + (MAX_R * 2, MAX_R * 2), pygame.SRCALPHA)
         for _ in range(int(sqrt(self.size.x * self.size.y) / 2)):
-            # semi-eliptical distribution
+            # semi-elliptical distribution
             offset = VEC(0, -self.size.y).rotate(randint(-90, 90))
             offset.x *= self.size.x / 2 / self.size.y
             offset.scale_to_length(randint(0, int(offset.length())))
@@ -49,6 +52,11 @@ class Storm(VisibleSprite):
         self.lifetime = 13
         self.lifetime_timer = time.time()
         self.disappearing = False
+
+        # for data transmission to other clients
+        self.offsets = [inttup(blob.offset) for blob in self.blobs]
+        self.radii = [blob.radius for blob in self.blobs]
+        self.scene.player.storms.append(self)
 
     def update(self) -> None:
         self.center_pos = self.pos + VEC(self.image.size) / 2
@@ -74,6 +82,11 @@ class Storm(VisibleSprite):
 
     def draw(self) -> None:
         self.scene.manager.screen.blit(self.image, self.pos - self.scene.player.camera.offset)
+
+    def kill(self) -> None:
+        self.scene.player.storms.remove(self)
+        self.client.irreg_data.put({"storm_id": self.id, "player_id": self.client.id})
+        super().kill()
 
 class StormAnim(VisibleSprite):
     def __init__(self, scene: Scene, pos: VEC, storm: Storm) -> None:

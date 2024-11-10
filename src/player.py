@@ -170,13 +170,14 @@ class Player(VisibleSprite):
         self.powerup_time = time.time()
         self.powerup_max_time = 0
         self.powerup_flash_time = time.time()
+        self.storms = []
 
         self.throw_trail = ThrowTrail(self.scene, self)
         self.throwing = False
         self.can_throw = True
         self.sb_vel = VEC(0, 0)
         self.snowball_queue = []
-        self.snowballs: list[Snowball] = []
+        self.snowballs: dict[Snowball] = {}
         self.rapidfire_time = time.time()
 
         self.frame_group = self.assets.player_idle
@@ -218,14 +219,36 @@ class Player(VisibleSprite):
         self.client.queue_data("powerup", ["rapidfire", "strength", "clustershot"].index(self.powerup) if self.powerup else -1)
 
         snowballs = []
-        for snowball in self.snowballs:
+        for snowball in self.snowballs.values():
             data = {
+                "id": snowball.id,
                 "pos": inttup(snowball.pos),
                 "frame": snowball.frame,
-                "type": int(snowball.frames == assets.snowball_large),
+                "type": snowball.type,
             }
             snowballs.append(data)
         self.client.queue_data("snowballs", snowballs)
+
+        storms = []
+        for storm in self.storms:
+            data = {
+                "id": storm.id,
+                "pos": inttup(storm.pos),
+                "alpha": int(storm.alpha),
+            }
+            storms.append(data)
+        self.client.queue_data("storms", storms)
+
+        storm_blobs = []
+        for storm in self.storms:
+            data = {
+                "id": storm.id,
+                "size": storm.image.size,
+                "offsets": storm.offsets,
+                "radii": storm.radii,
+            }
+            storm_blobs.append(data)
+        self.client.queue_data("storm_blobs", storm_blobs)
 
     def draw(self) -> None:
         self.manager.screen.blit(shadow(self.image), VEC(self.rect.topleft) - self.camera.offset + (3, 3), special_flags=BLEND_RGB_SUB)
@@ -334,12 +357,15 @@ class Player(VisibleSprite):
                 if self.powerup == "clustershot":
                     size = self.pop_snowball()
                     for _ in range(4 if size == 0 else 7):
-                        self.snowballs.append(Snowball(self.scene, self.sb_vel + VEC(uniform(-180, 180), uniform(-180, 180)), 1))
+                        sb = Snowball(self.scene, self.sb_vel + VEC(uniform(-180, 180), uniform(-180, 180)), 1)
+                        self.snowballs[sb.id] = sb
                     for _ in range(1 if size == 0 else 3):
-                        self.snowballs.append(Snowball(self.scene, self.sb_vel + VEC(uniform(-180, 180), uniform(-180, 180)), 2))
+                        sb = Snowball(self.scene, self.sb_vel + VEC(uniform(-180, 180), uniform(-180, 180)), 2)
+                        self.snowballs[sb.id] = sb
                 else:
                     size = self.pop_snowball()
-                    self.snowballs.append(Snowball(self.scene, self.sb_vel, size))
+                    sb = Snowball(self.scene, self.sb_vel, size)
+                    self.snowballs[sb.id] = sb
                 if self.powerup != "rapidfire":
                     self.dig_iterations -= 3 if size == 1 else 1
                     self.can_throw = bool(self.snowball_queue)
@@ -535,13 +561,14 @@ class Player(VisibleSprite):
 
     def update_camera(self) -> None:
         if self.snowballs:
-            i = len(self.snowballs) - 1
-            last = self.snowballs[i]
+            snowballs = list(self.snowballs.values())
+            i = len(snowballs) - 1
+            last = snowballs[i]
             while isinstance(last, SelfSnowball):
                 i -= 1
                 if i < 0:
                     break
-                last = self.snowballs[i]
+                last = snowballs[i]
         if not self.snowballs or isinstance(last, SelfSnowball):
             self.camera.follow = 3
             pos = self.pos - (0, self.pos.y * 0.4 + 140)

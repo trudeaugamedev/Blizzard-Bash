@@ -10,6 +10,7 @@ from .constants import VEC
 from random import randint, uniform, choice
 from math import cos, sin, pi
 from pygame.locals import *
+from uuid import uuid4
 import pygame
 import time
 
@@ -46,13 +47,23 @@ class Swirl(VisibleSprite):
         self.scene.manager.screen.blit(self.image, self.pos - self.scene.player.camera.offset, special_flags=BLEND_MULT)
 
 class StormSwirl(Swirl):
-    def __init__(self, scene: Scene, layer: Layers, storm: Storm, size: int, density: int = 6) -> None:
+    instances = {}
+
+    def __init__(self, scene: Scene, layer: Layers, storm: Storm, pos: VEC, size: int, density: int = 6, id: str = None) -> None:
         super().__init__(scene, layer, size, density, range(2, 4))
         self.storm = storm
+        self.pos = pos
         self.timer = time.time()
         self.orig_img = self.image.copy()
 
+        if id is None:
+            self.id = storm.id
+        else:
+            self.id = id
+        __class__.instances[self.id] = self
+
     def update(self) -> None:
+        if getattr(self, "storm", None) is None: return
         super().update()
 
         if time.time() - self.timer > 0.1:
@@ -64,3 +75,11 @@ class StormSwirl(Swirl):
 
         if self.storm.alpha == 255:
             self.kill()
+
+    def draw(self) -> None:
+        if getattr(self, "storm", None) is None: return
+        super().draw()
+
+    def kill(self) -> None:
+        __class__.instances.pop(self.storm.id)
+        super().kill()

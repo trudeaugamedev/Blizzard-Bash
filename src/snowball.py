@@ -4,8 +4,9 @@ if TYPE_CHECKING:
     from scene import Scene
     from player import Player
 
-from pygame.locals import BLEND_RGB_SUB
 from random import randint, choice, uniform
+from pygame.locals import BLEND_RGB_SUB
+from uuid import uuid4
 import pygame
 import time
 
@@ -21,6 +22,7 @@ from . import assets
 class Snowball(VisibleSprite):
     def __init__(self, scene: Scene, vel: tuple[float, float], sb_type: int) -> None:
         super().__init__(scene, Layers.SNOWBALL)
+        self.id = uuid4().hex
 
         self.player: Player = self.scene.player # Type annotation just bcs I need intellisense lol
         self.pos = self.player.rect.topleft + self.player.SB_OFFSET
@@ -52,7 +54,8 @@ class Snowball(VisibleSprite):
                 self.frame_time = time.time()
                 self.frame += 1
                 if self.frame == self.frames.length:
-                    self.scene.player.snowballs.remove(self)
+                    self.scene.player.snowballs.pop(self.id)
+                    self.client.irreg_data.put({"landed": 1, "snowball_id": self.id, "player_id": self.client.id})
                     super().kill()
             return
 
@@ -130,8 +133,8 @@ class Snowball(VisibleSprite):
             self.swirl.kill()
             size = VEC(600 + randint(-50, 50), 250 + randint(-50, 50))
             y = 800 + (self.pos.y - 40) * 0.6
-            storm = Storm(self.scene, self.pos - (size.x / 2, y) + VEC(randint(-80, 80), randint(-20, 20)), size)
-            StormSwirl(self.scene, Layers.SNOWBALL, storm, 128, 20).pos = self.pos - (64, 64)
+            storm = Storm(self.scene, self.id, self.pos - (size.x / 2, y) + VEC(randint(-80, 80), randint(-20, 20)), size)
+            StormSwirl(self.scene, Layers.SNOWBALL, storm, self.pos - (64, 64), 128, 20)
         self.landed = True
 
 class SelfSnowball(Snowball):

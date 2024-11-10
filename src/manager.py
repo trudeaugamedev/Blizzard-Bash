@@ -35,7 +35,6 @@ class GameManager:
         self.other_players = {}
         self.scene = StartMenu(self, None)
         self.ready = False
-        self.id = -1
 
     def run(self) -> None:
         while self.scene.running:
