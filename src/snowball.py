@@ -20,7 +20,7 @@ from .storm import Storm
 from . import assets
 
 class Snowball(VisibleSprite):
-    def __init__(self, scene: Scene, vel: tuple[float, float], sb_type: int, pos: VEC = None, follow: bool = True) -> None:
+    def __init__(self, scene: Scene, vel: tuple[float, float], sb_type: int, pos: VEC = None, follow: bool = True, is_storm: bool = False) -> None:
         super().__init__(scene, Layers.SNOWBALL)
         self.id = uuid4().hex
 
@@ -43,6 +43,7 @@ class Snowball(VisibleSprite):
         self.rot_speed = choice([randint(-400, -100), randint(100, 400)])
         self.hit_player = None
         self.follow = follow
+        self.is_storm = is_storm
 
         if self.type == 2:
             self.swirl = Swirl(self.scene, Layers.SNOWBALL, 64)
@@ -64,8 +65,8 @@ class Snowball(VisibleSprite):
         self.rotation += self.rot_speed * self.manager.dt
         self.image = pygame.transform.rotate(self.frames[self.frame], self.rotation)
 
-        self.acc = VEC(0, GRAVITY)
-        self.acc += self.scene.wind_vel
+        self.acc = VEC(0, GRAVITY) * (0.4 if self.is_storm else 1)
+        self.acc += self.scene.wind_vel * (0.1 if self.is_storm else 1)
 
         self.vel += self.acc * self.manager.dt
         self.pos += self.vel * self.manager.dt

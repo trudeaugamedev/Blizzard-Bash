@@ -79,7 +79,7 @@ class Storm(VisibleSprite):
         if self.alpha >= 255:
             if time.time() - self.snowball_timer > 0.18:
                 offset = VEC(choice(self.offsets)) * PIXEL_SIZE
-                self.scene.player.spawn_snowball(0, self.pos + offset, VEC(0, 0), follow=False)
+                self.scene.player.spawn_snowball(0, self.pos + offset, VEC(0, 0), follow=False, is_storm=True)
                 self.snowball_timer = time.time()
 
         if time.time() - self.lifetime_timer > self.lifetime:

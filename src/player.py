@@ -471,8 +471,8 @@ class Player(VisibleSprite):
         self.snowball_queue.append(size)
         self.dig_progress.snowballs_displays.append(self.dig_progress.SnowballDisplay(self.scene, self, size))
 
-    def spawn_snowball(self, size: int, pos: tuple[int, int], vel: tuple[int, int], follow: bool = True) -> None:
-        sb = Snowball(self.scene, VEC(vel), size, pos=pos, follow=follow)
+    def spawn_snowball(self, size: int, pos: tuple[int, int], vel: tuple[int, int], follow: bool = True, is_storm: bool = False) -> None:
+        sb = Snowball(self.scene, VEC(vel), size, pos=pos, follow=follow, is_storm=is_storm)
         self.snowballs[sb.id] = sb
 
     def pop_snowball(self) -> int:
