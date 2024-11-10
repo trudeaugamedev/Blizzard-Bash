@@ -71,7 +71,7 @@ class StormSwirl(Swirl):
             for _ in range(2):
                 StormAnim(self.scene, self.pos + (self.size / 2,) * 2, self.storm)
 
-        self.image.fill((self.storm.alpha * 0.15,) * 3, special_flags=BLEND_ADD)
+        self.image.fill((max(self.storm.alpha * 0.15 - 20, 0),) * 3, special_flags=BLEND_ADD)
 
         if self.storm.alpha == 255:
             self.kill()
