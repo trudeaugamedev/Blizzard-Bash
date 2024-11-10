@@ -116,7 +116,11 @@ class Parser:
 
         all_ids = set(Powerup.instances.keys())
         # Parse powerup position
-        if "powerups" not in data or not data["powerups"]: return
+        if "powerups" not in data: return
+        if not data["powerups"]:
+            for _id in all_ids:
+                Powerup.instances.pop(_id).kill()
+            return
         for powerup_data in data["powerups"]:
             if powerup_data["id"] in all_ids:
                 all_ids.remove(powerup_data["id"])
