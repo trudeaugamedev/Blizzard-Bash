@@ -188,11 +188,9 @@ wss.on("connection", (socket) => {
 				players.get(data.id).socket.send(strMsg);
 			} else if (data.powerup) {
 				powerups.delete(data.id);
-			}
-			if (data.storm_id) {
+			} else if (data.storm_id) {
 				xbroadcast(strMsg, data.player_id);
-			}
-			if (data.landed) {
+			} else if (data.landed) {
 				xbroadcast(strMsg, data.player_id);
 			}
 			return;
