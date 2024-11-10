@@ -358,6 +358,9 @@ class Player(VisibleSprite):
                 assets.throw_sound.play()
                 if self.powerup == "clustershot":
                     size = self.pop_snowball()
+                    if size == 2:
+                        sb = Snowball(self.scene, self.sb_vel, 2)
+                        self.snowballs[sb.id] = sb
                     for _ in range(4 if size == 0 else 7):
                         sb = Snowball(self.scene, self.sb_vel + VEC(uniform(-180, 180), uniform(-180, 180)), 0)
                         self.snowballs[sb.id] = sb
