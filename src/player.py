@@ -191,8 +191,7 @@ class Player(VisibleSprite):
 
         self.self_snowball_time = time.time()
 
-        self.CONST_ACC = 500 # 500 pixels per second squared (physics :P)
-        self.SMALL_MAX_SPEED = 30
+        self.CONST_ACC = 1300
         self.JUMP_SPEED1 = -400
         self.JUMP_SPEED2 = -320
         self.JUMP_SPEED3 = -210
@@ -304,9 +303,9 @@ class Player(VisibleSprite):
             self.idle = True
 
         if self.can_move:
-            self.vel.x *= 0.12 ** self.manager.dt
+            self.vel.x *= 0.004 ** self.manager.dt
         else:
-            self.vel.x *= 0.0001 ** self.manager.dt
+            self.vel.x *= 0.00000005 ** self.manager.dt
 
         if self.on_ground:
             self.jump_time = time.time()
