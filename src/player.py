@@ -271,6 +271,11 @@ class Player(VisibleSprite):
     def update_keys(self) -> None:
         self.keys = pygame.key.get_pressed()
 
+        if self.keys[K_SPACE] and self.on_ground and self.powerup != "rapidfire":
+            self.digging = True
+            self.idle = False
+            self.throwing = False
+
         self.acc = VEC(0, GRAVITY)
         if self.keys[K_a]: # Acceleration
             self.acc.x -= self.CONST_ACC
@@ -309,7 +314,7 @@ class Player(VisibleSprite):
 
         if self.on_ground:
             self.jump_time = time.time()
-        if self.keys[K_w] and self.can_move:
+        if self.keys[K_w] and self.can_move and not self.digging:
             if time.time() - self.jump_time < 0.2:
                 self.vel.y = self.JUMP_SPEED1
             elif time.time() - self.jump_time < 0.3:
@@ -325,11 +330,6 @@ class Player(VisibleSprite):
 
         if self.keys[K_s] and not self.on_ground:
             self.acc.y += GRAVITY
-
-        if self.keys[K_SPACE] and self.on_ground and self.powerup != "rapidfire":
-            self.digging = True
-            self.idle = False
-            self.throwing = False
 
     def update_throw(self) -> None:
         if self.powerup != "rapidfire":
