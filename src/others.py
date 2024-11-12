@@ -8,6 +8,7 @@ from random import choice
 from math import sin, pi
 import pygame
 import time
+import sys
 
 from .constants import VEC, FONT, PIXEL_SIZE, WIDTH
 from .ground import Ground1, Ground2, Ground3
@@ -42,6 +43,10 @@ class OtherPlayer(VisibleSprite):
         self.powerup = -1
         self.powerup_flash_time = time.time()
 
+        self.start_time = time.time()
+        self.msg_times = []
+        self.last_time = time.time()
+
     def update(self) -> None:
         self.rect = self.image.get_rect(midbottom=self.pos)
         self.real_rect.midbottom = self.rect.midbottom
@@ -66,6 +71,10 @@ class OtherPlayer(VisibleSprite):
         self.orig_image = self.assets.player[self.frame]
         self.upright_image = pygame.transform.flip(self.orig_image, self.flip, False)
         self.image = pygame.transform.rotate(self.upright_image, self.rotation)
+
+        if time.time() - self.start_time > 10:
+            print(self.msg_times)
+            sys.exit()
 
     def set_colors(self, clothes, hat, skin):
         if clothes == self.clothes_hue and hat == self.hat_hue and skin == self.skin_tone: return

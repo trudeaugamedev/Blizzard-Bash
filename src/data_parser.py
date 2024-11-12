@@ -6,6 +6,7 @@ if TYPE_CHECKING:
 from src.others import OtherPlayer, OtherSnowball, OtherStorm
 from src.powerup import Powerup
 from src.constants import VEC
+import time
 
 from websockets.exceptions import ConnectionClosedError
 
@@ -73,6 +74,8 @@ class Parser:
                 except KeyError:
                     continue
             other = self.manager.other_players[player_data["id"]]
+            other.msg_times.append(round(time.time() - other.last_time, 6))
+            other.last_time = time.time()
 
             if "name" in player_data and player_data["name"] is not None: other.name = player_data["name"]
             if "pos" in player_data and player_data["pos"] is not None: other.pos = VEC(player_data["pos"])
