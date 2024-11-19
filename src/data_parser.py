@@ -8,6 +8,7 @@ from src.powerup import Powerup
 from src.constants import VEC
 
 from websockets.exceptions import ConnectionClosedError
+import time
 
 class Parser:
     def __init__(self, client: Client) -> None:
