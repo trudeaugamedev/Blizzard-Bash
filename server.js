@@ -83,14 +83,6 @@ class Powerup {
 		this.type = ["rapidfire", "strength", "clustershot", "hailstorm"][randint(0, 3)];
 		this.startTime = Date.now();
 	}
-	constructor (id, type) {
-		this.id = id;
-		powerupId++;
-		this.vel = [0, 0]
-		this.pos = [randint(-2400, 2400), -1200];
-		this.type = type;
-		this.startTime = Date.now();		
-	}
 
 	update() {
 		this.vel[1] += 0.01;
@@ -272,18 +264,6 @@ function handleAdminMessage(msg) {
 			broadcast(JSON.stringify({"type": "dc", "id": id}));
 		} else {
 			console.log(`Non-existent player id ${id}!`)
-		}
-	} else if (command.startsWith("powerup")) {
-		let name = command.substring(9);
-		switch (name) {
-			case "rapidfire":
-			case "clustershot":
-			case "strength":
-			case "hailstorm":
-				powerups.set(powerupId, new Powerup(powerupId, name));
-				break;
-			default:
-				console.log(`Non-existent powerup`);
 		}
 	}
 }
