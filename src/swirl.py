@@ -36,6 +36,7 @@ class Swirl(VisibleSprite):
                 uniform(7, 12), # speed
                 choice(dot_sizes) # radius
             ])
+        self.visible = True
 
     def update(self) -> None:
         for dot in self.dots:
@@ -43,18 +44,20 @@ class Swirl(VisibleSprite):
             pygame.draw.aacircle(self.image, dot[2], pos, dot[5])
 
     def draw(self) -> None:
+        if not self.visible: return
         self.image.fill((2, 2, 2), special_flags=BLEND_ADD)
         self.scene.manager.screen.blit(self.image, self.pos - self.scene.player.camera.offset, special_flags=BLEND_MULT)
 
 class StormSwirl(Swirl):
     instances = {}
 
-    def __init__(self, scene: Scene, layer: Layers, storm: Storm, pos: VEC, size: int, density: int = 6, id: str = None) -> None:
+    def __init__(self, scene: Scene, layer: Layers, storm: Storm, pos: VEC, size: int, density: int = 6, id: str = None, suck: bool = False) -> None:
         super().__init__(scene, layer, size, density, range(2, 4))
         self.storm = storm
         self.pos = pos
         self.timer = time.time()
         self.orig_img = self.image.copy()
+        self.suck = suck
 
         if id is None:
             self.id = storm.id
@@ -70,6 +73,12 @@ class StormSwirl(Swirl):
             self.timer = time.time()
             for _ in range(2):
                 StormAnim(self.scene, self.pos + (self.size / 2,) * 2, self.storm)
+
+        if self.suck:
+            if (dist := self.scene.player.pos.distance_to(self.pos + (self.size / 2,) * 2)) < 250:
+                vel = (1 - dist / 250) * (self.pos + (self.size / 2,) * 2 - self.scene.player.pos).normalize() * 50
+                vel.y *= 0.3
+                self.scene.player.vel += vel
 
         self.image.fill((max(self.storm.alpha * 0.15 - 20, 0),) * 3, special_flags=BLEND_ADD)
 

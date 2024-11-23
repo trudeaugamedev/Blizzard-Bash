@@ -8,6 +8,7 @@ from src.powerup import Powerup
 from src.constants import VEC
 
 from websockets.exceptions import ConnectionClosedError
+import time
 
 class Parser:
     def __init__(self, client: Client) -> None:
@@ -32,6 +33,10 @@ class Parser:
                 if data["command"].startswith("start"):
                     self.manager.scene.waiting = False
                     self.manager.scene.player.powerup = None
+                    self.manager.scene.player.powerup_time = 0
+                    while self.manager.scene.player.snowball_queue:
+                        self.manager.scene.player.pop_snowball()
+                    self.manager.scene.player.dig_iterations = 0
                 elif data["command"] == "stop":
                     self.manager.scene.time_left = -1
             case "wd": # Wind
@@ -70,18 +75,19 @@ class Parser:
                     continue
             other = self.manager.other_players[player_data["id"]]
 
-            if "name" in player_data and player_data["name"]: other.name = player_data["name"]
-            if "pos" in player_data and player_data["pos"]: other.pos = VEC(player_data["pos"])
-            if "rot" in player_data and player_data["rot"]: other.rotation = player_data["rot"]
-            if "flip" in player_data and player_data["flip"]: other.flip = player_data["flip"]
-            if "frame" in player_data and player_data["frame"]: other.frame = player_data["frame"]
-            if "score" in player_data and player_data["score"]: other.score = player_data["score"]
-            if "powerup" in player_data and player_data["powerup"]: other.powerup = player_data["powerup"]
-            if "colors" in player_data and player_data["colors"]: other.set_colors(*player_data["colors"])
+            if "name" in player_data and player_data["name"] is not None: other.name = player_data["name"]
+            if "pos" in player_data and player_data["pos"] is not None: other.pos = VEC(player_data["pos"])
+            if "rot" in player_data and player_data["rot"] is not None: other.rotation = player_data["rot"]
+            if "flip" in player_data and player_data["flip"] is not None: other.flip = player_data["flip"]
+            if "frame" in player_data and player_data["frame"] is not None: other.frame = player_data["frame"]
+            if "score" in player_data and player_data["score"] is not None: other.score = player_data["score"]
+            if "powerup" in player_data and player_data["powerup"] is not None: other.powerup = player_data["powerup"]
+            if "colors" in player_data and player_data["colors"] is not None: other.set_colors(*player_data["colors"])
 
             if "snowballs" in player_data and player_data["snowballs"]:
                 # Parse data of snowballs
                 for snowball_data in player_data["snowballs"]:
+                    if snowball_data["id"] in OtherSnowball.killed: continue
                     if snowball_data["id"] in other.snowballs:
                         snowball = other.snowballs[snowball_data["id"]]
                         snowball.pos = VEC(snowball_data["pos"])
@@ -111,7 +117,11 @@ class Parser:
 
         all_ids = set(Powerup.instances.keys())
         # Parse powerup position
-        if "powerups" not in data or not data["powerups"]: return
+        if "powerups" not in data: return
+        if not data["powerups"]:
+            for _id in all_ids:
+                Powerup.instances.pop(_id).kill()
+            return
         for powerup_data in data["powerups"]:
             if powerup_data["id"] in all_ids:
                 all_ids.remove(powerup_data["id"])

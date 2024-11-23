@@ -129,9 +129,14 @@ class DigProgress(VisibleSprite):
 
         if self.player.powerup != "rapidfire":
             for snowball in self.snowballs_displays:
+                if snowball.type == 2:
+                    snowball.swirl.visible = True
                 snowball.draw()
         else:
             self.manager.screen.blit(assets.infinite_snowballs, rect.midbottom - VEC(assets.infinite_snowballs.get_width() // 2, 0) + (0, 16))
+            for display in self.snowballs_displays:
+                if display.type == 2:
+                    display.swirl.visible = False
 
 class Player(VisibleSprite):
     def __init__(self, scene: Scene) -> None:
@@ -191,8 +196,7 @@ class Player(VisibleSprite):
 
         self.self_snowball_time = time.time()
 
-        self.CONST_ACC = 500 # 500 pixels per second squared (physics :P)
-        self.SMALL_MAX_SPEED = 30
+        self.CONST_ACC = 1300
         self.JUMP_SPEED1 = -400
         self.JUMP_SPEED2 = -320
         self.JUMP_SPEED3 = -210
@@ -272,6 +276,11 @@ class Player(VisibleSprite):
     def update_keys(self) -> None:
         self.keys = pygame.key.get_pressed()
 
+        if self.keys[K_SPACE] and self.on_ground and self.powerup != "rapidfire":
+            self.digging = True
+            self.idle = False
+            self.throwing = False
+
         self.acc = VEC(0, GRAVITY)
         if self.keys[K_a]: # Acceleration
             self.acc.x -= self.CONST_ACC
@@ -304,13 +313,13 @@ class Player(VisibleSprite):
             self.idle = True
 
         if self.can_move:
-            self.vel.x *= 0.12 ** self.manager.dt
+            self.vel.x *= 0.004 ** self.manager.dt
         else:
-            self.vel.x *= 0.0001 ** self.manager.dt
+            self.vel.x *= 0.00000005 ** self.manager.dt
 
         if self.on_ground:
             self.jump_time = time.time()
-        if self.keys[K_w] and self.can_move:
+        if self.keys[K_w] and self.can_move and not self.digging:
             if time.time() - self.jump_time < 0.2:
                 self.vel.y = self.JUMP_SPEED1
             elif time.time() - self.jump_time < 0.3:
@@ -324,10 +333,8 @@ class Player(VisibleSprite):
             self.ground_level = Ground2 if self.ground_level == Ground3 else Ground1
             self.on_ground = False
 
-        if self.keys[K_SPACE] and self.on_ground and self.powerup != "rapidfire":
-            self.digging = True
-            self.idle = False
-            self.throwing = False
+        if self.keys[K_s] and not self.on_ground:
+            self.acc.y += GRAVITY
 
     def update_throw(self) -> None:
         if self.powerup != "rapidfire":
@@ -356,12 +363,18 @@ class Player(VisibleSprite):
                 assets.throw_sound.play()
                 if self.powerup == "clustershot":
                     size = self.pop_snowball()
+                    if size == 2:
+                        sb = Snowball(self.scene, self.sb_vel, 2)
+                        self.snowballs[sb.id] = sb
                     for _ in range(4 if size == 0 else 7):
                         sb = Snowball(self.scene, self.sb_vel + VEC(uniform(-180, 180), uniform(-180, 180)), 0)
                         self.snowballs[sb.id] = sb
                     for _ in range(1 if size == 0 else 3):
                         sb = Snowball(self.scene, self.sb_vel + VEC(uniform(-180, 180), uniform(-180, 180)), 1)
                         self.snowballs[sb.id] = sb
+                elif self.powerup == "rapidfire":
+                    sb = Snowball(self.scene, self.sb_vel, 0)
+                    self.snowballs[sb.id] = sb
                 else:
                     size = self.pop_snowball()
                     sb = Snowball(self.scene, self.sb_vel, size)
@@ -449,7 +462,8 @@ class Player(VisibleSprite):
         if self.pos.x > Border.x or self.pos.x < -Border.x:
             if time.time() - self.self_snowball_time > 800 / diff * 0.06:
                 pos = self.pos - (0, 400) - self.scene.wind_vel * 0.25 + (self.vel.x * 0.4, 0) + (uniform(-80, 80), 0)
-                self.spawn_snowball(0, pos, VEC(0, 0))
+                sb = SelfSnowball(self.scene, VEC(0, 0), randint(0, 1), pos=pos, follow=False)
+                self.snowballs[sb.id] = sb
                 self.self_snowball_time = time.time()
 
         self.can_move = self.frame_group != self.assets.player_dig and not self.digging
@@ -458,8 +472,8 @@ class Player(VisibleSprite):
         self.snowball_queue.append(size)
         self.dig_progress.snowballs_displays.append(self.dig_progress.SnowballDisplay(self.scene, self, size))
 
-    def spawn_snowball(self, size: int, pos: tuple[int, int], vel: tuple[int, int], follow: bool = True) -> None:
-        sb = Snowball(self.scene, VEC(vel), size, pos=pos, follow=follow)
+    def spawn_snowball(self, size: int, pos: tuple[int, int], vel: tuple[int, int], follow: bool = True, is_storm: bool = False) -> None:
+        sb = Snowball(self.scene, VEC(vel), size, pos=pos, follow=follow, is_storm=is_storm)
         self.snowballs[sb.id] = sb
 
     def pop_snowball(self) -> int:
