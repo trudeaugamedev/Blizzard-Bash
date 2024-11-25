@@ -84,8 +84,7 @@ class VortexSwirl(Swirl):
                 vel.y *= 0.3
                 self.scene.player.vel += vel
 
-        # self.image.fill((max(self.storm.alpha * 0.15 - 20, 0),) * 3, special_flags=BLEND_ADD)
-        self.image.fill((100, 0, 0), special_flags=BLEND_ADD)
+        self.image.fill((0, 0, 0), special_flags=BLEND_ADD)
 
         if time.time() - self.startTime > self.maxTime:
             self.kill()
