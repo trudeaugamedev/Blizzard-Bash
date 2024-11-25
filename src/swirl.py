@@ -4,9 +4,10 @@ if TYPE_CHECKING:
     from scene import Scene
 
 from .sprite import VisibleSprite, Layers
-from .storm import Storm, StormAnim
+# from .storm import Storm, StormAnim
 from .constants import VEC
 
+import pytweening as tween
 from random import randint, uniform, choice
 from math import cos, sin, pi
 from pygame.locals import *
@@ -48,31 +49,34 @@ class Swirl(VisibleSprite):
         self.image.fill((2, 2, 2), special_flags=BLEND_ADD)
         self.scene.manager.screen.blit(self.image, self.pos - self.scene.player.camera.offset, special_flags=BLEND_MULT)
 
-class StormSwirl(Swirl):
+class VortexSwirl(Swirl):
     instances = {}
 
-    def __init__(self, scene: Scene, layer: Layers, storm: Storm, pos: VEC, size: int, density: int = 6, id: str = None, suck: bool = False) -> None:
+    def __init__(self, scene: Scene, layer: Layers, pos: VEC, size: int, density: int = 6, id: str = None, suck: bool = False) -> None:
         super().__init__(scene, layer, size, density, range(2, 4))
-        self.storm = storm
+        # self.storm = storm
         self.pos = pos
         self.timer = time.time()
+        self.startTime = time.time()
+        self.maxTime = 15
         self.orig_img = self.image.copy()
         self.suck = suck
 
-        if id is None:
-            self.id = storm.id
-        else:
-            self.id = id
+        # if id is None:
+        #     self.id = storm.id
+        # else:
+        #     self.id = id
+        self.id = id
         __class__.instances[self.id] = self
 
     def update(self) -> None:
-        if getattr(self, "storm", None) is None: return
+        # if getattr(self, "storm", None) is None: return
         super().update()
 
         if time.time() - self.timer > 0.1:
             self.timer = time.time()
             for _ in range(2):
-                StormAnim(self.scene, self.pos + (self.size / 2,) * 2, self.storm)
+                VortexAnim(self.scene, self.pos + (self.size / 2,) * 2)
 
         if self.suck:
             if (dist := self.scene.player.pos.distance_to(self.pos + (self.size / 2,) * 2)) < 250:
@@ -80,15 +84,60 @@ class StormSwirl(Swirl):
                 vel.y *= 0.3
                 self.scene.player.vel += vel
 
-        self.image.fill((max(self.storm.alpha * 0.15 - 20, 0),) * 3, special_flags=BLEND_ADD)
+        # self.image.fill((max(self.storm.alpha * 0.15 - 20, 0),) * 3, special_flags=BLEND_ADD)
+        self.image.fill((100, 0, 0), special_flags=BLEND_ADD)
 
-        if self.storm.alpha == 255:
+        if time.time() - self.startTime > self.maxTime:
             self.kill()
 
     def draw(self) -> None:
-        if getattr(self, "storm", None) is None: return
+        # if getattr(self, "storm", None) is None: return
         super().draw()
 
     def kill(self) -> None:
-        __class__.instances.pop(self.storm.id)
+        # __class__.instances.pop(self.storm.id)
         super().kill()
+
+class VortexAnim(VisibleSprite):
+    def __init__(self, scene: Scene, pos: VEC) -> None:
+        super().__init__(scene, Layers.STORM_ANIM)
+        self.start_pos = pos.copy()
+        self.pos = pos.copy()
+        # blob = choice(storm.blobs)
+        # radius = blob.radius * PIXEL_SIZE
+        radius = 10
+        # self.target_offset = blob.offset * PIXEL_SIZE
+        # self.target_pos = storm.pos + self.target_offset
+        self.radius = radius
+        self.scale = 0
+        # self.storm = storm
+        self.orig_image = pygame.Surface((radius * 2, radius * 2), pygame.SRCALPHA)
+        pygame.draw.circle(self.orig_image, (138, 155, 178), (radius, radius), radius)
+        self.orig_image.set_alpha(50)
+        # self.alpha_target = self.storm.alpha * 0.7
+        self.alpha_target = 255 * 0.7
+        self.linear_progress = 0
+        self.progress = 0
+
+    def update(self) -> None:
+        self.linear_progress += 1.0 * self.manager.dt
+        self.progress = tween.easeOutCubic(self.linear_progress)
+
+        if self.linear_progress < 1:
+            # self.alpha_target = self.storm.alpha * 0.7
+            self.alpha = self.progress * (self.alpha_target - 50) + 50
+        else:
+            self.alpha -= 270 * self.manager.dt
+        self.orig_image.set_alpha(self.alpha)
+
+        if self.alpha <= 0:
+            self.kill()
+
+        # self.target_pos = self.storm.pos + self.target_offset
+        # self.pos = self.progress * (self.target_pos - self.start_pos) + self.start_pos
+
+        self.scale = min(self.progress, 1)
+
+    def draw(self) -> None:
+        image = pygame.transform.scale_by(self.orig_image, self.scale)
+        self.scene.manager.screen.blit(image, self.pos - VEC(image.size) // 2 - self.scene.player.camera.offset)
