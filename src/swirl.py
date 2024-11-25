@@ -78,11 +78,16 @@ class VortexSwirl(Swirl):
             for _ in range(2):
                 VortexAnim(self.scene, self.pos + (self.size / 2,) * 2)
 
+        # sucking is on the thrower's side?????
         if self.suck:
             if (dist := self.scene.player.pos.distance_to(self.pos + (self.size / 2,) * 2)) < 250:
                 vel = (1 - dist / 250) * (self.pos + (self.size / 2,) * 2 - self.scene.player.pos).normalize() * 50
                 vel.y *= 0.3
                 self.scene.player.vel += vel
+        for snowball in self.scene.player.snowballs.values():
+            if (dist := snowball.pos.distance_to(self.pos + (self.size / 2,) * 2)) < 250 and dist > 0:
+                snowball.vel *= (dist / 250) ** self.manager.dt
+                snowball.vel += (1 - dist / 250) * (self.pos + (self.size / 2, 0) - snowball.pos).normalize() * 15
 
         self.image.fill((0, 0, 0), special_flags=BLEND_ADD)
 
@@ -104,7 +109,7 @@ class VortexAnim(VisibleSprite):
         self.pos = pos.copy()
         # blob = choice(storm.blobs)
         # radius = blob.radius * PIXEL_SIZE
-        radius = 10
+        radius = 0
         # self.target_offset = blob.offset * PIXEL_SIZE
         # self.target_pos = storm.pos + self.target_offset
         self.radius = radius
