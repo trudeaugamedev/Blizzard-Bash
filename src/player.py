@@ -175,7 +175,7 @@ class Player(VisibleSprite):
         self.powerup_time = time.time()
         self.powerup_max_time = 0
         self.powerup_flash_time = time.time()
-        self.storms = []
+        # self.storms = []
 
         self.throw_trail = ThrowTrail(self.scene, self)
         self.throwing = False
@@ -233,26 +233,26 @@ class Player(VisibleSprite):
             snowballs.append(data)
         self.client.queue_data("snowballs", snowballs)
 
-        storms = []
-        for storm in self.storms:
-            data = {
-                "id": storm.id,
-                "pos": inttup(storm.pos),
-                "alpha": int(storm.alpha),
-            }
-            storms.append(data)
-        self.client.queue_data("storms", storms)
+        # storms = []
+        # for storm in self.storms:
+        #     data = {
+        #         "id": storm.id,
+        #         "pos": inttup(storm.pos),
+        #         "alpha": int(storm.alpha),
+        #     }
+        #     storms.append(data)
+        # self.client.queue_data("storms", storms)
 
-        storm_blobs = []
-        for storm in self.storms:
-            data = {
-                "id": storm.id,
-                "size": storm.image.size,
-                "offsets": storm.offsets,
-                "radii": storm.radii,
-            }
-            storm_blobs.append(data)
-        self.client.queue_data("storm_blobs", storm_blobs)
+        # storm_blobs = []
+        # for storm in self.storms:
+        #     data = {
+        #         "id": storm.id,
+        #         "size": storm.image.size,
+        #         "offsets": storm.offsets,
+        #         "radii": storm.radii,
+        #     }
+        #     storm_blobs.append(data)
+        # self.client.queue_data("storm_blobs", storm_blobs)
 
     def draw(self) -> None:
         self.manager.screen.blit(shadow(self.image), VEC(self.rect.topleft) - self.camera.offset + (3, 3), special_flags=BLEND_RGB_SUB)

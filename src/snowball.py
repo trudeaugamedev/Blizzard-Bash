@@ -43,7 +43,7 @@ class Snowball(VisibleSprite):
         self.rot_speed = choice([randint(-400, -100), randint(100, 400)])
         self.hit_player = None
         self.follow = follow
-        self.is_storm = is_storm
+        # self.is_storm = is_storm
 
         if self.type == 2:
             self.swirl = Swirl(self.scene, Layers.SNOWBALL, 64)
@@ -65,8 +65,10 @@ class Snowball(VisibleSprite):
         self.rotation += self.rot_speed * self.manager.dt
         self.image = pygame.transform.rotate(self.frames[self.frame], self.rotation)
 
-        self.acc = VEC(0, GRAVITY) * (0.4 if self.is_storm else 1)
-        self.acc += self.scene.wind_vel * (0.1 if self.is_storm else 1)
+        # self.acc = VEC(0, GRAVITY) * (0.4 if self.is_storm else 1)
+        # self.acc += self.scene.wind_vel * (0.1 if self.is_storm else 1)
+        self.acc = VEC(0, GRAVITY)
+        self.acc += self.scene.wind_vel
 
         self.vel += self.acc * self.manager.dt
         self.pos += self.vel * self.manager.dt
@@ -85,17 +87,17 @@ class Snowball(VisibleSprite):
         if self.collide():
             return
 
-        if not self.is_storm:
-            for powerup in Powerup.instances.values():
-                if powerup.rect.colliderect(self.real_rect) and not powerup.touched:
-                    if powerup.type == "hailstorm":
-                        self.scene.player.add_snowball(2)
-                        self.scene.player.dig_iterations += 1
-                    else:
-                        self.player.powerup = powerup.type
-                        self.player.powerup_time = time.time()
-                    self.client.irreg_data.put({"id": powerup.id, "powerup": 1}) # powerup key to uniquify the message
-                    powerup.touched = True
+        # if not self.is_storm:
+        for powerup in Powerup.instances.values():
+            if powerup.rect.colliderect(self.real_rect) and not powerup.touched:
+                if powerup.type == "hailstorm":
+                    self.scene.player.add_snowball(2)
+                    self.scene.player.dig_iterations += 1
+                else:
+                    self.player.powerup = powerup.type
+                    self.player.powerup_time = time.time()
+                self.client.irreg_data.put({"id": powerup.id, "powerup": 1}) # powerup key to uniquify the message
+                powerup.touched = True
 
         if self.type == 2:
             self.swirl.pos = self.pos - VEC(32, 32)
