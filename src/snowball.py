@@ -32,7 +32,9 @@ class Snowball(VisibleSprite):
         self.frame = 0
         self.frame_time = time.time()
         self.type = sb_type
-        self.frames = [assets.snowball_small, assets.snowball_large, assets.snowball_large][sb_type]
+        self.frames = [assets.snowball_small, assets.snowball_large, assets.snowball_large, # normal snowballs
+                       assets.snowball_small, assets.snowball_large, # clusters
+                       assets.snowball_small, assets.snowball_large][sb_type] # strengths
         self.score = 1 if self.frames == assets.snowball_small else 4
         self.image = self.frames[self.frame]
         self.rect = self.image.get_rect(center=self.pos)
@@ -147,9 +149,15 @@ class Snowball(VisibleSprite):
     def trigger(self) -> None:
         if self.type == 2: # vortex
             self.kill()
-        if self.type == 3: # cluster
-            pass
-        if self.type == 4: # strength
+        if self.type == 3 or self.type == 4: # cluster
+            for _ in range(4 if self.type == 3 else 7):
+                sb = Snowball(self.scene, self.vel + VEC(uniform(-180, 180), uniform(-180, 180)), 0, self.pos)
+                self.scene.player.snowballs[sb.id] = sb
+            for _ in range(1 if self.type == 4 else 3):
+                sb = Snowball(self.scene, self.vel + VEC(uniform(-180, 180), uniform(-180, 180)), 1, self.pos)
+                self.scene.player.snowballs[sb.id] = sb
+                self.kill()
+        if self.type == 5 or self.type == 6: # strength
             pass
 
 class SelfSnowball(Snowball):

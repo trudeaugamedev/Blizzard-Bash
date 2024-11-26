@@ -349,7 +349,7 @@ class Player(VisibleSprite):
                 self.has_trigger = False
                 self.just_triggered = True
                 self.throwing = False
-                for snowball in self.snowballs.values():
+                for snowball in list(self.snowballs.values()):
                     snowball.trigger()
             elif self.can_throw:
                 m_pos = VEC(pygame.mouse.get_pos())
@@ -376,12 +376,18 @@ class Player(VisibleSprite):
                     if size == 2:
                         sb = Snowball(self.scene, self.sb_vel, 2)
                         self.snowballs[sb.id] = sb
-                    for _ in range(4 if size == 0 else 7):
-                        sb = Snowball(self.scene, self.sb_vel + VEC(uniform(-180, 180), uniform(-180, 180)), 0)
-                        self.snowballs[sb.id] = sb
-                    for _ in range(1 if size == 0 else 3):
-                        sb = Snowball(self.scene, self.sb_vel + VEC(uniform(-180, 180), uniform(-180, 180)), 1)
-                        self.snowballs[sb.id] = sb
+                        size -= 1
+                    sb = Snowball(self.scene, self.sb_vel, 3 + size)
+                    self.snowballs[sb.id] = sb
+                    # if size == 2:
+                    #     sb = Snowball(self.scene, self.sb_vel, 2)
+                    #     self.snowballs[sb.id] = sb
+                    # for _ in range(4 if size == 0 else 7):
+                    #     sb = Snowball(self.scene, self.sb_vel + VEC(uniform(-180, 180), uniform(-180, 180)), 0)
+                    #     self.snowballs[sb.id] = sb
+                    # for _ in range(1 if size == 0 else 3):
+                    #     sb = Snowball(self.scene, self.sb_vel + VEC(uniform(-180, 180), uniform(-180, 180)), 1)
+                    #     self.snowballs[sb.id] = sb
                 elif self.powerup == "rapidfire":
                     sb = Snowball(self.scene, self.sb_vel, 0)
                     self.snowballs[sb.id] = sb
@@ -585,12 +591,12 @@ class Player(VisibleSprite):
         self.powerup_max_time = {"rapidfire": 7, "strength": 16, "clustershot": 10}[self.powerup]
         if time.time() - self.powerup_time > self.powerup_max_time:
             if self.powerup == "rapidfire":
-                self.powerup = None
+                self.powerup = "clustershot"
                 self.throwing = False
             if self.powerup == "strength":
-                self.powerup = None
+                self.powerup = "clustershot"
             if self.powerup == "clustershot":
-                self.powerup = None
+                self.powerup = "clustershot"
 
     def update_camera(self) -> None:
         if self.snowballs:
