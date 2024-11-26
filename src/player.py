@@ -360,9 +360,8 @@ class Player(VisibleSprite):
                     self.frame_group = self.assets.player_throw_l
                 # Use camera offset to convert screen-space pos to in-world pos
                 try:
-                    self.sb_vel = ((m_pos - self.SB_OFFSET + self.camera.offset) - self.pos) * 8 * (1.4 if self.powerup == "strength" else 1)
-                    if self.sb_vel.length() > self.THROW_SPEED * (1.4 if self.powerup == "strength" else 1):
-                        self.sb_vel.scale_to_length(self.THROW_SPEED * (1.4 if self.powerup == "strength" else 1))
+                    self.sb_vel = ((m_pos - self.SB_OFFSET + self.camera.offset) - self.pos) * 8
+                    self.sb_vel.scale_to_length(self.THROW_SPEED)
                 except ValueError:
                     self.sb_vel = VEC() # 0 vector
         if MOUSEBUTTONUP in self.manager.events:
