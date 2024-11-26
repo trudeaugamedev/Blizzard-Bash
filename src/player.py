@@ -591,12 +591,12 @@ class Player(VisibleSprite):
         self.powerup_max_time = {"rapidfire": 7, "strength": 16, "clustershot": 10}[self.powerup]
         if time.time() - self.powerup_time > self.powerup_max_time:
             if self.powerup == "rapidfire":
-                self.powerup = "clustershot"
+                self.powerup = None
                 self.throwing = False
             if self.powerup == "strength":
-                self.powerup = "clustershot"
+                self.powerup = None
             if self.powerup == "clustershot":
-                self.powerup = "clustershot"
+                self.powerup = None
 
     def update_camera(self) -> None:
         if self.snowballs:
