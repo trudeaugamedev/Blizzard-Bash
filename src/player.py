@@ -395,7 +395,7 @@ class Player(VisibleSprite):
             elif not self.has_trigger:
                 self.just_triggered = False
                 self.throwing = False
-            elif self.snowballs.__len__() == 0:
+            elif len(self.snowballs) == 0:
                 self.just_triggered = False
                 self.throwing = False
 
