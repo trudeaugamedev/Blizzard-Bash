@@ -20,7 +20,7 @@ from .ground import Ground1
 from . import assets
 
 class Snowball(VisibleSprite):
-    def __init__(self, scene: Scene, vel: tuple[float, float], sb_type: int, pos: VEC = None, follow: bool = True, is_storm: bool = False) -> None:
+    def __init__(self, scene: Scene, vel: tuple[float, float], sb_type: int, pos: VEC = None, follow: bool = True) -> None:
         super().__init__(scene, Layers.SNOWBALL)
         self.id = uuid4().hex
 
@@ -151,12 +151,17 @@ class Snowball(VisibleSprite):
             self.kill()
         if self.type == 3 or self.type == 4: # cluster
             for _ in range(4 if self.type == 3 else 7):
-                sb = Snowball(self.scene, self.vel + VEC(uniform(-180, 180), uniform(-180, 180)), 0, self.pos)
+                sb = Snowball(self.scene, self.vel + VEC(uniform(-180, 180), uniform(-180, 180)), 0, self.pos.copy())
                 self.scene.player.snowballs[sb.id] = sb
-            for _ in range(1 if self.type == 4 else 3):
-                sb = Snowball(self.scene, self.vel + VEC(uniform(-180, 180), uniform(-180, 180)), 1, self.pos)
+            for _ in range(1 if (self.type == 3) else 3):
+                sb = Snowball(self.scene, self.vel + VEC(uniform(-280, 280), uniform(-180, 180)), 1, self.pos.copy())
                 self.scene.player.snowballs[sb.id] = sb
-                self.kill()
+
+            # # funny cluster?
+            # for _ in range (30):
+            #     sb = Snowball(self.scene, VEC(uniform(-1, 1), uniform(-1, 1)).normalize() * 500, self.type - 3, self.pos.copy())
+            #     self.scene.player.snowballs[sb.id] = sb
+            self.kill()
         if self.type == 5 or self.type == 6: # strength
             pass
 

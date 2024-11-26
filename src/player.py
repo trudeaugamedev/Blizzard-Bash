@@ -379,15 +379,6 @@ class Player(VisibleSprite):
                         size -= 1
                     sb = Snowball(self.scene, self.sb_vel, 3 + size)
                     self.snowballs[sb.id] = sb
-                    # if size == 2:
-                    #     sb = Snowball(self.scene, self.sb_vel, 2)
-                    #     self.snowballs[sb.id] = sb
-                    # for _ in range(4 if size == 0 else 7):
-                    #     sb = Snowball(self.scene, self.sb_vel + VEC(uniform(-180, 180), uniform(-180, 180)), 0)
-                    #     self.snowballs[sb.id] = sb
-                    # for _ in range(1 if size == 0 else 3):
-                    #     sb = Snowball(self.scene, self.sb_vel + VEC(uniform(-180, 180), uniform(-180, 180)), 1)
-                    #     self.snowballs[sb.id] = sb
                 elif self.powerup == "rapidfire":
                     sb = Snowball(self.scene, self.sb_vel, 0)
                     self.snowballs[sb.id] = sb
@@ -403,6 +394,9 @@ class Player(VisibleSprite):
                 else:
                     self.can_throw = True
             elif not self.has_trigger:
+                self.just_triggered = False
+                self.throwing = False
+            elif self.snowballs.__len__() == 0:
                 self.just_triggered = False
                 self.throwing = False
 
