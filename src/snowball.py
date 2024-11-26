@@ -163,7 +163,8 @@ class Snowball(VisibleSprite):
             #     self.scene.player.snowballs[sb.id] = sb
             self.kill()
         if self.type == 5 or self.type == 6: # strength
-            pass
+            m_pos = VEC(pygame.mouse.get_pos())
+            self.vel = ((m_pos + self.scene.player.camera.offset) - self.pos) * 4
 
 class SelfSnowball(Snowball):
     def collide(self) -> bool:
