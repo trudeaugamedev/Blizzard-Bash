@@ -519,7 +519,7 @@ class Player(VisibleSprite):
                         self.pop_snowball()
                         self.add_snowball(1) # large snowball
                     else:
-                        self.add_snowball(0) # small snowball
+                        self.add_snowball(2) # small snowball
                 elif self.frame <= 7:
                     if not self.keys[K_SPACE]:
                         self.frame_group = self.assets.player_idle
