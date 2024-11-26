@@ -144,6 +144,14 @@ class Snowball(VisibleSprite):
             VortexSwirl(self.scene, Layers.SNOWBALL, self.pos - (64, 64), 128, 20)
         self.landed = True
 
+    def trigger(self) -> None:
+        if self.type == 2: # vortex
+            self.kill()
+        if self.type == 3: # cluster
+            pass
+        if self.type == 4: # strength
+            pass
+
 class SelfSnowball(Snowball):
     def collide(self) -> bool:
         if self.scene.player.real_rect.colliderect(self.real_rect):

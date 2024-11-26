@@ -180,6 +180,8 @@ class Player(VisibleSprite):
         self.throw_trail = ThrowTrail(self.scene, self)
         self.throwing = False
         self.can_throw = True
+        self.has_trigger = False
+        self.just_triggered = False
         self.sb_vel = VEC(0, 0)
         self.snowball_queue = []
         self.snowballs: dict[Snowball] = {}
@@ -342,26 +344,34 @@ class Player(VisibleSprite):
         elif time.time() - self.rapidfire_time > 0.2:
             self.rapidfire_time = time.time()
             self.can_throw = True
-        if pygame.mouse.get_pressed()[0] and self.can_throw:
-            m_pos = VEC(pygame.mouse.get_pos())
-            self.throwing = True
-            if self.can_throw and self.dig_iterations < 3:
-                self.frame_group = self.assets.player_throw_s
+        if pygame.mouse.get_pressed()[0]:
+            if self.has_trigger:
+                self.has_trigger = False
+                self.just_triggered = True
+                self.throwing = False
+                for snowball in self.snowballs.values():
+                    snowball.trigger()
             elif self.can_throw:
-                self.frame_group = self.assets.player_throw_l
-            # Use camera offset to convert screen-space pos to in-world pos
-            try:
-                self.sb_vel = ((m_pos - self.SB_OFFSET + self.camera.offset) - self.pos) * 8 * (1.4 if self.powerup == "strength" else 1)
-                if self.sb_vel.length() > self.THROW_SPEED * (1.4 if self.powerup == "strength" else 1):
-                    self.sb_vel.scale_to_length(self.THROW_SPEED * (1.4 if self.powerup == "strength" else 1))
-            except ValueError:
-                self.sb_vel = VEC() # 0 vector
+                m_pos = VEC(pygame.mouse.get_pos())
+                self.throwing = True
+                if self.can_throw and self.dig_iterations < 3:
+                    self.frame_group = self.assets.player_throw_s
+                elif self.can_throw:
+                    self.frame_group = self.assets.player_throw_l
+                # Use camera offset to convert screen-space pos to in-world pos
+                try:
+                    self.sb_vel = ((m_pos - self.SB_OFFSET + self.camera.offset) - self.pos) * 8 * (1.4 if self.powerup == "strength" else 1)
+                    if self.sb_vel.length() > self.THROW_SPEED * (1.4 if self.powerup == "strength" else 1):
+                        self.sb_vel.scale_to_length(self.THROW_SPEED * (1.4 if self.powerup == "strength" else 1))
+                except ValueError:
+                    self.sb_vel = VEC() # 0 vector
         if MOUSEBUTTONUP in self.manager.events:
-            if self.manager.events[MOUSEBUTTONUP].button == 1 and self.can_throw:
+            if self.manager.events[MOUSEBUTTONUP].button == 1 and self.can_throw and not self.just_triggered:
                 self.throwing = False
                 assets.throw_sound.set_volume(0.2)
                 assets.throw_sound.play()
                 if self.powerup == "clustershot":
+                    self.has_trigger = True
                     size = self.pop_snowball()
                     if size == 2:
                         sb = Snowball(self.scene, self.sb_vel, 2)
@@ -382,8 +392,13 @@ class Player(VisibleSprite):
                 if self.powerup != "rapidfire":
                     self.dig_iterations -= 3 if size == 1 else 1
                     self.can_throw = bool(self.snowball_queue)
+                    if size == 2 or self.powerup == "strength":
+                        self.has_trigger = True
                 else:
                     self.can_throw = True
+            elif not self.has_trigger:
+                self.just_triggered = False
+                self.throwing = False
 
     def update_position(self) -> None:
         centerx = int(self.rect.centerx // PIXEL_SIZE * PIXEL_SIZE)
