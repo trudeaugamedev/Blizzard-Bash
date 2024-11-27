@@ -264,6 +264,16 @@ function handleAdminMessage(msg) {
 			players.delete(id);
 			broadcast(JSON.stringify({"type": "dc", "id": id}));
 		} else {
+			let name = command.substring(5);
+			for (const [id, player] of players) {
+				console.log(player.data.name);
+				if (player.data.name == name) {
+					player.socket.send_obj({"type": "kc"});
+					players.delete(player.data.id)
+					broadcast(JSON.stringify({"type": "dc", "id": id}));
+					return;
+				}
+			}
 			console.log(`Non-existent player id ${id}!`)
 		}
 	}
