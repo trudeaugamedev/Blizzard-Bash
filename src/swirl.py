@@ -86,9 +86,10 @@ class VortexSwirl(Swirl):
                 self.scene.player.vel += vel
         for snowball in self.scene.player.snowballs.values():
             if (dist := snowball.pos.distance_to(self.pos + (self.size / 2,) * 2)) < 250 and dist > 0:
-                snowball.vel *= ((dist + 10) / 260) ** self.manager.dt
-                snowball.vel += (1 - dist / 250) * (self.pos + (self.size / 2, self.size / 2) - snowball.pos).normalize() * 150
-                snowball.vel += (1.1 - dist / 250) * (self.pos + (self.size / 2, self.size / 2) - snowball.pos).normalize().rotate(-90) * 10
+                snowball.vel *= ((dist + 10) / 260) ** self.manager.dt # more friction the closer to center the snowball gets
+                snowball.vel += (1 - dist / 250) * (self.pos + (self.size / 2, self.size / 2) - snowball.pos).normalize() * 150 # normal accel (toward center)
+                snowball.vel += (1.1 - dist / 250) * (self.pos + (self.size / 2, self.size / 2) - snowball.pos).normalize().rotate(-90) * 10 # tangent accel (perp. to normal)
+                snowball.follow = False # don't mess with people's camera if snowball gets stuck
 
         self.image.fill((0, 0, 0), special_flags=BLEND_ADD)
 

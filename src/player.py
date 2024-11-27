@@ -24,13 +24,14 @@ class Camera:
         self.follow = follow
         self.float_offset = VEC(pos) - SCR_DIM // 2
         self.offset = intvec(self.float_offset)
+        self.scene = scene
 
     def update(self, pos: tuple[int, int]):
         self.tick_offset = pos - self.offset - SCR_DIM // 2
         self.tick_offset = snap(self.tick_offset, VEC(), VEC(1, 1))
         self.float_offset += self.tick_offset * self.follow * self.manager.dt
         self.offset = intvec(self.float_offset)
-        self.offset.y = max(-800, min(self.offset.y, -420))
+        self.offset.y = max(self.scene.player.pos.y - 700, min(self.offset.y, -420))
 
 class ThrowTrail(VisibleSprite):
     def __init__(self, scene: Scene, player: Player) -> None:
