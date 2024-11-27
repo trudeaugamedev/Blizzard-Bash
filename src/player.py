@@ -176,6 +176,7 @@ class Player(VisibleSprite):
         self.powerup_time = time.time()
         self.powerup_max_time = 0
         self.powerup_flash_time = time.time()
+        self.overheat = 0
         # self.storms = []
 
         self.throw_trail = ThrowTrail(self.scene, self)
@@ -320,6 +321,9 @@ class Player(VisibleSprite):
         else:
             self.vel.x *= 0.00000005 ** self.manager.dt
 
+        self.vel.x *= max(0, min(1, 1.12 - self.overheat / 25))
+        self.overheat = max(0, self.overheat - 5 * self.manager.dt)
+
         if self.on_ground:
             self.jump_time = time.time()
         if self.keys[K_w] and self.can_move and not self.digging:
@@ -342,9 +346,6 @@ class Player(VisibleSprite):
     def update_throw(self) -> None:
         if self.powerup != "rapidfire":
             self.can_throw = self.can_move and self.dig_iterations > 0
-        elif time.time() - self.rapidfire_time > 0.2:
-            self.rapidfire_time = time.time()
-            self.can_throw = True
         if pygame.mouse.get_pressed()[0]:
             if self.has_trigger:
                 self.has_trigger = False
@@ -382,6 +383,7 @@ class Player(VisibleSprite):
                 elif self.powerup == "rapidfire":
                     sb = Snowball(self.scene, self.sb_vel, 0)
                     self.snowballs[sb.id] = sb
+                    self.overheat += 1
                 else:
                     size = self.pop_snowball()
                     sb = Snowball(self.scene, self.sb_vel, size + (5 if self.powerup == "strength" and size != 2 else 0))
@@ -581,16 +583,18 @@ class Player(VisibleSprite):
         self.real_rect.midbottom = self.rect.midbottom
 
     def update_powerup(self) -> None:
-        if self.powerup is None: return
-        self.powerup_max_time = {"rapidfire": 7, "strength": 16, "clustershot": 10}[self.powerup]
-        if time.time() - self.powerup_time > self.powerup_max_time:
-            if self.powerup == "rapidfire":
-                self.powerup = None
-                self.throwing = False
-            if self.powerup == "strength":
-                self.powerup = None
-            if self.powerup == "clustershot":
-                self.powerup = None
+        self.powerup = "rapidfire"
+        self.can_throw = True
+        # if self.powerup is None: return
+        # self.powerup_max_time = {"rapidfire": 7, "strength": 16, "clustershot": 10}[self.powerup]
+        # if time.time() - self.powerup_time > self.powerup_max_time:
+        #     if self.powerup == "rapidfire":
+        #         self.powerup = None
+        #         self.throwing = False
+        #     if self.powerup == "strength":
+        #         self.powerup = None
+        #     if self.powerup == "clustershot":
+        #         self.powerup = None
 
     def update_camera(self) -> None:
         if self.snowballs:
