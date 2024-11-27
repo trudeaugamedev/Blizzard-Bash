@@ -462,7 +462,7 @@ class Player(VisibleSprite):
             self.vel.x = sign(self.hit_strength) * abs(self.hit_strength) * 100
             if not self.scene.waiting and not self.scene.eliminated:
                 if self.hit_powerup not in {"rapidfire", "clustershot"}:
-                    self.scene.score -= 1 # Penalty for getting hit (1 for now, may depend on self.hit_size)
+                    self.scene.score -= 2 # Penalty for getting hit (2 for now, may depend on self.hit_size)
             self.hit_strength = self.hit_size = 0
             self.hit_powerup = None
 
