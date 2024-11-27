@@ -162,7 +162,7 @@ class Snowball(VisibleSprite):
                 sb = Snowball(self.scene, self.vel + VEC(uniform(-180, 180), uniform(-180, 180)), 0, self.pos.copy())
                 self.scene.player.snowballs[sb.id] = sb
             for _ in range(1 if (self.type == 3) else 3):
-                sb = Snowball(self.scene, self.vel + VEC(uniform(-280, 280), uniform(-180, 180)), 1, self.pos.copy())
+                sb = Snowball(self.scene, self.vel + VEC(uniform(-180, 180), uniform(-180, 180)), 1, self.pos.copy())
                 self.scene.player.snowballs[sb.id] = sb
 
             # # funny cluster?
