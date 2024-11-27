@@ -79,7 +79,8 @@ class Powerup {
 		this.id = id;
 		powerupId++;
 		this.vel = [0, 0]
-		this.pos = [randint(-2400, 2400), -1200];
+		let x = 2400 - (1 - secondsLeft / totalTime) * 1600
+		this.pos = [randint(-x, x), -1200];
 		this.type = ["rapidfire", "strength", "clustershot", "hailstorm"][randint(0, 3)];
 		this.startTime = Date.now();
 	}
