@@ -75,13 +75,14 @@ class Player {
 }
 
 class Powerup {
-	constructor (id) {
-		this.id = id;
+	constructor (type) {
+		this.id = powerupId;
 		powerupId++;
 		this.vel = [0, 0]
 		let x = 2400 - (1 - secondsLeft / totalTime) * 1600
 		this.pos = [randint(-x, x), -1200];
-		this.type = ["rapidfire", "strength", "clustershot", "hailstorm"][randint(0, 3)];
+		if (type == -1) type = randint(0, 3);
+		this.type = ["rapidfire", "strength", "clustershot", "hailstorm"][type];
 		this.startTime = Date.now();
 	}
 
@@ -269,12 +270,17 @@ function handleAdminMessage(msg) {
 				console.log(player.data.name);
 				if (player.data.name == name) {
 					player.socket.send_obj({"type": "kc"});
-					players.delete(player.data.id)
+					players.delete(player.data.id);
 					broadcast(JSON.stringify({"type": "dc", "id": id}));
 					return;
 				}
 			}
 			console.log(`Non-existent player id ${id}!`)
+		}
+	} else if (command.startsWith("powerup")) {
+		let powerup = parseInt(command.substring(8));
+		for (let i = 0; i < 40; i++) {
+			powerups.set(powerupId, new Powerup(powerup));
 		}
 	}
 }
@@ -305,7 +311,7 @@ function game() {
 	if (Date.now() - powerupTime > powerupDuration) {
 		powerupTime = Date.now();
 		powerupDuration = randint(5000, 10000);
-		powerups.set(powerupId, new Powerup(powerupId));
+		powerups.set(powerupId, new Powerup(-1));
 	}
 	for (const [id, powerup] of powerups) {
 		powerup.update();
