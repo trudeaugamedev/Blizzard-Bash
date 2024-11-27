@@ -82,7 +82,7 @@ class MainGame(Scene):
 
         if time.time() - self.snowflake_time > 0.05:
             self.snowflake_time = time.time()
-            for _ in range(14):
+            for _ in range(5):
                 # choose between above left and right so that we can have snowflakes coming in from the side
                 # and also so that when we move to the left or right we don't get empty air with no snowflakes
                 pos = choice([
