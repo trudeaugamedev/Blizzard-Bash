@@ -387,7 +387,7 @@ class Player(VisibleSprite):
                     sb = Snowball(self.scene, self.sb_vel, size + (5 if self.powerup == "strength" and size != 2 else 0))
                     self.snowballs[sb.id] = sb
                 if self.powerup != "rapidfire":
-                    self.dig_iterations -= 3 if size == 1 else 1
+                    self.dig_iterations -= 3 if (size == 1 or size == 2) else 1
                     self.can_throw = bool(self.snowball_queue)
                     if size == 2 or self.powerup == "strength":
                         self.has_trigger = True
