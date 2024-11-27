@@ -20,7 +20,7 @@ class SnowflakeRenderer(VisibleSprite):
         ...
 
     def draw(self) -> None:
-        self.manager.screen.fblits(self.snowflakes)
+        self.manager.screen.fblits(map(lambda s: (s.image, s.pos - s.scene.player.camera.offset), self.snowflakes))
         self.snowflakes = []
 
 # actually not visible, but just needs to be updated
@@ -39,25 +39,21 @@ class SnowFlake(VisibleSprite):
 
         self.pos = VEC(pos)
         self.vel = VEC(0, 0)
-        self.resistance = uniform(0.85, 0.98)
+        self.resistance = uniform(0.0001, 0.0012)
 
         self.image = pygame.transform.rotate(choices(assets.snowflakes, [10, 9, 8, 7, 3, 3, 2, 2, 1, 2])[0], randint(0, 359))
         self.size = VEC(self.image.get_size())
-        self.rect = pygame.Rect(self.pos, self.size)
 
     def update(self) -> None:
         self.vel.y += GRAVITY * self.manager.dt
         self.vel += self.scene.wind_vel * 5 * self.manager.dt
-        self.vel *= self.resistance
+        self.vel *= self.resistance ** self.manager.dt
         self.pos += self.vel * self.manager.dt
 
-        self.rect.center = self.pos
-
-        if -self.size.x < self.rect.left - self.scene.player.camera.offset.x < WIDTH and self.rect.bottom > self.scene.player.camera.offset.y:
-            self.renderer.snowflakes.append((self.image, self.rect.topleft - self.scene.player.camera.offset))
+        self.renderer.snowflakes.append(self)
 
         try:
-            if self.rect.bottom > self.ground.height_map[self.pos.x // PIXEL_SIZE * PIXEL_SIZE]:
+            if self.pos.y + self.size.x / 2 > self.ground.height_map[self.pos.x // PIXEL_SIZE * PIXEL_SIZE]:
                 self.kill()
                 return
         except KeyError:
@@ -67,3 +63,7 @@ class SnowFlake(VisibleSprite):
 
     def draw(self) -> None:
         ...
+
+    def kill(self) -> None:
+        self.renderer.snowflakes.remove(self)
+        super().kill()
