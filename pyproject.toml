@@ -14,6 +14,7 @@ pytweening = "^1.2.0"
 opensimplex = "^0.4.5.1"
 websockets = "^13.1"
 pyinstaller = "^6.11.0"
+snakeviz = "^2.2.2"
 
 
 [build-system]
