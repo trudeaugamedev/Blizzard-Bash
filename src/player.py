@@ -383,7 +383,7 @@ class Player(VisibleSprite):
                 elif self.powerup == "rapidfire":
                     sb = Snowball(self.scene, self.sb_vel, 0)
                     self.snowballs[sb.id] = sb
-                    self.overheat += 1
+                    self.overheat = min(30, self.overheat + 1)
                 else:
                     size = self.pop_snowball()
                     sb = Snowball(self.scene, self.sb_vel, size + (5 if self.powerup == "strength" and size != 2 else 0))
@@ -583,18 +583,16 @@ class Player(VisibleSprite):
         self.real_rect.midbottom = self.rect.midbottom
 
     def update_powerup(self) -> None:
-        self.powerup = "rapidfire"
-        self.can_throw = True
-        # if self.powerup is None: return
-        # self.powerup_max_time = {"rapidfire": 7, "strength": 16, "clustershot": 10}[self.powerup]
-        # if time.time() - self.powerup_time > self.powerup_max_time:
-        #     if self.powerup == "rapidfire":
-        #         self.powerup = None
-        #         self.throwing = False
-        #     if self.powerup == "strength":
-        #         self.powerup = None
-        #     if self.powerup == "clustershot":
-        #         self.powerup = None
+        if self.powerup is None: return
+        self.powerup_max_time = {"rapidfire": 7, "strength": 16, "clustershot": 10}[self.powerup]
+        if time.time() - self.powerup_time > self.powerup_max_time:
+            if self.powerup == "rapidfire":
+                self.powerup = None
+                self.throwing = False
+            if self.powerup == "strength":
+                self.powerup = None
+            if self.powerup == "clustershot":
+                self.powerup = None
 
     def update_camera(self) -> None:
         if self.snowballs:
