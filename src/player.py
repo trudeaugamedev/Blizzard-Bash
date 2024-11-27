@@ -31,7 +31,7 @@ class Camera:
         self.tick_offset = snap(self.tick_offset, VEC(), VEC(1, 1))
         self.float_offset += self.tick_offset * self.follow * self.manager.dt
         self.offset = intvec(self.float_offset)
-        self.offset.y = max(self.scene.player.pos.y - 700, min(self.offset.y, -420))
+        self.offset.y = max(self.scene.player.pos.y - 650, min(self.offset.y, -420))
 
 class ThrowTrail(VisibleSprite):
     def __init__(self, scene: Scene, player: Player) -> None:
@@ -492,8 +492,8 @@ class Player(VisibleSprite):
         self.snowball_queue.append(size)
         self.dig_progress.snowballs_displays.append(self.dig_progress.SnowballDisplay(self.scene, self, size))
 
-    def spawn_snowball(self, size: int, pos: tuple[int, int], vel: tuple[int, int], follow: bool = True, is_storm: bool = False) -> None:
-        sb = Snowball(self.scene, VEC(vel), size, pos=pos, follow=follow, is_storm=is_storm)
+    def spawn_snowball(self, size: int, pos: tuple[int, int], vel: tuple[int, int], follow: bool = True) -> None:
+        sb = Snowball(self.scene, VEC(vel), size, pos=pos, follow=follow)
         self.snowballs[sb.id] = sb
 
     def pop_snowball(self) -> int:

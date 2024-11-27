@@ -77,6 +77,9 @@ class VortexSwirl(Swirl):
             self.timer = time.time()
             for _ in range(2):
                 VortexAnim(self.scene, self.pos + (self.size / 2,) * 2)
+            
+            # # funny vortex (i just want to see more snowballs)
+            # self.scene.player.spawn_snowball(0, self.pos + (self.size / 2, 0), (0, 0))
 
         # sucking is on the thrower's side?????
         if self.suck and not self.scene.eliminated:

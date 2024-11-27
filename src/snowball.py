@@ -20,7 +20,7 @@ from .ground import Ground1
 from . import assets
 
 class Snowball(VisibleSprite):
-    def __init__(self, scene: Scene, vel: tuple[float, float], sb_type: int, pos: VEC = None, follow: bool = True) -> None:
+    def __init__(self, scene: Scene, vel: tuple[float, float], sb_type: int, pos: VEC = None, follow: bool = True, stasis: bool = False) -> None:
         super().__init__(scene, Layers.SNOWBALL)
         self.id = uuid4().hex
 
@@ -46,6 +46,8 @@ class Snowball(VisibleSprite):
         self.hit_player = None
         self.follow = follow
         # self.is_storm = is_storm
+        self.stasis = stasis
+        self.start_time = time.time()
 
         if self.type == 2:
             self.swirl = Swirl(self.scene, Layers.SNOWBALL, 64)
@@ -71,6 +73,7 @@ class Snowball(VisibleSprite):
         # self.acc += self.scene.wind_vel * (0.1 if self.is_storm else 1)
         self.acc = VEC(0, GRAVITY)
         self.acc += self.scene.wind_vel
+        if self.stasis: self.acc = VEC()
 
         self.vel += self.acc * self.manager.dt
         self.pos += self.vel * self.manager.dt
@@ -79,6 +82,11 @@ class Snowball(VisibleSprite):
 
         if self.pos.y < -900:
             self.follow = False
+        if abs(self.pos.x - self.scene.player.pos.x) > 2400:
+            self.follow = False
+
+        if self.stasis and time.time() - self.start_time > 15:
+            self.kill()
 
         try:
             ground_y = Ground1.height_map[int(self.rect.centerx // PIXEL_SIZE * PIXEL_SIZE)]
@@ -173,6 +181,12 @@ class Snowball(VisibleSprite):
         if self.type == 5 or self.type == 6: # strength
             m_pos = VEC(pygame.mouse.get_pos())
             self.vel = ((m_pos + self.scene.player.camera.offset) - self.pos).normalize() * (2200 if self.type == 5 else 3000)
+
+            # # funny strength cuz why not
+            # for i in range (40):
+            #     sb = Snowball(self.scene, (0, 0), self.type - 5, m_pos + self.scene.player.camera.offset + VEC(uniform(-1, 1), uniform(-1, 1)).normalize() * 100, False, True)
+            #     sb.vel = ((m_pos + self.scene.player.camera.offset) - sb.pos).normalize() * 30
+            #     self.scene.player.snowballs[sb.id] = sb
 
 class SelfSnowball(Snowball):
     def collide(self) -> bool:
