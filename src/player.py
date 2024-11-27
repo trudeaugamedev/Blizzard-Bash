@@ -585,16 +585,17 @@ class Player(VisibleSprite):
         self.real_rect.midbottom = self.rect.midbottom
 
     def update_powerup(self) -> None:
-        if self.powerup is None: return
-        self.powerup_max_time = {"rapidfire": 8, "strength": 16, "clustershot": 12}[self.powerup]
-        if time.time() - self.powerup_time > self.powerup_max_time:
-            if self.powerup == "rapidfire":
-                self.powerup = None
-                self.throwing = False
-            if self.powerup == "strength":
-                self.powerup = None
-            if self.powerup == "clustershot":
-                self.powerup = None
+        self.powerup = "strength"
+        # if self.powerup is None: return
+        # self.powerup_max_time = {"rapidfire": 8, "strength": 16, "clustershot": 12}[self.powerup]
+        # if time.time() - self.powerup_time > self.powerup_max_time:
+        #     if self.powerup == "rapidfire":
+        #         self.powerup = None
+        #         self.throwing = False
+        #     if self.powerup == "strength":
+        #         self.powerup = None
+        #     if self.powerup == "clustershot":
+        #         self.powerup = None
 
     def update_camera(self) -> None:
         if self.snowballs:
@@ -610,10 +611,15 @@ class Player(VisibleSprite):
             self.camera.follow = 3
             pos = self.pos - (0, self.pos.y * 0.4 + 140)
             if self.throwing:
-                pos += VEC(self.sb_vel.x * 0.15, 0)
+                pos += VEC(self.sb_vel.x * (0.15 if self.powerup != "strength" else 0.5), 0)
             self.camera.update(pos)
         else:
-            self.camera.follow = 2
-            diff = (last.pos - self.pos) / 2
-            pos = self.pos + diff.clamp_magnitude(450)
+            if last.type in {5, 6}:
+                self.camera.follow = 3
+                diff = (last.pos - self.pos) / 2
+                pos = self.pos + diff.clamp_magnitude(500, 1200)
+            else:
+                self.camera.follow = 2
+                diff = (last.pos - self.pos) / 2
+                pos = self.pos + diff.clamp_magnitude(450)
             self.camera.update(pos)
