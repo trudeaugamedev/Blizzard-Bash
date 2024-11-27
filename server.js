@@ -294,7 +294,7 @@ function game() {
 
 	if (Date.now() - powerupTime > powerupDuration) {
 		powerupTime = Date.now();
-		powerupDuration = randint(5000, 15000);
+		powerupDuration = randint(5000, 10000);
 		powerups.set(powerupId, new Powerup(powerupId));
 	}
 	for (const [id, powerup] of powerups) {
