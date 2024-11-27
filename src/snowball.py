@@ -77,6 +77,9 @@ class Snowball(VisibleSprite):
         self.rect = self.image.get_rect(center=self.pos)
         self.real_rect.center = self.rect.center
 
+        if self.pos.y < -900:
+            self.follow = False
+
         try:
             ground_y = Ground1.height_map[int(self.rect.centerx // PIXEL_SIZE * PIXEL_SIZE)]
         except KeyError:
@@ -147,6 +150,8 @@ class Snowball(VisibleSprite):
             # y = 800 + (self.pos.y - 40) * 0.6
             # storm = Storm(self.scene, self.id, self.pos - (size.x / 2, y) + VEC(randint(-80, 80), randint(-20, 20)), size, self.hit_player)
             VortexSwirl(self.scene, Layers.SNOWBALL, self.pos - (64, 64), 128, 20)
+        if self.type != 0 and self.type != 1:
+            self.scene.player.has_trigger = False
         self.landed = True
 
     def trigger(self) -> None:

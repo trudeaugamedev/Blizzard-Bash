@@ -30,7 +30,7 @@ class Camera:
         self.tick_offset = snap(self.tick_offset, VEC(), VEC(1, 1))
         self.float_offset += self.tick_offset * self.follow * self.manager.dt
         self.offset = intvec(self.float_offset)
-        self.offset.y = min(self.offset.y, -420)
+        self.offset.y = max(-800, min(self.offset.y, -420))
 
 class ThrowTrail(VisibleSprite):
     def __init__(self, scene: Scene, player: Player) -> None:
