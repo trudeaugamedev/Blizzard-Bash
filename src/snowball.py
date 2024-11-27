@@ -12,15 +12,15 @@ import time
 
 from .constants import VEC, GRAVITY, PIXEL_SIZE
 from .sprite import VisibleSprite, Layers
-from .swirl import Swirl, StormSwirl
+from .swirl import Swirl, VortexSwirl
 from .utils import shadow, sign
 from .powerup import Powerup
 from .ground import Ground1
-from .storm import Storm
+# from .storm import Storm
 from . import assets
 
 class Snowball(VisibleSprite):
-    def __init__(self, scene: Scene, vel: tuple[float, float], sb_type: int, pos: VEC = None, follow: bool = True, is_storm: bool = False) -> None:
+    def __init__(self, scene: Scene, vel: tuple[float, float], sb_type: int, pos: VEC = None, follow: bool = True) -> None:
         super().__init__(scene, Layers.SNOWBALL)
         self.id = uuid4().hex
 
@@ -32,7 +32,9 @@ class Snowball(VisibleSprite):
         self.frame = 0
         self.frame_time = time.time()
         self.type = sb_type
-        self.frames = [assets.snowball_small, assets.snowball_large, assets.snowball_large][sb_type]
+        self.frames = [assets.snowball_small, assets.snowball_large, assets.snowball_large, # normal snowballs
+                       assets.snowball_small, assets.snowball_large, # clusters
+                       assets.snowball_small, assets.snowball_large][sb_type] # strengths
         self.score = 1 if self.frames == assets.snowball_small else 4
         self.image = self.frames[self.frame]
         self.rect = self.image.get_rect(center=self.pos)
@@ -43,7 +45,7 @@ class Snowball(VisibleSprite):
         self.rot_speed = choice([randint(-400, -100), randint(100, 400)])
         self.hit_player = None
         self.follow = follow
-        self.is_storm = is_storm
+        # self.is_storm = is_storm
 
         if self.type == 2:
             self.swirl = Swirl(self.scene, Layers.SNOWBALL, 64)
@@ -65,8 +67,10 @@ class Snowball(VisibleSprite):
         self.rotation += self.rot_speed * self.manager.dt
         self.image = pygame.transform.rotate(self.frames[self.frame], self.rotation)
 
-        self.acc = VEC(0, GRAVITY) * (0.4 if self.is_storm else 1)
-        self.acc += self.scene.wind_vel * (0.1 if self.is_storm else 1)
+        # self.acc = VEC(0, GRAVITY) * (0.4 if self.is_storm else 1)
+        # self.acc += self.scene.wind_vel * (0.1 if self.is_storm else 1)
+        self.acc = VEC(0, GRAVITY)
+        self.acc += self.scene.wind_vel
 
         self.vel += self.acc * self.manager.dt
         self.pos += self.vel * self.manager.dt
@@ -85,17 +89,17 @@ class Snowball(VisibleSprite):
         if self.collide():
             return
 
-        if not self.is_storm:
-            for powerup in Powerup.instances.values():
-                if powerup.rect.colliderect(self.real_rect) and not powerup.touched:
-                    if powerup.type == "hailstorm":
-                        self.scene.player.add_snowball(2)
-                        self.scene.player.dig_iterations += 1
-                    else:
-                        self.player.powerup = powerup.type
-                        self.player.powerup_time = time.time()
-                    self.client.irreg_data.put({"id": powerup.id, "powerup": 1}) # powerup key to uniquify the message
-                    powerup.touched = True
+        # if not self.is_storm:
+        for powerup in Powerup.instances.values():
+            if powerup.rect.colliderect(self.real_rect) and not powerup.touched:
+                if powerup.type == "hailstorm":
+                    self.scene.player.add_snowball(2)
+                    self.scene.player.dig_iterations += 3
+                else:
+                    self.player.powerup = powerup.type
+                    self.player.powerup_time = time.time()
+                self.client.irreg_data.put({"id": powerup.id, "powerup": 1}) # powerup key to uniquify the message
+                powerup.touched = True
 
         if self.type == 2:
             self.swirl.pos = self.pos - VEC(32, 32)
@@ -135,12 +139,35 @@ class Snowball(VisibleSprite):
 
     def kill(self) -> None:
         if self.type == 2:
-            self.swirl.kill()
-            size = VEC(600 + randint(-50, 50), 250 + randint(-50, 50))
-            y = 800 + (self.pos.y - 40) * 0.6
-            storm = Storm(self.scene, self.id, self.pos - (size.x / 2, y) + VEC(randint(-80, 80), randint(-20, 20)), size, self.hit_player)
-            StormSwirl(self.scene, Layers.SNOWBALL, storm, self.pos - (64, 64), 128, 20)
+            try:
+                self.swirl.kill()
+            except:
+                pass
+            # size = VEC(600 + randint(-50, 50), 250 + randint(-50, 50))
+            # y = 800 + (self.pos.y - 40) * 0.6
+            # storm = Storm(self.scene, self.id, self.pos - (size.x / 2, y) + VEC(randint(-80, 80), randint(-20, 20)), size, self.hit_player)
+            VortexSwirl(self.scene, Layers.SNOWBALL, self.pos - (64, 64), 128, 20)
         self.landed = True
+
+    def trigger(self) -> None:
+        if self.type == 2: # vortex
+            self.kill()
+        if self.type == 3 or self.type == 4: # cluster
+            for _ in range(4 if self.type == 3 else 7):
+                sb = Snowball(self.scene, self.vel + VEC(uniform(-180, 180), uniform(-180, 180)), 0, self.pos.copy())
+                self.scene.player.snowballs[sb.id] = sb
+            for _ in range(1 if (self.type == 3) else 3):
+                sb = Snowball(self.scene, self.vel + VEC(uniform(-280, 280), uniform(-180, 180)), 1, self.pos.copy())
+                self.scene.player.snowballs[sb.id] = sb
+
+            # # funny cluster?
+            # for _ in range (30):
+            #     sb = Snowball(self.scene, VEC(uniform(-1, 1), uniform(-1, 1)).normalize() * 500, self.type - 3, self.pos.copy())
+            #     self.scene.player.snowballs[sb.id] = sb
+            self.kill()
+        if self.type == 5 or self.type == 6: # strength
+            m_pos = VEC(pygame.mouse.get_pos())
+            self.vel = ((m_pos + self.scene.player.camera.offset) - self.pos).normalize() * (2200 if self.type == 5 else 3000)
 
 class SelfSnowball(Snowball):
     def collide(self) -> bool:

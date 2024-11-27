@@ -12,7 +12,7 @@ import time
 from .constants import VEC, FONT, PIXEL_SIZE, WIDTH
 from .ground import Ground1, Ground2, Ground3
 from .sprite import VisibleSprite, Layers
-from .swirl import Swirl, StormSwirl
+from .swirl import Swirl, VortexSwirl
 from .utils import shadow
 from . import assets
 
@@ -168,15 +168,15 @@ class OtherSnowball(VisibleSprite):
     def kill(self) -> None:
         if self.type == 2:
             self.swirl.kill()
-            StormSwirl(self.scene, Layers.SNOWBALL, None, self.pos - (64, 64), 128, 20, self.id, suck=True)
+            VortexSwirl(self.scene, Layers.SNOWBALL, self.pos - (64, 64), 128, 20, self.id, suck=True)
         __class__.killed.add(self.id)
         super().kill()
 
-class OtherStorm(VisibleSprite):
+class OtherVortex(VisibleSprite):
     instances = {}
-    edge_imgs = [pygame.Surface((32, 32)), pygame.Surface((48, 48)), pygame.Surface((64, 64)), pygame.Surface((80, 80))]
-    for img in edge_imgs:
-        pygame.draw.circle(img, (2, 2, 2), (img.width // 2, img.height // 2), img.width // 2)
+    # edge_imgs = [pygame.Surface((32, 32)), pygame.Surface((48, 48)), pygame.Surface((64, 64)), pygame.Surface((80, 80))]
+    # for img in edge_imgs:
+    #     pygame.draw.circle(img, (2, 2, 2), (img.width // 2, img.height // 2), img.width // 2)
 
     def __init__(self, scene: Scene, id: str, pos: tuple[int, int], alpha: int) -> None:
         # why tf does this sometimes not get initialized :sob:
@@ -186,19 +186,19 @@ class OtherStorm(VisibleSprite):
         self.pos = VEC(pos) if pos is not None else VEC(0, 0)
         self.alpha = alpha
         self.size = VEC(0, 0)
-        self.blobs = []
+        # self.blobs = []
 
     def create_image(self, size: tuple[int, int], offsets: list[tuple[int, int]], radii: list[int]) -> None:
         if self.image is not None: return
         self.size = VEC(size) // PIXEL_SIZE
         self.image = pygame.Surface(self.size, pygame.SRCALPHA)
-        for offset, radius in zip(offsets, radii):
-            blob = OtherStormBlob(self.scene, self, offset, radius)
-            blob.draw()
-            self.blobs.append(blob)
-        for pos in pygame.mask.from_surface(self.image).outline(3):
-            img = choice(self.edge_imgs)
-            self.image.blit(img, VEC(pos) - VEC(img.size) // 2, special_flags=pygame.BLEND_ADD)
+        # for offset, radius in zip(offsets, radii):
+        #     blob = OtherStormBlob(self.scene, self, offset, radius)
+        #     blob.draw()
+        #     self.blobs.append(blob)
+        # for pos in pygame.mask.from_surface(self.image).outline(3):
+        #     img = choice(self.edge_imgs)
+        #     self.image.blit(img, VEC(pos) - VEC(img.size) // 2, special_flags=pygame.BLEND_ADD)
         self.image = pygame.transform.scale_by(self.image, PIXEL_SIZE)
         self.image.set_alpha(0)
         self.size *= PIXEL_SIZE
@@ -207,20 +207,20 @@ class OtherStorm(VisibleSprite):
         if self.image is None: return
         self.image.set_alpha(self.alpha)
 
-        if self.id in StormSwirl.instances:
-            StormSwirl.instances[self.id].storm = self
+        # if self.id in StormSwirl.instances:
+        #     StormSwirl.instances[self.id].storm = self
 
     def draw(self) -> None:
         if self.image is None: return
         while self.image.get_locked(): pass
         self.manager.screen.blit(self.image, VEC(self.pos) - self.scene.player.camera.offset)
 
-class OtherStormBlob:
-    def __init__(self, scene: Scene, storm: OtherStorm, offset: tuple[int, int], radius: int) -> None:
-        self.scene = scene
-        self.storm = storm
-        self.offset = VEC(offset)
-        self.radius = radius
+# class OtherStormBlob:
+#     def __init__(self, scene: Scene, storm: OtherStorm, offset: tuple[int, int], radius: int) -> None:
+#         self.scene = scene
+#         self.storm = storm
+#         self.offset = VEC(offset)
+#         self.radius = radius
 
-    def draw(self) -> None:
-        pygame.draw.circle(self.storm.image, (138, 155, 178), self.offset, self.radius)
+#     def draw(self) -> None:
+#         pygame.draw.circle(self.storm.image, (138, 155, 178), self.offset, self.radius)

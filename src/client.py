@@ -43,8 +43,8 @@ class Client:
             "snowballs": None,
             "powerup": None,
             "score": None,
-            "storm_blobs": None,
-            "storms": None,
+            # "storm_blobs": None,
+            # "storms": None,
         }
         self.modified_data = {key: True for key in self.pers_data}
         self.irreg_data = Queue() # Occasional data

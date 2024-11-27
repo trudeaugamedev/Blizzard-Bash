@@ -30,6 +30,7 @@ class Camera:
         self.tick_offset = snap(self.tick_offset, VEC(), VEC(1, 1))
         self.float_offset += self.tick_offset * self.follow * self.manager.dt
         self.offset = intvec(self.float_offset)
+        self.offset.y = min(self.offset.y, -420)
 
 class ThrowTrail(VisibleSprite):
     def __init__(self, scene: Scene, player: Player) -> None:
@@ -175,11 +176,14 @@ class Player(VisibleSprite):
         self.powerup_time = time.time()
         self.powerup_max_time = 0
         self.powerup_flash_time = time.time()
-        self.storms = []
+        self.overheat = 0
+        # self.storms = []
 
         self.throw_trail = ThrowTrail(self.scene, self)
         self.throwing = False
         self.can_throw = True
+        self.has_trigger = False
+        self.just_triggered = False
         self.sb_vel = VEC(0, 0)
         self.snowball_queue = []
         self.snowballs: dict[Snowball] = {}
@@ -233,26 +237,26 @@ class Player(VisibleSprite):
             snowballs.append(data)
         self.client.queue_data("snowballs", snowballs)
 
-        storms = []
-        for storm in self.storms:
-            data = {
-                "id": storm.id,
-                "pos": inttup(storm.pos),
-                "alpha": int(storm.alpha),
-            }
-            storms.append(data)
-        self.client.queue_data("storms", storms)
+        # storms = []
+        # for storm in self.storms:
+        #     data = {
+        #         "id": storm.id,
+        #         "pos": inttup(storm.pos),
+        #         "alpha": int(storm.alpha),
+        #     }
+        #     storms.append(data)
+        # self.client.queue_data("storms", storms)
 
-        storm_blobs = []
-        for storm in self.storms:
-            data = {
-                "id": storm.id,
-                "size": storm.image.size,
-                "offsets": storm.offsets,
-                "radii": storm.radii,
-            }
-            storm_blobs.append(data)
-        self.client.queue_data("storm_blobs", storm_blobs)
+        # storm_blobs = []
+        # for storm in self.storms:
+        #     data = {
+        #         "id": storm.id,
+        #         "size": storm.image.size,
+        #         "offsets": storm.offsets,
+        #         "radii": storm.radii,
+        #     }
+        #     storm_blobs.append(data)
+        # self.client.queue_data("storm_blobs", storm_blobs)
 
     def draw(self) -> None:
         self.manager.screen.blit(shadow(self.image), VEC(self.rect.topleft) - self.camera.offset + (3, 3), special_flags=BLEND_RGB_SUB)
@@ -317,6 +321,9 @@ class Player(VisibleSprite):
         else:
             self.vel.x *= 0.00000005 ** self.manager.dt
 
+        self.vel.x *= max(0, min(1, 1.12 - self.overheat / 25))
+        self.overheat = max(0, self.overheat - 5 * self.manager.dt)
+
         if self.on_ground:
             self.jump_time = time.time()
         if self.keys[K_w] and self.can_move and not self.digging:
@@ -339,51 +346,61 @@ class Player(VisibleSprite):
     def update_throw(self) -> None:
         if self.powerup != "rapidfire":
             self.can_throw = self.can_move and self.dig_iterations > 0
-        elif time.time() - self.rapidfire_time > 0.2:
-            self.rapidfire_time = time.time()
-            self.can_throw = True
-        if pygame.mouse.get_pressed()[0] and self.can_throw:
-            m_pos = VEC(pygame.mouse.get_pos())
-            self.throwing = True
-            if self.can_throw and self.dig_iterations < 3:
-                self.frame_group = self.assets.player_throw_s
+        if pygame.mouse.get_pressed()[0]:
+            if self.has_trigger:
+                self.has_trigger = False
+                self.just_triggered = True
+                self.throwing = False
+                for snowball in list(self.snowballs.values()):
+                    snowball.trigger()
             elif self.can_throw:
-                self.frame_group = self.assets.player_throw_l
-            # Use camera offset to convert screen-space pos to in-world pos
-            try:
-                self.sb_vel = ((m_pos - self.SB_OFFSET + self.camera.offset) - self.pos) * 8 * (1.4 if self.powerup == "strength" else 1)
-                if self.sb_vel.length() > self.THROW_SPEED * (1.4 if self.powerup == "strength" else 1):
-                    self.sb_vel.scale_to_length(self.THROW_SPEED * (1.4 if self.powerup == "strength" else 1))
-            except ValueError:
-                self.sb_vel = VEC() # 0 vector
+                m_pos = VEC(pygame.mouse.get_pos())
+                self.throwing = True
+                if self.can_throw and self.dig_iterations < 3:
+                    self.frame_group = self.assets.player_throw_s
+                elif self.can_throw:
+                    self.frame_group = self.assets.player_throw_l
+                # Use camera offset to convert screen-space pos to in-world pos
+                try:
+                    self.sb_vel = ((m_pos - self.SB_OFFSET + self.camera.offset) - self.pos) * 8
+                    self.sb_vel.scale_to_length(self.THROW_SPEED)
+                except ValueError:
+                    self.sb_vel = VEC() # 0 vector
         if MOUSEBUTTONUP in self.manager.events:
-            if self.manager.events[MOUSEBUTTONUP].button == 1 and self.can_throw:
+            if self.manager.events[MOUSEBUTTONUP].button == 1 and self.can_throw and not self.just_triggered:
                 self.throwing = False
                 assets.throw_sound.set_volume(0.2)
                 assets.throw_sound.play()
                 if self.powerup == "clustershot":
+                    self.has_trigger = True
                     size = self.pop_snowball()
                     if size == 2:
                         sb = Snowball(self.scene, self.sb_vel, 2)
                         self.snowballs[sb.id] = sb
-                    for _ in range(4 if size == 0 else 7):
-                        sb = Snowball(self.scene, self.sb_vel + VEC(uniform(-180, 180), uniform(-180, 180)), 0)
-                        self.snowballs[sb.id] = sb
-                    for _ in range(1 if size == 0 else 3):
-                        sb = Snowball(self.scene, self.sb_vel + VEC(uniform(-180, 180), uniform(-180, 180)), 1)
-                        self.snowballs[sb.id] = sb
+                        size -= 1
+                    sb = Snowball(self.scene, self.sb_vel, 3 + size)
+                    self.snowballs[sb.id] = sb
                 elif self.powerup == "rapidfire":
                     sb = Snowball(self.scene, self.sb_vel, 0)
                     self.snowballs[sb.id] = sb
+                    self.overheat = min(30, self.overheat + 1)
                 else:
                     size = self.pop_snowball()
-                    sb = Snowball(self.scene, self.sb_vel, size)
+                    sb = Snowball(self.scene, self.sb_vel, size + (5 if self.powerup == "strength" and size != 2 else 0))
                     self.snowballs[sb.id] = sb
                 if self.powerup != "rapidfire":
-                    self.dig_iterations -= 3 if size == 1 else 1
+                    self.dig_iterations -= 3 if (size == 1 or size == 2) else 1
                     self.can_throw = bool(self.snowball_queue)
+                    if size == 2 or self.powerup == "strength":
+                        self.has_trigger = True
                 else:
                     self.can_throw = True
+            elif not self.has_trigger:
+                self.just_triggered = False
+                self.throwing = False
+            elif len(self.snowballs) == 0:
+                self.just_triggered = False
+                self.throwing = False
 
     def update_position(self) -> None:
         centerx = int(self.rect.centerx // PIXEL_SIZE * PIXEL_SIZE)

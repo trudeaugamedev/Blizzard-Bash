@@ -26,7 +26,7 @@ class GameManager:
 
         self.client = Client(self)
 
-        self.flags = HWSURFACE | DOUBLEBUF | RESIZABLE | SCALED | FULLSCREEN
+        self.flags = HWSURFACE | DOUBLEBUF | RESIZABLE | SCALED #| FULLSCREEN
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT), self.flags)
         self.clock = pygame.time.Clock()
         self.dt = self.clock.tick_busy_loop(FPS) / 1000
@@ -44,7 +44,10 @@ class GameManager:
                     profile(self.scene.update)
                 else:
                     self.scene.update()
-                self.scene.draw()
+                if K_F11 in self.key_downs:
+                    profile(self.scene.draw)
+                else:
+                    self.scene.draw()
             except AbortScene:
                 pass
 

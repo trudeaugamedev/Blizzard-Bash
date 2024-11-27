@@ -51,7 +51,7 @@ class Powerup(VisibleSprite):
             # MODIFICATIONS TO THIS SECTION SHOULD BE REFLECTED IN snowball.py AS WELL or else throwing a snowball at the powerup will crash the game!!!
             if self.type == "hailstorm":
                 self.scene.player.add_snowball(2)
-                self.scene.player.dig_iterations += 1
+                self.scene.player.dig_iterations += 3
             else:
                 if self.scene.player.powerup == "rapidfire":
                     self.scene.player.throwing = False

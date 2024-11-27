@@ -39,7 +39,7 @@ pygame.display.set_mode()
 
 snowflakes: list[pygame.Surface] = []
 for i in range(10):
-    snowflakes.append(load_img(f"{TEXTURES}/snowflake/snowflake_{i}.png", 2, alpha=False))
+    snowflakes.append(load_img(f"{TEXTURES}/snowflake/snowflake_{i}.png", 3, alpha=False))
     snowflakes[i].set_colorkey((0, 0, 0))
 
 ground_tiles: list[pygame.Surface] = [

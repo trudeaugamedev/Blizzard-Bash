@@ -19,7 +19,7 @@ class Ground1Manager(VisibleSprite):
     def __init__(self, scene: Scene, ground: Ground1 | Ground2 | Ground3 = None, layer: Layers = Layers.GROUND1) -> None:
         super().__init__(scene, layer)
         self.ground = ground if ground else Ground1
-        self.size = VEC(26 * TILE_SIZE, 850)
+        self.size = VEC(26 * TILE_SIZE, 720)
         self.image = pygame.Surface(self.size)
         self.image.set_colorkey((0, 0, 0))
         self.pos = VEC(-WIDTH // 2, -450)
@@ -30,7 +30,7 @@ class Ground1Manager(VisibleSprite):
         for x in range(-110, 110):
             # Horizontal stretch and vertical stretch (essentially)
             y = noise.noise2(x * 0.1, 0) * 150
-            ground = Ground1(self.scene, self, (x * TILE_SIZE, y), (TILE_SIZE, 430 - y))
+            ground = Ground1(self.scene, self, (x * TILE_SIZE, y), (TILE_SIZE, 330 - y))
         for ground in Ground1.instances.values():
             ground.generate_image() # Create a images only after all tiles have been created
             ground.draw()
@@ -76,7 +76,7 @@ class Ground2Manager(Ground1Manager):
         for x in range(-110, 110):
             # Horizontal stretch and vertical stretch (essentially)
             y = noise.noise2(x * 0.1 + 10000, 0) * 200 - 120
-            Ground2(self.scene, self, (x * TILE_SIZE, y), (TILE_SIZE, 430 - y))
+            Ground2(self.scene, self, (x * TILE_SIZE, y), (TILE_SIZE, 330 - y))
         for ground in Ground2.instances.values():
             ground.generate_image() # Create a images only after all tiles have been created
             ground.draw()
@@ -93,7 +93,7 @@ class Ground3Manager(Ground1Manager):
         for x in range(-110, 110):
             # Horizontal stretch and vertical stretch (essentially)
             y = noise.noise2(x * 0.1 + 20000, 0) * 250 - 250
-            Ground3(self.scene, self, (x * TILE_SIZE, y), (TILE_SIZE, 430 - y))
+            Ground3(self.scene, self, (x * TILE_SIZE, y), (TILE_SIZE, 330 - y))
         for ground in Ground3.instances.values():
             ground.generate_image() # Create a images only after all tiles have been created
             ground.draw()

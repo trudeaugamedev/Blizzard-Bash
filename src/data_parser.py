@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .client import Client
 
-from src.others import OtherPlayer, OtherSnowball, OtherStorm
+from src.others import OtherPlayer, OtherSnowball, OtherVortex
 from src.powerup import Powerup
 from src.constants import VEC
 
@@ -95,25 +95,25 @@ class Parser:
                     else:
                         other.snowballs[snowball_data["id"]] = OtherSnowball(self.manager.scene, snowball_data["id"], snowball_data["pos"], snowball_data["frame"], snowball_data["type"])
 
-            # contains data for the image of the storm
-            if "storm_blobs" in player_data and player_data["storm_blobs"]:
-                for data in player_data["storm_blobs"]:
-                    id = data["id"]
-                    if id in OtherStorm.instances:
-                        storm = OtherStorm.instances[id]
-                    else:
-                        OtherStorm.instances[id] = OtherStorm(self.manager.scene, id, None, None) # pos, alpha
-                        OtherStorm.instances[id].create_image(data["size"], data["offsets"], data["radii"])
+            # # contains data for the image of the storm
+            # if "storm_blobs" in player_data and player_data["storm_blobs"]:
+            #     for data in player_data["storm_blobs"]:
+            #         id = data["id"]
+            #         if id in OtherVortex.instances:
+            #             storm = OtherVortex.instances[id]
+            #         else:
+            #             OtherVortex.instances[id] = OtherVortex(self.manager.scene, id, None, None) # pos, alpha
+            #             OtherVortex.instances[id].create_image(data["size"], data["offsets"], data["radii"])
 
             # continuous data for the storm
-            if "storms" in player_data and player_data["storms"]:
-                for storm_data in player_data["storms"]:
-                    if storm_data["id"] in OtherStorm.instances:
-                        storm = OtherStorm.instances[storm_data["id"]]
-                        storm.pos = VEC(storm_data["pos"])
-                        storm.alpha = storm_data["alpha"]
-                    else:
-                        OtherStorm.instances[storm_data["id"]] = OtherStorm(self.manager.scene, storm_data["id"], storm_data["pos"], storm_data["alpha"])
+            # if "storms" in player_data and player_data["storms"]:
+            #     for storm_data in player_data["storms"]:
+            #         if storm_data["id"] in OtherVortex.instances:
+            #             storm = OtherVortex.instances[storm_data["id"]]
+            #             storm.pos = VEC(storm_data["pos"])
+            #             storm.alpha = storm_data["alpha"]
+            #         else:
+            #             OtherVortex.instances[storm_data["id"]] = OtherVortex(self.manager.scene, storm_data["id"], storm_data["pos"], storm_data["alpha"])
 
         all_ids = set(Powerup.instances.keys())
         # Parse powerup position
@@ -146,4 +146,4 @@ class Parser:
             self.manager.scene.frost_vignette.opacity += 70 * abs(data["hit"])
 
         elif "storm_id" in data:
-            OtherStorm.instances.pop(data["storm_id"]).kill()
+            OtherVortex.instances.pop(data["storm_id"]).kill()
