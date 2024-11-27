@@ -41,6 +41,7 @@ class OtherPlayer(VisibleSprite):
         self.arrow = OtherArrow(self.scene, self)
         self.powerup = -1
         self.powerup_flash_time = time.time()
+        self.disconnect_time = time.time()
 
     def update(self) -> None:
         self.rect = self.image.get_rect(midbottom=self.pos)
@@ -66,6 +67,9 @@ class OtherPlayer(VisibleSprite):
         self.orig_image = self.assets.player[self.frame]
         self.upright_image = pygame.transform.flip(self.orig_image, self.flip, False)
         self.image = pygame.transform.rotate(self.upright_image, self.rotation)
+
+        if time.time() - self.disconnect_time > 1500:
+            self.kill()
 
     def set_colors(self, clothes, hat, skin):
         if clothes == self.clothes_hue and hat == self.hat_hue and skin == self.skin_tone: return

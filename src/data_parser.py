@@ -74,6 +74,7 @@ class Parser:
                 except KeyError:
                     continue
             other = self.manager.other_players[player_data["id"]]
+            other.disconnect_time = time.time()
 
             if "name" in player_data and player_data["name"] is not None: other.name = player_data["name"]
             if "pos" in player_data and player_data["pos"] is not None: other.pos = VEC(player_data["pos"])
