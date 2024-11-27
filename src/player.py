@@ -346,6 +346,8 @@ class Player(VisibleSprite):
     def update_throw(self) -> None:
         if self.powerup != "rapidfire":
             self.can_throw = self.can_move and self.dig_iterations > 0
+        else:
+            self.can_throw = True
         if pygame.mouse.get_pressed()[0]:
             if self.has_trigger:
                 self.has_trigger = False
