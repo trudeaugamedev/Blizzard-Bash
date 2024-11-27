@@ -1,3 +1,5 @@
+# **OUTDATED README!!!!!!**
+
 # Blizzard Bash - The Game
 
 This is a multiplayer snowball fight game made for the 2022 Winter Carnival and the 2023 Blizzards Bash of Pierre Elliott Trudeau High School. 
