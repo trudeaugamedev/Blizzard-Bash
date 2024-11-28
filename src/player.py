@@ -231,7 +231,7 @@ class Player(VisibleSprite):
         self.client.queue_data("rot", int(self.rotation))
         self.client.queue_data("flip", self.flip)
         self.client.queue_data("frame", self.assets.player.index(self.orig_image))
-        self.client.queue_data("powerup", ["rapidfire", "strength", "clustershot"].index(self.powerup) if self.powerup else -1)
+        self.client.queue_data("powerup", ["rapidfire", "strength", "clustershot", "telekinesis"].index(self.powerup) if self.powerup else -1)
 
         snowballs = []
         for snowball in self.snowballs.values():
@@ -269,7 +269,7 @@ class Player(VisibleSprite):
         self.manager.screen.blit(shadow(self.image), VEC(self.rect.topleft) - self.camera.offset + (3, 3), special_flags=BLEND_RGB_SUB)
 
         if self.powerup:
-            color = {"rapidfire": (63, 134, 165), "strength": (233, 86, 86), "clustershot": (78, 180, 93)}[self.powerup]
+            color = {"rapidfire": (63, 134, 165), "strength": (233, 86, 86), "clustershot": (78, 180, 93), "telekinesis": (204, 102, 255)}[self.powerup]
             alpha = (sin((time.time() - self.powerup_flash_time) * pi * 3) * 0.5 + 0.5) * 255
             mask = pygame.mask.from_surface(self.image)
             powerup_overlay = mask.scale(VEC(mask.get_size()) + (20, 14)).to_surface(setcolor=(*color, alpha), unsetcolor=(0, 0, 0, 0))
@@ -594,14 +594,9 @@ class Player(VisibleSprite):
     def update_powerup(self) -> None:
         if not self.infinite:
             if self.powerup is None: return
-            self.powerup_max_time = {"rapidfire": 8, "strength": 16, "clustershot": 12}[self.powerup]
+            self.powerup_max_time = {"rapidfire": 8, "strength": 16, "clustershot": 12, "hailstorm": 0, "telekinesis": 20}[self.powerup]
             if time.time() - self.powerup_time > self.powerup_max_time:
-                if self.powerup == "rapidfire":
-                    self.powerup = None
-                    self.throwing = False
-                if self.powerup == "strength":
-                    self.powerup = None
-                if self.powerup == "clustershot":
+                if self.powerup != None:
                     self.powerup = None
         else:
             self.powerup = self.inf_type

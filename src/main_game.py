@@ -84,6 +84,9 @@ class MainGame(Scene):
                 case "infR":
                     self.player.infinite = True
                     self.player.inf_type = "rapidfire"
+                case "infT":
+                    self.player.infinite = True
+                    self.player.inf_type = "telekinesis"
                 case "funS":
                     self.player.funny_strength = True
                 case "funC":
