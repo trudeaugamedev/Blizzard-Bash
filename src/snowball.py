@@ -175,20 +175,22 @@ class Snowball(VisibleSprite):
                 sb = Snowball(self.scene, self.vel + VEC(uniform(-180, 180), uniform(-180, 180)), 1, self.pos.copy())
                 self.scene.player.snowballs[sb.id] = sb
 
-            # # funny cluster?
-            # for _ in range (30):
-            #     sb = Snowball(self.scene, VEC(uniform(-1, 1), uniform(-1, 1)).normalize() * 500, self.type - 3, self.pos.copy())
-            #     self.scene.player.snowballs[sb.id] = sb
+            # funny cluster?
+            if self.scene.player.funny_cluster:
+                for _ in range (30):
+                    sb = Snowball(self.scene, VEC(uniform(-1, 1), uniform(-1, 1)).normalize() * 500, self.type - 3, self.pos.copy())
+                    self.scene.player.snowballs[sb.id] = sb
             self.kill()
         if self.type == 5 or self.type == 6: # strength
             m_pos = VEC(pygame.mouse.get_pos())
             self.vel = ((m_pos + self.scene.player.camera.offset) - self.pos).normalize() * (2200 if self.type == 5 else 3000)
 
-            # # funny strength cuz why not
-            # for i in range (40):
-            #     sb = Snowball(self.scene, (0, 0), self.type - 5, m_pos + self.scene.player.camera.offset + VEC(uniform(-1, 1), uniform(-1, 1)).normalize() * 100, False, True)
-            #     sb.vel = ((m_pos + self.scene.player.camera.offset) - sb.pos).normalize() * 30
-            #     self.scene.player.snowballs[sb.id] = sb
+            # funny strength cuz why not
+            if self.scene.player.funny_strength:
+                for i in range (40):
+                    sb = Snowball(self.scene, (0, 0), self.type - 5, m_pos + self.scene.player.camera.offset + VEC(uniform(-1, 1), uniform(-1, 1)).normalize() * 100, False, True)
+                    sb.vel = ((m_pos + self.scene.player.camera.offset) - sb.pos).normalize() * 30
+                    self.scene.player.snowballs[sb.id] = sb
 
 class SelfSnowball(Snowball):
     def collide(self) -> bool:

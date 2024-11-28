@@ -180,6 +180,12 @@ class Player(VisibleSprite):
         self.overheat = 0
         # self.storms = []
 
+        # Cheats
+        self.infinite = False
+        self.inf_type = ""
+        self.funny_strength = False
+        self.funny_cluster = False
+
         self.throw_trail = ThrowTrail(self.scene, self)
         self.throwing = False
         self.can_throw = True
@@ -586,17 +592,19 @@ class Player(VisibleSprite):
         self.real_rect.midbottom = self.rect.midbottom
 
     def update_powerup(self) -> None:
-        # self.powerup = "strength"
-        if self.powerup is None: return
-        self.powerup_max_time = {"rapidfire": 8, "strength": 16, "clustershot": 12}[self.powerup]
-        if time.time() - self.powerup_time > self.powerup_max_time:
-            if self.powerup == "rapidfire":
-                self.powerup = None
-                self.throwing = False
-            if self.powerup == "strength":
-                self.powerup = None
-            if self.powerup == "clustershot":
-                self.powerup = None
+        if not self.infinite:
+            if self.powerup is None: return
+            self.powerup_max_time = {"rapidfire": 8, "strength": 16, "clustershot": 12}[self.powerup]
+            if time.time() - self.powerup_time > self.powerup_max_time:
+                if self.powerup == "rapidfire":
+                    self.powerup = None
+                    self.throwing = False
+                if self.powerup == "strength":
+                    self.powerup = None
+                if self.powerup == "clustershot":
+                    self.powerup = None
+        else:
+            self.powerup = self.inf_type
 
     def update_camera(self) -> None:
         if self.snowballs:

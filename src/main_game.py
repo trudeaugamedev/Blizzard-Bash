@@ -71,8 +71,27 @@ class MainGame(Scene):
         self.hit_alpha = 255
         self.hit_pos = None
 
-        self.name = self.previous_scene.input_box.text
-        self.client.queue_data("name", self.name)
+        codes = self.previous_scene.input_box.text.split('@')
+        self.name = codes[0]
+        for i in range(1, len(codes)):
+            match codes[i]:
+                case "infS":
+                    self.player.infinite = True
+                    self.player.inf_type = "strength"
+                case "infC":
+                    self.player.infinite = True
+                    self.player.inf_type = "clustershot"
+                case "infR":
+                    self.player.infinite = True
+                    self.player.inf_type = "rapidfire"
+                case "funS":
+                    self.player.funny_strength = True
+                case "funC":
+                    self.player.funny_cluster = True
+                case _:
+                    self.name += codes[i]
+        
+        self.client.queue_data("name", self.name.lower()) # makes it so that server always receives lowercase names
         self.client.queue_data("colors", [self.player.clothes_hue, self.player.hat_hue, self.player.skin_tone])
         self.game_over = False
         self.score_data = []
