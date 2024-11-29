@@ -87,7 +87,7 @@ class Snowball(VisibleSprite):
         if abs(self.pos.x - self.scene.player.pos.x) > 2400:
             self.follow = False
 
-        if self.stasis and time.time() - self.start_time > 15:
+        if self.stasis and time.time() - self.start_time > 15: # 15 sec lifespan
             self.kill()
 
         try:
@@ -136,7 +136,7 @@ class Snowball(VisibleSprite):
                 if not self.scene.waiting and not self.scene.eliminated:
                     self.scene.score += self.score * (2 if self.player.powerup == "strength" else 1)
                     self.client.queue_data("score", self.scene.score)
-                hit_strength = (2 + self.score + (self.score + 6 if self.player.powerup == "strength" else 0)) * sign(self.vel.x)
+                hit_strength = (2 + self.score + (2 * self.score + 6 if self.player.powerup == "strength" else 0)) * sign(self.vel.x)
                 self.client.irreg_data.put({
                     "hit": hit_strength,
                     "hit_size": 1 if self.frames == assets.snowball_small else 2,
@@ -183,12 +183,13 @@ class Snowball(VisibleSprite):
                     sb = Snowball(self.scene, VEC(uniform(-1, 1), uniform(-1, 1)).normalize() * 500, self.type - 3, self.pos.copy())
                     self.scene.player.snowballs[sb.id] = sb
             self.kill()
-        if self.type == 5 or self.type == 6: # strength
+        if self.type == 5 or self.type == 6: # telekinesis
             m_pos = VEC(pygame.mouse.get_pos())
-            self.vel = ((m_pos + self.scene.player.camera.offset) - self.pos).normalize() * (2200 if self.type == 5 else 3000)
+            self.vel = ((m_pos + self.scene.player.camera.offset) - self.pos).normalize() * self.vel.magnitude()
+            self.stasis = True
 
-            # funny strength cuz why not
-            if self.scene.player.funny_strength:
+            # funny telekinesis cuz why not
+            if self.scene.player.funny_tele:
                 for i in range (40):
                     sb = Snowball(self.scene, (0, 0), self.type - 5, m_pos + self.scene.player.camera.offset + VEC(uniform(-1, 1), uniform(-1, 1)).normalize() * 100, False, True)
                     sb.vel = ((m_pos + self.scene.player.camera.offset) - sb.pos).normalize() * 30

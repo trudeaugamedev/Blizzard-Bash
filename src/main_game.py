@@ -87,8 +87,8 @@ class MainGame(Scene):
                 case "infT":
                     self.player.infinite = True
                     self.player.inf_type = "telekinesis"
-                case "funS":
-                    self.player.funny_strength = True
+                case "funT":
+                    self.player.funny_tele = True
                 case "funC":
                     self.player.funny_cluster = True
                 case _:

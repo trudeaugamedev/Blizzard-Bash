@@ -183,7 +183,7 @@ class Player(VisibleSprite):
         # Cheats
         self.infinite = False
         self.inf_type = ""
-        self.funny_strength = False
+        self.funny_tele = False
         self.funny_cluster = False
 
         self.throw_trail = ThrowTrail(self.scene, self)
@@ -403,13 +403,15 @@ class Player(VisibleSprite):
                     self.snowballs[sb.id] = sb
                     self.overheat = min(30, self.overheat + 1)
                 else:
+                    if (self.powerup == "strength"):
+                        self.sb_vel *= 2
                     size = self.pop_snowball()
-                    sb = Snowball(self.scene, self.sb_vel, size + (5 if self.powerup == "strength" and size != 2 else 0))
+                    sb = Snowball(self.scene, self.sb_vel, size + (5 if self.powerup == "telekinesis" and size != 2 else 0))
                     self.snowballs[sb.id] = sb
                 if self.powerup != "rapidfire":
                     self.dig_iterations -= 3 if (size == 1 or size == 2) else 1
                     self.can_throw = bool(self.snowball_queue)
-                    if size == 2 or self.powerup == "strength":
+                    if size == 2 or self.powerup == "telekinesis":
                         self.has_trigger = True
                 else:
                     self.can_throw = True
@@ -479,6 +481,8 @@ class Player(VisibleSprite):
             if not self.scene.waiting and not self.scene.eliminated:
                 if self.hit_powerup not in {"rapidfire", "clustershot"}:
                     self.scene.score -= 2 # Penalty for getting hit (2 for now, may depend on self.hit_size)
+                if (self.hit_powerup == "strength"):
+                    self.scene.score -= 2 # lose another 2 points
             self.hit_strength = self.hit_size = 0
             self.hit_powerup = None
 
@@ -505,7 +509,7 @@ class Player(VisibleSprite):
             for snowball in self.snowballs.values():
                 if (snowball.pos.distance_to(self.pos + VEC(self.size / 2, self.size / 2))) <= 250:
                     snowball.time_mult = 0.2
-                    snowball.follow = False # don't mess with people's camera if snowball gets stuck
+                    snowball.follow = False # temporarily remove follow because camera is acting weird
 
         self.can_move = self.frame_group != self.assets.player_dig and not self.digging
 
