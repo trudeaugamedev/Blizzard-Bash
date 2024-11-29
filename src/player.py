@@ -634,7 +634,7 @@ class Player(VisibleSprite):
             self.camera.follow = 3
             pos = self.pos - (0, self.pos.y * 0.4 + 140)
             if self.throwing:
-                pos += VEC(self.sb_vel.x * (0.15 if self.powerup != "strength" else 0.5), 0)
+                pos += VEC(self.sb_vel.x * 0.15, 0)
             self.camera.update(pos)
         else:
             self.camera.follow = 2.5
