@@ -28,6 +28,7 @@ class Snowball(VisibleSprite):
         self.pos = self.player.rect.topleft + self.player.SB_OFFSET if pos is None else pos
         self.vel = VEC(vel)
         self.acc = VEC(0, 0)
+        self.time_mult = 1
         self.size = VEC(0, 0)
         self.frame = 0
         self.frame_time = time.time()
@@ -75,8 +76,9 @@ class Snowball(VisibleSprite):
         self.acc += self.scene.wind_vel
         if self.stasis: self.acc = VEC()
 
-        self.vel += self.acc * self.manager.dt
-        self.pos += self.vel * self.manager.dt
+        self.vel += self.acc * self.manager.dt * self.time_mult
+        self.pos += self.vel * self.manager.dt * self.time_mult
+        self.time_mult = 1
         self.rect = self.image.get_rect(center=self.pos)
         self.real_rect.center = self.rect.center
 

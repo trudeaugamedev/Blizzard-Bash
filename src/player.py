@@ -275,6 +275,15 @@ class Player(VisibleSprite):
             powerup_overlay = mask.scale(VEC(mask.get_size()) + (20, 14)).to_surface(setcolor=(*color, alpha), unsetcolor=(0, 0, 0, 0))
             self.manager.screen.blit(powerup_overlay, VEC(self.rect.topleft) - (10, 7) - self.camera.offset)
 
+        # CRUDE (AND BAD) GRAPHICS HERE
+        if self.powerup == "telekinesis":
+            trans_surf = pygame.Surface(self.manager.screen.get_size())
+            trans_surf.fill((0, 0, 0))
+            pygame.draw.circle(trans_surf, (204, 102, 255), self.pos - self.camera.offset, 250)
+            pygame.draw.circle(trans_surf, (0, 0, 0), self.pos - self.camera.offset, 240)
+            trans_surf.set_colorkey((0, 0, 0))
+            self.manager.screen.blit(trans_surf, (0,0))
+
         if self.scene.eliminated:
             self.image.set_alpha(80)
         self.manager.screen.blit(self.image, (*(VEC(self.rect.topleft) - self.camera.offset), *self.size))
@@ -491,6 +500,12 @@ class Player(VisibleSprite):
                 sb = SelfSnowball(self.scene, VEC(0, 0), randint(0, 1), pos=pos, follow=False)
                 self.snowballs[sb.id] = sb
                 self.self_snowball_time = time.time()
+
+        if self.powerup == "telekinesis":
+            for snowball in self.snowballs.values():
+                if (snowball.pos.distance_to(self.pos + VEC(self.size / 2, self.size / 2))) <= 250:
+                    snowball.time_mult = 0.2
+                    snowball.follow = False # don't mess with people's camera if snowball gets stuck
 
         self.can_move = self.frame_group != self.assets.player_dig and not self.digging
 
