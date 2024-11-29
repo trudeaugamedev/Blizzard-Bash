@@ -68,6 +68,12 @@ class OtherPlayer(VisibleSprite):
         self.upright_image = pygame.transform.flip(self.orig_image, self.flip, False)
         self.image = pygame.transform.rotate(self.upright_image, self.rotation)
 
+        if self.powerup == 3:
+            for snowball in self.scene.player.snowballs.values():
+                if (snowball.pos.distance_to(self.pos + VEC(self.size / 2, self.size / 2))) <= 250:
+                    snowball.time_mult = 0.2
+                    snowball.follow = False # don't mess with people's camera if snowball gets stuck
+
         if time.time() - self.disconnect_time > 1500:
             self.kill()
 
@@ -84,11 +90,19 @@ class OtherPlayer(VisibleSprite):
         self.manager.screen.blit(shadow(self.image), VEC(self.rect.topleft) - self.scene.player.camera.offset + (3, 3), special_flags=BLEND_RGB_SUB)
 
         if self.powerup != -1:
-            color = [(63, 134, 165), (233, 86, 86), (78, 180, 93)][self.powerup]
+            color = [(63, 134, 165), (233, 86, 86), (78, 180, 93), (204, 102, 255)][self.powerup]
             alpha = (sin((time.time() - self.powerup_flash_time) * pi * 3) * 0.5 + 0.5) * 255
             mask = pygame.mask.from_surface(self.image)
             powerup_overlay = mask.scale(VEC(mask.get_size()) + (20, 14)).to_surface(setcolor=(*color, alpha), unsetcolor=(0, 0, 0, 0))
             self.manager.screen.blit(powerup_overlay, VEC(self.rect.topleft) - (10, 7) - self.scene.player.camera.offset)
+            # CRUDE (AND BAD) GRAPHICS HERE
+            if self.powerup == 3:
+                trans_surf = pygame.Surface(self.manager.screen.get_size())
+                trans_surf.fill((0, 0, 0))
+                pygame.draw.circle(trans_surf, (204, 102, 255), self.pos - self.scene.player.camera.offset, 250)
+                pygame.draw.circle(trans_surf, (0, 0, 0), self.pos - self.scene.player.camera.offset, 240)
+                trans_surf.set_colorkey((0, 0, 0))
+                self.manager.screen.blit(trans_surf, (0, 0))
 
         self.manager.screen.blit(self.image, VEC(self.rect.topleft) - self.scene.player.camera.offset)
 
