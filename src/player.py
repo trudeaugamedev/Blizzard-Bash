@@ -382,6 +382,8 @@ class Player(VisibleSprite):
                 try:
                     self.sb_vel = ((m_pos - self.SB_OFFSET + self.camera.offset) - self.pos) * 8
                     self.sb_vel.scale_to_length(self.THROW_SPEED)
+                    if (self.powerup == "strength"):
+                        self.sb_vel *= 2
                 except ValueError:
                     self.sb_vel = VEC() # 0 vector
         if MOUSEBUTTONUP in self.manager.events:
@@ -403,8 +405,6 @@ class Player(VisibleSprite):
                     self.snowballs[sb.id] = sb
                     self.overheat = min(30, self.overheat + 1)
                 else:
-                    if (self.powerup == "strength"):
-                        self.sb_vel *= 2
                     size = self.pop_snowball()
                     sb = Snowball(self.scene, self.sb_vel, size + (5 if self.powerup == "telekinesis" and size != 2 else 0))
                     self.snowballs[sb.id] = sb
