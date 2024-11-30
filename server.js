@@ -81,7 +81,7 @@ class Powerup {
 		this.vel = [0, 0]
 		let x = 2400 - (1 - secondsLeft / totalTime) * 1600
 		this.pos = [randint(-x, x), -1200];
-		if (type == -1) type = randint(0, 3);
+		if (type == -1) type = randint(0, 4);
 		this.type = ["rapidfire", "strength", "clustershot", "hailstorm", "telekinesis"][type];
 		this.startTime = Date.now();
 	}
