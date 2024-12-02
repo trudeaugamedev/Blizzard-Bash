@@ -185,6 +185,11 @@ class Player(VisibleSprite):
         self.inf_type = ""
         self.funny_tele = False
         self.funny_cluster = False
+        # Ultimate Cheat?
+        self.can_toggle_bot = False
+        self.aimbot = False
+        self.bot_mpos = VEC()
+        self.bot_pressing = ""
 
         self.throw_trail = ThrowTrail(self.scene, self)
         self.throwing = False
@@ -296,13 +301,13 @@ class Player(VisibleSprite):
     def update_keys(self) -> None:
         self.keys = pygame.key.get_pressed()
 
-        if self.keys[K_SPACE] and self.on_ground and self.powerup != "rapidfire":
+        if (self.keys[K_SPACE] or self.bot_pressing.find(" space ") != -1) and self.on_ground and self.powerup != "rapidfire":
             self.digging = True
             self.idle = False
             self.throwing = False
 
         self.acc = VEC(0, GRAVITY)
-        if self.keys[K_a]: # Acceleration
+        if self.keys[K_a] or self.bot_pressing.find(" a ") != -1: # Acceleration
             self.acc.x -= self.CONST_ACC
             self.flip = True
             if self.can_move:
@@ -315,7 +320,7 @@ class Player(VisibleSprite):
         elif self.vel.x < 0: # Deceleration
             self.acc.x += self.CONST_ACC
             self.idle = True
-        if self.keys[K_d]:
+        if self.keys[K_d] or self.bot_pressing.find(" d ") != -1:
             self.acc.x += self.CONST_ACC
             self.flip = False
             if self.can_move:
@@ -331,6 +336,11 @@ class Player(VisibleSprite):
         if self.keys[K_a] and self.keys[K_d]:
             self.acc.x = -sign(self.vel.x) * self.CONST_ACC
             self.idle = True
+        if self.keys[K_q] and self.can_toggle_bot and self.on_ground: # jump when toggling because I don't want to log keys
+            self.aimbot = not self.aimbot
+            self.bot_mpos = VEC()
+            self.vel.y = self.JUMP_SPEED1
+            self.on_ground = False
 
         if self.can_move:
             self.vel.x *= 0.004 ** self.manager.dt
@@ -342,7 +352,7 @@ class Player(VisibleSprite):
 
         if self.on_ground:
             self.jump_time = time.time()
-        if self.keys[K_w] and self.can_move and not self.digging:
+        if (self.keys[K_w] or self.bot_pressing.find(" w ") != -1) and self.can_move and not self.digging:
             if time.time() - self.jump_time < 0.2:
                 self.vel.y = self.JUMP_SPEED1
             elif time.time() - self.jump_time < 0.3:
@@ -352,7 +362,7 @@ class Player(VisibleSprite):
             self.jumping = True
             self.on_ground = False
 
-        if self.keys[K_s] and self.on_ground and self.ground_level in {Ground2, Ground3}:
+        if (self.keys[K_s] or self.bot_pressing.find(" s ") != -1) and self.on_ground and self.ground_level in {Ground2, Ground3}:
             self.ground_level = Ground2 if self.ground_level == Ground3 else Ground1
             self.on_ground = False
 
@@ -364,7 +374,7 @@ class Player(VisibleSprite):
             self.can_throw = self.can_move and self.dig_iterations > 0
         else:
             self.can_throw = True
-        if pygame.mouse.get_pressed()[0]:
+        if pygame.mouse.get_pressed()[0] or self.bot_pressing == "click":
             if self.has_trigger:
                 self.has_trigger = False
                 self.just_triggered = True
@@ -373,6 +383,8 @@ class Player(VisibleSprite):
                     snowball.trigger()
             elif self.can_throw:
                 m_pos = VEC(pygame.mouse.get_pos())
+                if self.bot_mpos != VEC():
+                    m_pos = self.bot_mpos
                 self.throwing = True
                 if self.can_throw and self.dig_iterations < 3:
                     self.frame_group = self.assets.player_throw_s
@@ -386,8 +398,8 @@ class Player(VisibleSprite):
                         self.sb_vel *= 2
                 except ValueError:
                     self.sb_vel = VEC() # 0 vector
-        if MOUSEBUTTONUP in self.manager.events:
-            if self.manager.events[MOUSEBUTTONUP].button == 1 and self.can_throw and not self.just_triggered:
+        if MOUSEBUTTONUP in self.manager.events or self.bot_pressing == "click":
+            if (self.bot_pressing == "click" or self.manager.events[MOUSEBUTTONUP].button == 1) and self.can_throw and not self.just_triggered:
                 self.throwing = False
                 assets.throw_sound.set_volume(0.2)
                 assets.throw_sound.play()
@@ -511,7 +523,43 @@ class Player(VisibleSprite):
                     snowball.time_mult = 0.2
                     snowball.follow = False # temporarily remove follow because camera is acting weird
 
+        # bot decision making
+        if self.aimbot:
+            self.bot_pressing = self.get_bot_decision()
+        else:
+            self.bot_pressing = ""
+
         self.can_move = self.frame_group != self.assets.player_dig and not self.digging
+
+    def get_bot_decision(self) -> str:
+        self.min_dist = 99999
+        self.tracking_player = None
+        returning = ""
+        for player in self.manager.other_players.values():
+            if self.pos.distance_to(player.pos) < self.min_dist:
+                self.tracking_player = player
+                self.min_dist = self.pos.distance_to(player.pos)
+        if self.tracking_player != None:
+            if self.dig_iterations < 3:
+                return " space "
+            if self.min_dist < 250:
+                self.bot_mpos = self.tracking_player.pos - self.camera.offset
+                self.bot_mpos -= VEC(self.scene.wind_vel * 0.1, 0)
+                self.bot_mpos += VEC(0, (self.tracking_player.pos.y - self.pos.y) * 0.1)
+                return "click"
+            if self.tracking_player.pos.x > self.pos.x:
+                returning += " d "
+            else:
+                returning += " a "
+            if self.dig_iterations < 4:
+                returning += " space "
+            if self.tracking_player.pos.y - self.pos.y < -50:
+                returning += " w "
+            if self.tracking_player.pos.y - self.pos.y > 50:
+                returning += " s "
+        else:
+            return " space "
+        return returning
 
     def add_snowball(self, size: int) -> None:
         self.snowball_queue.append(size)
@@ -552,7 +600,7 @@ class Player(VisibleSprite):
                 self.frame_time = time.time()
                 self.frame += 1
                 if self.frame > 8:
-                    if not self.keys[K_SPACE]:
+                    if (not self.keys[K_SPACE] and not self.aimbot) or (self.bot_pressing.find(" space ") == -1 and self.aimbot):
                         self.digging = False
                         self.can_throw = True
                     else:
@@ -566,7 +614,7 @@ class Player(VisibleSprite):
                     else:
                         self.add_snowball(0) # small snowball
                 elif self.frame <= 7:
-                    if not self.keys[K_SPACE]:
+                    if (not self.keys[K_SPACE] and not self.aimbot) or (self.bot_pressing.find(" space ") == -1 and self.aimbot):
                         self.frame_group = self.assets.player_idle
                         self.idle = True
                         self.frame = 0
