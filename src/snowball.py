@@ -48,6 +48,7 @@ class Snowball(VisibleSprite):
         self.follow = follow
         # self.is_storm = is_storm
         self.stasis = stasis
+        self.really_follow = False
         self.start_time = time.time()
 
         if self.type == 2:
@@ -75,6 +76,9 @@ class Snowball(VisibleSprite):
         self.acc = VEC(0, GRAVITY)
         self.acc += self.scene.wind_vel
         if self.stasis: self.acc = VEC()
+        if self.really_follow: 
+            m_pos = VEC(pygame.mouse.get_pos())
+            self.vel = ((m_pos + self.scene.player.camera.offset) - (self.pos - self.size / 2)).normalize() * 1000
 
         self.vel += self.acc * self.manager.dt * self.time_mult
         self.pos += self.vel * self.manager.dt * self.time_mult
@@ -87,7 +91,7 @@ class Snowball(VisibleSprite):
         if abs(self.pos.x - self.scene.player.pos.x) > 2400:
             self.follow = False
 
-        if self.stasis and time.time() - self.start_time > 15: # 15 sec lifespan
+        if self.stasis and time.time() - self.start_time > 20: # 20 sec lifespan
             self.kill()
 
         try:
@@ -169,6 +173,7 @@ class Snowball(VisibleSprite):
     def trigger(self) -> None:
         if self.type == 2: # vortex
             self.kill()
+
         if self.type == 3 or self.type == 4: # cluster
             for _ in range(4 if self.type == 3 else 7):
                 sb = Snowball(self.scene, self.vel + VEC(uniform(-180, 180), uniform(-180, 180)), 0, self.pos.copy())
@@ -183,17 +188,15 @@ class Snowball(VisibleSprite):
                     sb = Snowball(self.scene, VEC(uniform(-1, 1), uniform(-1, 1)).normalize() * 500, self.type - 3, self.pos.copy())
                     self.scene.player.snowballs[sb.id] = sb
             self.kill()
+
         if self.type == 5 or self.type == 6: # telekinesis
             m_pos = VEC(pygame.mouse.get_pos())
-            self.vel = ((m_pos + self.scene.player.camera.offset) - self.pos).normalize() * self.vel.magnitude()
+            self.vel = ((m_pos + self.scene.player.camera.offset) - self.pos).normalize() * 1000
             self.stasis = True
 
             # funny telekinesis cuz why not
             if self.scene.player.funny_tele:
-                for i in range (40):
-                    sb = Snowball(self.scene, (0, 0), self.type - 5, m_pos + self.scene.player.camera.offset + VEC(uniform(-1, 1), uniform(-1, 1)).normalize() * 100, False, True)
-                    sb.vel = ((m_pos + self.scene.player.camera.offset) - sb.pos).normalize() * 30
-                    self.scene.player.snowballs[sb.id] = sb
+                self.really_follow = True
 
 class SelfSnowball(Snowball):
     def collide(self) -> bool:
