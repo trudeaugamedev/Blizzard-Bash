@@ -92,6 +92,7 @@ class MainGame(Scene):
                 case "funC":
                     self.player.funny_cluster = True
                 case _:
+                    self.name += "@"
                     self.name += codes[i]
         
         self.client.queue_data("name", self.name.lower()) # makes it so that server always receives lowercase names
