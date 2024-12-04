@@ -185,11 +185,12 @@ class Player(VisibleSprite):
         self.inf_type = ""
         self.funny_tele = False
         self.funny_cluster = False
-        # Ultimate Cheat?
+        # bot
         self.can_toggle_bot = False
         self.aimbot = False
         self.bot_mpos = VEC()
         self.bot_pressing = ""
+        self.bot_target = VEC(99999, 0)
 
         self.throw_trail = ThrowTrail(self.scene, self)
         self.throwing = False
@@ -374,7 +375,7 @@ class Player(VisibleSprite):
             self.can_throw = self.can_move and self.dig_iterations > 0
         else:
             self.can_throw = True
-        if pygame.mouse.get_pressed()[0] or self.bot_pressing == "click":
+        if pygame.mouse.get_pressed()[0] or self.bot_pressing.find(" click ") != -1:
             if self.has_trigger:
                 self.has_trigger = False
                 self.just_triggered = True
@@ -398,8 +399,8 @@ class Player(VisibleSprite):
                         self.sb_vel *= 2
                 except ValueError:
                     self.sb_vel = VEC() # 0 vector
-        if MOUSEBUTTONUP in self.manager.events or self.bot_pressing == "click":
-            if (self.bot_pressing == "click" or self.manager.events[MOUSEBUTTONUP].button == 1) and self.can_throw and not self.just_triggered:
+        if MOUSEBUTTONUP in self.manager.events or self.bot_pressing.find(" click ") != -1:
+            if (self.bot_pressing.find(" click ") != -1 or self.manager.events[MOUSEBUTTONUP].button == 1) and self.can_throw and not self.just_triggered:
                 self.throwing = False
                 assets.throw_sound.set_volume(0.2)
                 assets.throw_sound.play()
@@ -531,33 +532,81 @@ class Player(VisibleSprite):
 
         self.can_move = self.frame_group != self.assets.player_dig and not self.digging
 
+    # helper functions for decision making
+    def left_of(self, o: float) -> bool:
+        return self.pos.x < o
+    def right_of(self, o: float) -> bool:
+        return self.pos.x > o
+    def close_to(self, o: VEC|float, dist: float) -> bool:
+        if isinstance(o, VEC):
+            return self.pos.distance_to(o) < dist
+        return abs(self.pos.x - o) < dist
+
     def get_bot_decision(self) -> str:
+        # avoid the border at all costs
+        if self.right_of(Border.x):
+            self.bot_target.x = Border.x - 500
+        if self.left_of(-Border.x):
+            self.bot_target.x = -Border.x + 500
+        if self.bot_target.x != 99999:
+            if self.close_to(self.bot_target.x, 200):
+                self.bot_target.x = 99999
+            elif self.right_of(self.bot_target.x):
+                return " a "
+            else:
+                return " d "
+
         self.min_dist = 99999
+        self.min_snow_dist = 99999
         self.tracking_player = None
+        self.tracking_snowball = None
+        self.snowball_prev_pos = VEC()
         returning = ""
         for player in self.manager.other_players.values():
-            if self.pos.distance_to(player.pos) < self.min_dist:
+            if self.close_to(player.pos, self.min_dist):
                 self.tracking_player = player
                 self.min_dist = self.pos.distance_to(player.pos)
+            for snowball in list(player.snowballs.values()):
+                if self.close_to(snowball.pos, self.min_snow_dist):
+                    self.tracking_snowball = snowball
+                    self.min_snow_dist = self.pos.distance_to(snowball.pos)      
+        # dodging logic (kinda bad but it's enough for now)
+        if self.tracking_snowball != None:
+            if abs(self.tracking_snowball.pos.x - self.pos.x) < 275 and not self.tracking_snowball.pos.y - self.pos.y < -100:
+                return " w "
+        # attacking logic
         if self.tracking_player != None:
-            if self.dig_iterations < 3:
-                return " space "
-            if self.min_dist < 250:
-                self.bot_mpos = self.tracking_player.pos - self.camera.offset
-                self.bot_mpos -= VEC(self.scene.wind_vel * 0.1, 0)
-                self.bot_mpos += VEC(0, (self.tracking_player.pos.y - self.pos.y) * 0.1)
-                return "click"
-            if self.tracking_player.pos.x > self.pos.x:
+            # run away from powerup holders
+            if self.tracking_player.powerup != -1:
+                if self.left_of(self.tracking_player.pos.x):
+                    return " a "
+                else:
+                    return " d "
+            if self.dig_iterations < 3: # always dig when you don't have a large snowball
+                return returning + " space "
+            if self.min_dist < 300: # start shooting at 300 range
+                self.bot_mpos = (self.tracking_player.pos - VEC(0, self.size.y) - self.camera.offset)
+                self.bot_mpos -= VEC(0, abs(self.tracking_player.pos.x - self.pos.x) - 400) / 4
+                pygame.mouse.set_pos(self.bot_mpos)
+                if self.tracking_player.pos.y - self.pos.y < -100: # account for wind when target too high
+                    self.bot_mpos -= VEC(self.scene.wind_vel * 0.1, 0)
+                else: # otherwise just drag mouse really far away
+                    self.bot_mpos += (self.bot_mpos - self.pos - VEC(0, self.size.y / 2) + self.camera.offset) * 2
+                returning += " click "
+                if self.min_dist < 150 and self.tracking_player.pos.y - self.pos.y > -50: # too close, move further away
+                    if self.left_of(self.tracking_player.pos.x):
+                        returning = " a "
+                    else:
+                        returning = " d "
+            elif self.left_of(self.tracking_player.pos.x): # move toward tracking player
                 returning += " d "
             else:
                 returning += " a "
-            if self.dig_iterations < 4:
-                returning += " space "
-            if self.tracking_player.pos.y - self.pos.y < -50:
+            if self.tracking_player.pos.y - self.pos.y < -50: # jump up if target too high
                 returning += " w "
-            if self.tracking_player.pos.y - self.pos.y > 50:
+            if self.tracking_player.pos.y - self.pos.y > 50: # drop down if target too low
                 returning += " s "
-        else:
+        else: # more snowballs if no target
             return " space "
         return returning
 

@@ -246,8 +246,7 @@ function handleAdminMessage(msg) {
 		elimTime = totalTime / 2 / (players.size - 1 - 1); // minus admin, -1 again to offset the last two players
 		secondsLeft = Math.floor((totalTime - (Date.now() - startTime)) / 1000) - 1;
 		for (const [id, player] of players) {
-			player.socket.send_obj({"type": "tp", "pos" : [randint(-2400, 2400), -1000]});
-			console.log(player.data.pos);
+			player.socket.send_obj({"type": "tp", "tppos" : [randint(-2400, 2400), -1000]});
 		}
 		broadcast(JSON.stringify({"type": "tm", "seconds": secondsLeft}));
 	} else if (command === "elimination") {
