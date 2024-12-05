@@ -395,7 +395,7 @@ class Player(VisibleSprite):
                     self.frame_group = self.assets.player_throw_l
                 # Use camera offset to convert screen-space pos to in-world pos
                 try:
-                    self.sb_vel = ((m_pos - self.SB_OFFSET + self.camera.offset) - self.pos) * 8
+                    self.sb_vel = ((m_pos - (self.SB_OFFSET - self.camera.offset)) - VEC(self.rect.topleft)) * 8
                     self.sb_vel.scale_to_length(self.THROW_SPEED)
                     if (self.powerup == "strength"):
                         self.sb_vel *= 2
@@ -578,11 +578,12 @@ class Player(VisibleSprite):
             if self.close_to(powerup.pos, self.min_pwr_dist) :
                 self.tracking_powerup = powerup
                 self.min_pwr_dist = self.pos.distance_to(powerup.pos)
-        # go for powerups
+        # go for powerups when you don't have powerups
         if self.tracking_powerup != None and self.min_pwr_dist < 1500:
-            if self.tracking_player == None or \
+            if (self.tracking_player == None or \
                self.close_to(self.tracking_powerup.pos, self.pos.distance_to(self.tracking_player.pos) + 100) or \
-               (sign(self.pos.x - self.tracking_powerup.pos.x) != sign(self.pos.x - self.tracking_player.pos.x) and self.powerup == None):
+               (sign(self.pos.x - self.tracking_powerup.pos.x) != sign(self.pos.x - self.tracking_player.pos.x)) and \
+               self.powerup == None):
                 if self.close_to(self.tracking_powerup.pos.x, 50):
                     pass
                 if self.left_of(self.tracking_powerup.pos.x):
@@ -609,6 +610,7 @@ class Player(VisibleSprite):
             if self.click_again:
                 self.click_again = False
                 self.bot_mpos = (self.tracking_player.pos - VEC(0, self.size.y / 2) - self.camera.offset)
+                pygame.mouse.set_pos(self.bot_mpos)
                 return returning + " click "
             # dig when you don't have a large snowball
             if self.dig_iterations < 3:
