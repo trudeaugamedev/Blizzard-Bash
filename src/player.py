@@ -17,6 +17,7 @@ from .sprite import VisibleSprite, Layers
 from .border import Border
 from .swirl import Swirl
 from . import assets
+from .powerup import Powerup
 
 class Camera:
     def __init__(self, scene: Scene, pos: tuple[int, int], follow: int):
@@ -191,6 +192,7 @@ class Player(VisibleSprite):
         self.bot_mpos = VEC()
         self.bot_pressing = ""
         self.bot_target = VEC(99999, 0)
+        self.click_again = False
 
         self.throw_trail = ThrowTrail(self.scene, self)
         self.throwing = False
@@ -558,8 +560,10 @@ class Player(VisibleSprite):
 
         self.min_dist = 99999
         self.min_snow_dist = 99999
+        self.min_pwr_dist = 99999
         self.tracking_player = None
         self.tracking_snowball = None
+        self.tracking_powerup = None
         self.snowball_prev_pos = VEC()
         returning = ""
         for player in self.manager.other_players.values():
@@ -569,31 +573,66 @@ class Player(VisibleSprite):
             for snowball in list(player.snowballs.values()):
                 if self.close_to(snowball.pos, self.min_snow_dist):
                     self.tracking_snowball = snowball
-                    self.min_snow_dist = self.pos.distance_to(snowball.pos)      
+                    self.min_snow_dist = self.pos.distance_to(snowball.pos) 
+        for powerup in Powerup.instances.values():
+            if self.close_to(powerup.pos, self.min_pwr_dist) :
+                self.tracking_powerup = powerup
+                self.min_pwr_dist = self.pos.distance_to(powerup.pos)
+        # go for powerups
+        if self.tracking_powerup != None and self.min_pwr_dist < 1500:
+            if self.tracking_player == None or \
+               self.close_to(self.tracking_powerup.pos, self.pos.distance_to(self.tracking_player.pos) + 100) or \
+               (sign(self.pos.x - self.tracking_powerup.pos.x) != sign(self.pos.x - self.tracking_player.pos.x) and self.powerup == None):
+                if self.close_to(self.tracking_powerup.pos.x, 50):
+                    pass
+                if self.left_of(self.tracking_powerup.pos.x):
+                    returning += " d "
+                else:
+                    returning += " a "
+
         # dodging logic (kinda bad but it's enough for now)
         if self.tracking_snowball != None:
             if abs(self.tracking_snowball.pos.x - self.pos.x) < 275 and not self.tracking_snowball.pos.y - self.pos.y < -100:
-                return " w "
+                return returning + " w "
+        # before going into attacks, finish powerup logic
+        if returning != "":
+            return returning + " s "
+        
         # attacking logic
         if self.tracking_player != None:
-            # run away from powerup holders
-            if self.tracking_player.powerup != -1:
+            # run away from rapidfire or cluster holders unless owning a powerup yourself
+            if (self.tracking_player.powerup == 0 or self.tracking_player.powerup == 2) and self.powerup == None:
                 if self.left_of(self.tracking_player.pos.x):
-                    return " a "
+                    return returning + " a "
                 else:
                     return " d "
-            if self.dig_iterations < 3: # always dig when you don't have a large snowball
+            if self.click_again:
+                self.click_again = False
+                self.bot_mpos = (self.tracking_player.pos - VEC(0, self.size.y / 2) - self.camera.offset)
+                return returning + " click "
+            # dig when you don't have a large snowball
+            if self.dig_iterations < 3:
                 return returning + " space "
-            if self.min_dist < 300: # start shooting at 300 range
+            # start shooting at 300 range
+            if self.min_dist < (600 if self.powerup == "strength" else (250 if self.powerup == "rapidfire" else 300)):
                 self.bot_mpos = (self.tracking_player.pos - VEC(0, self.size.y) - self.camera.offset)
                 self.bot_mpos -= VEC(0, abs(self.tracking_player.pos.x - self.pos.x) - 400) / 4
-                pygame.mouse.set_pos(self.bot_mpos)
-                if self.tracking_player.pos.y - self.pos.y < -100: # account for wind when target too high
+                if self.powerup == "strength": # adjustment to aiming when using strength
+                    self.bot_mpos += VEC(0, 80)
+                if self.powerup == "clustershot": # adjust upwards when using cluster to get more snowballs in
+                    self.bot_mpos -= VEC(0, 30)
+                # account for wind when target too high
+                if self.tracking_player.pos.y - self.pos.y < -100:
                     self.bot_mpos -= VEC(self.scene.wind_vel * 0.1, 0)
-                else: # otherwise just drag mouse really far away
+                # otherwise just drag mouse really far away
+                else: 
                     self.bot_mpos += (self.bot_mpos - self.pos - VEC(0, self.size.y / 2) + self.camera.offset) * 2
                 returning += " click "
-                if self.min_dist < 150 and self.tracking_player.pos.y - self.pos.y > -50: # too close, move further away
+                # trigger tele and cluster instantly
+                if self.powerup == "telekinesis" or self.powerup == "clustershot":
+                    self.click_again = True
+                # too close, move further away
+                if self.min_dist < 150 and self.tracking_player.pos.y - self.pos.y > -50 or (self.powerup == "strength" and self.min_dist < 250):
                     if self.left_of(self.tracking_player.pos.x):
                         returning = " a "
                     else:
@@ -604,7 +643,7 @@ class Player(VisibleSprite):
                 returning += " a "
             if self.tracking_player.pos.y - self.pos.y < -50: # jump up if target too high
                 returning += " w "
-            if self.tracking_player.pos.y - self.pos.y > 50: # drop down if target too low
+            if self.tracking_player.pos.y - self.pos.y > 100: # drop down if target too low
                 returning += " s "
         else: # more snowballs if no target
             return " space "

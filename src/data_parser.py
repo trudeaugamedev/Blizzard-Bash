@@ -40,7 +40,7 @@ class Parser:
                 elif data["command"] == "stop":
                     self.manager.scene.time_left = -1
             case "tp": # teleport
-                self.manager.scene.player.pos = data["tppos"]
+                self.manager.scene.player.pos = VEC(data["tppos"])
             case "wd": # Wind
                 self.manager.scene.wind_vel = VEC(data["speed"], 0)
             case "tm": # Time
