@@ -95,6 +95,8 @@ class MainGame(Scene):
                     self.player.can_toggle_bot = True
                 case "bot":
                     self.player.aimbot = True
+                case "noKB":
+                    self.player.no_kb = True
                 case _:
                     self.name += codes[i]
         
