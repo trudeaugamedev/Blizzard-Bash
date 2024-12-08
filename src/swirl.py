@@ -30,26 +30,31 @@ class Swirl(VisibleSprite):
             rot = uniform(0, 2 * pi)
             self.dots.append([
                 # late binding GAHHHHHH
-                lambda t, b=b, rot=rot: cos(rot) * ((size - 2) * cos(t)) - sin(rot) * (b * sin(t)) + size,
-                lambda t, b=b, rot=rot: sin(rot) * ((size - 2) * cos(t)) + cos(rot) * (b * sin(t)) + size,
+                lambda t, sc, b=b, rot=rot: cos(rot) * ((size - 2) * cos(t)) * sc - sin(rot) * (b * sin(t)) * sc + size,
+                lambda t, sc, b=b, rot=rot: sin(rot) * ((size - 2) * cos(t)) * sc + cos(rot) * (b * sin(t)) * sc + size,
                 (randint(90, 160),) * 3, # color
                 uniform(0, 2 * pi), # phase
                 uniform(7, 12), # speed
-                choice(dot_sizes) # radius
+                choice(dot_sizes), # radius
+                0, # scale
+                uniform(0.3, 0.7) # scale speed
             ])
         self.visible = True
-        self.scale = 1
+        self.alpha = 255
 
     def update(self) -> None:
         for dot in self.dots:
-            pos = VEC(dot[0](time.time() * dot[4] + dot[3]), dot[1](time.time() * dot[4] + dot[3]))
-            pygame.draw.aacircle(self.image, dot[2], pos, dot[5])
+            real_scale = tween.easeOutExpo(dot[6])
+            pos = VEC(dot[0](time.time() * dot[4] + dot[3], real_scale), dot[1](time.time() * dot[4] + dot[3], real_scale))
+            pygame.draw.aacircle(self.image, (140, 140, 140), pos, dot[5])
+            dot[6] += dot[7] * self.manager.dt
+            if dot[6] > 1:
+                dot[6] = 1
 
     def draw(self) -> None:
         if not self.visible: return
         self.image.fill((2, 2, 2), special_flags=BLEND_ADD)
-        img = pygame.transform.scale_by(self.image, self.scale)
-        self.scene.manager.screen.blit(img, self.pos + (self.size // 2,) * 2 - VEC(img.size) // 2 - self.scene.player.camera.offset, special_flags=BLEND_MULT)
+        self.scene.manager.screen.blit(self.image, self.pos - self.scene.player.camera.offset, special_flags=BLEND_MULT)
 
 class VortexSwirl(Swirl):
     instances = {}
@@ -63,7 +68,6 @@ class VortexSwirl(Swirl):
         self.maxTime = 15
         self.orig_img = self.image.copy()
         self.suck = suck
-        self.scale = 0
 
         # if id is None:
         #     self.id = storm.id
@@ -76,37 +80,36 @@ class VortexSwirl(Swirl):
         # if getattr(self, "storm", None) is None: return
         super().update()
 
-        self.scale += 3.5 * self.manager.dt
-        if self.scale > 1:
-            self.scale = 1
-
         if time.time() - self.timer > 0.1:
             self.timer = time.time()
             for _ in range(2):
-                VortexAnim(self.scene, self.pos + (self.scale / 2,) * 2)
+                VortexAnim(self.scene, self.pos + (self.size / 2,) * 2)
 
             # # funny vortex (i just want to see more snowballs)
             # self.scene.player.spawn_snowball(0, self.pos + (self.size / 2, 0), (0, 0))
 
         # sucking is on the thrower's side?????
         if self.suck and not self.scene.eliminated:
-            if (dist := self.scene.player.pos.distance_to(self.pos + (self.scale / 2,) * 2)) < 250:
-                vel = (1 - dist / 250) * (self.pos + (self.scale / 2,) * 2 - self.scene.player.pos).normalize() * 50
+            if (dist := self.scene.player.pos.distance_to(self.pos + (self.size / 2,) * 2)) < 250:
+                vel = (1 - dist / 250) * (self.pos + (self.size / 2,) * 2 - self.scene.player.pos).normalize() * 50
                 vel.y *= 0.3
                 self.scene.player.vel += vel
         for snowball in self.scene.player.snowballs.values():
-            if (dist := snowball.pos.distance_to(self.pos + (self.scale / 2,) * 2)) < 250 and dist > 0:
+            if (dist := snowball.pos.distance_to(self.pos + (self.size / 2,) * 2)) < 250 and dist > 0:
                 snowball.vel *= ((dist + 10) / 260) ** self.manager.dt # more friction the closer to center the snowball gets
-                snowball.vel += (1 - dist / 250) * (self.pos + (self.scale / 2, self.scale / 2) - snowball.pos).normalize() * 150 # normal accel (toward center)
-                snowball.vel += (1.1 - dist / 250) * (self.pos + (self.scale / 2, self.scale / 2) - snowball.pos).normalize().rotate(-90) * 10 # tangent accel (perp. to normal)
+                snowball.vel += (1 - dist / 250) * (self.pos + (self.size / 2, self.size / 2) - snowball.pos).normalize() * 150 # normal accel (toward center)
+                snowball.vel += (1.1 - dist / 250) * (self.pos + (self.size / 2, self.size / 2) - snowball.pos).normalize().rotate(-90) * 10 # tangent accel (perp. to normal)
                 snowball.follow = False # don't mess with people's camera if snowball gets stuck
 
         self.image.fill((0, 0, 0), special_flags=BLEND_ADD)
 
         if time.time() - self.startTime > self.maxTime:
             self.kill()
-        elif time.time() - self.startTime > self.maxTime - 0.5:
-            self.scale = 1 - (time.time() - self.startTime - (self.maxTime - 0.5)) * 2
+        if time.time() - self.startTime > self.maxTime - 1:
+            for dot in self.dots:
+                dot[6] -= 4.5 * dot[7] * self.manager.dt
+                if dot[6] < 0:
+                    dot[6] = 0
 
     def draw(self) -> None:
         super().draw()
