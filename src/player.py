@@ -383,13 +383,7 @@ class Player(VisibleSprite):
         else:
             self.can_throw = True
         if pygame.mouse.get_pressed()[0] or self.bot_pressing.find(" click ") != -1:
-            if self.has_trigger:
-                self.has_trigger = False
-                self.just_triggered = True
-                self.throwing = False
-                for snowball in list(self.snowballs.values()):
-                    snowball.trigger()
-            elif self.can_throw and not self.just_triggered:
+            if self.can_throw and not self.just_triggered:
                 m_pos = VEC(pygame.mouse.get_pos())
                 if self.bot_mpos != VEC():
                     m_pos = self.bot_mpos
@@ -407,7 +401,12 @@ class Player(VisibleSprite):
                 except ValueError:
                     self.sb_vel = VEC() # 0 vector
         if MOUSEBUTTONDOWN in self.manager.events or self.bot_pressing.find(" click ") != -1:
-            
+            if self.has_trigger:
+                self.has_trigger = False
+                self.just_triggered = True
+                self.throwing = False
+                for snowball in list(self.snowballs.values()):
+                    snowball.trigger()
         if MOUSEBUTTONUP in self.manager.events or self.bot_pressing.find(" click ") != -1:
             if (self.bot_pressing.find(" click ") != -1 or self.manager.events[MOUSEBUTTONUP].button == 1) and self.can_throw and not self.just_triggered:
                 self.throwing = False
