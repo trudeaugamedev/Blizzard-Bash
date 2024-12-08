@@ -156,7 +156,7 @@ class Aura(VisibleSprite):
         self.ring_time = time.time()
 
     def update(self) -> None:
-        self.pos = self.player.pos
+        self.pos = self.player.pos - (0, self.player.size.y // 2)
         if time.time() - self.ring_time > 0.5:
             self.rings.append(0)
             self.ring_time = time.time()
