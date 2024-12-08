@@ -7,20 +7,36 @@ function randint(min, max) {
 
 function broadcast(msg) {
 	for (const player of players.values()) {
-		player.socket.send(msg);
+		try {
+			player.socket.send(msg);
+		} catch (err) {
+			console.error(err);
+		}
 	}
 	for (const spectator of spectators.values()) {
-		spectator.socket.send(msg);
+		try {
+			spectator.socket.send(msg);
+		} catch (err) {
+			console.error(err);
+		}
 	}
 }
 
 function xbroadcast(msg, x_id) {
 	for (const [id, player] of players) {
 		if (id === x_id) continue;
-		player.socket.send(msg);
+		try {
+			player.socket.send(msg);
+		} catch (err) {
+			console.error(err);
+		}
 	}
 	for (const [id, spectator] of spectators) {
-		spectator.socket.send(msg);
+		try {
+			spectator.socket.send(msg);
+		} catch (err) {
+			console.error(err);
+		}
 	}
 }
 
@@ -51,15 +67,27 @@ function getPlayerData(x_id, init) {
 
 function broadcastPlayerData() {
 	for (const [id, player] of players) {
-		player.socket.send(JSON.stringify(getPlayerData(id, id === -1)));
+		try {
+			player.socket.send(JSON.stringify(getPlayerData(id, id === -1)));
+		} catch (err) {
+			console.error(err);
+		}
 	}
 	for (const [id, spectator] of spectators) {
-		spectator.socket.send(JSON.stringify(getPlayerData(-1, true)));
+		try {
+			spectator.socket.send(JSON.stringify(getPlayerData(-1, true)));
+		} catch (err) {
+			console.error(err);
+		}
 	}
 }
 
 WebSocket.WebSocket.prototype.send_obj = function send_obj (obj) {
-	this.send(JSON.stringify(obj));
+	try {
+		this.send(JSON.stringify(obj));
+	} catch (err) {
+		console.error(err);
+	}
 }
 
 class Player {
