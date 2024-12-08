@@ -188,6 +188,8 @@ class Player(VisibleSprite):
         self.funny_cluster = False
         self.no_kb = False
         self.trigger_time = time.time() + 99999
+        self.completely_lag = 0
+        self.lag_time = time.time()
         # bot
         self.can_toggle_bot = False
         self.aimbot = False
@@ -378,6 +380,12 @@ class Player(VisibleSprite):
             self.acc.y += GRAVITY
 
     def update_throw(self) -> None:
+        if self.completely_lag and time.time() - self.lag_time > 0.1:
+            self.lag_time = time.time()
+            for _ in range(int(self.completely_lag)):
+                sb = Snowball(self.scene, (uniform(-100,100), -1000), 1, VEC())
+                self.snowballs[sb.id] = sb
+
         if self.powerup != "rapidfire":
             self.can_throw = self.can_move and self.dig_iterations > 0
         else:
