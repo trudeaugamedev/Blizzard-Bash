@@ -194,7 +194,8 @@ class Snowball(VisibleSprite):
             # y = 800 + (self.pos.y - 40) * 0.6
             # storm = Storm(self.scene, self.id, self.pos - (size.x / 2, y) + VEC(randint(-80, 80), randint(-20, 20)), size, self.hit_player)
             VortexSwirl(self.scene, Layers.SNOWBALL, self.pos - (64, 64), 128, 20)
-        self.scene.player.has_trigger = False
+        if self.type not in {0, 1}:
+            self.scene.player.has_trigger = False
         self.landed = True
 
     def trigger(self) -> None:
