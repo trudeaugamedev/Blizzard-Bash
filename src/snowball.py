@@ -216,6 +216,8 @@ class Snowball(VisibleSprite):
                     self.scene.player.snowballs[sb.id] = sb
             self.kill()
 
+            Wave(self.scene, self.pos, (78, 180, 93))
+
         if self.type == 5 or self.type == 6: # telekinesis
             m_pos = VEC(pygame.mouse.get_pos() if not self.scene.player.aimbot else self.scene.player.bot_mpos)
             self.vel = ((m_pos + self.scene.player.camera.offset) - self.pos).normalize() * 1500
@@ -226,6 +228,8 @@ class Snowball(VisibleSprite):
             # funny telekinesis cuz why not
             if self.scene.player.funny_tele:
                 self.really_follow = True
+
+            Wave(self.scene, self.pos, (204, 102, 255))
 
 class SelfSnowball(Snowball):
     def collide(self) -> bool:
@@ -239,3 +243,21 @@ class SelfSnowball(Snowball):
                 self.scene.score -= 1
             return True
         return False
+
+class Wave(VisibleSprite):
+    def __init__(self, scene: Scene, pos: VEC, color: tuple[int, int, int]) -> None:
+        super().__init__(scene, Layers.SNOWBALL)
+        self.pos = pos.copy()
+        self.color = color
+        self.radius = 0
+
+    def update(self) -> None:
+        self.radius += 220 * self.manager.dt
+        if self.radius > 130:
+            super().kill()
+
+    def draw(self) -> None:
+        r = int(self.radius)
+        trans_surf = pygame.Surface((r * 2, r * 2), pygame.SRCALPHA)
+        pygame.draw.aacircle(trans_surf, self.color + ((1 - self.radius / 130) * 200,), (r, r), r, 3 + int((1 - self.radius / 130) * 6))
+        self.manager.screen.blit(trans_surf, self.pos - VEC(r, r) - self.scene.player.camera.offset)
