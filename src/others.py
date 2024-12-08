@@ -167,7 +167,7 @@ class OtherSnowball(VisibleSprite):
         self.pos = VEC(pos)
         self.frame = frame
         self.type = type
-        self.frames = assets.snowball_small if type == 0 else assets.snowball_large
+        self.frames = assets.snowball_small if type in {0, 3, 5} else assets.snowball_large
         self.image = self.frames[self.frame]
         self.rect = self.image.get_rect(center=self.pos)
         if self.type == 2:
