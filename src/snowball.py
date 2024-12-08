@@ -194,6 +194,7 @@ class Snowball(VisibleSprite):
             self.vel = ((m_pos + self.scene.player.camera.offset) - self.pos).normalize() * 1500
             self.start_time = time.time() # reset lifespan lol
             self.stasis = True
+            self.type -= 5
 
             # funny telekinesis cuz why not
             if self.scene.player.funny_tele:
