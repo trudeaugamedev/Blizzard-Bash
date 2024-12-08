@@ -126,7 +126,8 @@ class OtherPlayer(VisibleSprite):
 
     def kill(self) -> None:
         self.arrow.kill()
-        for snowball in self.snowballs:
+        # i fucking hate myself
+        for snowball in self.snowballs.values():
             snowball.kill()
         super().kill()
 

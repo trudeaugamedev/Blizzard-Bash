@@ -121,8 +121,6 @@ let totalTime = 600000;
 let startTime, timerTime, midTime, elimTime;
 let secondsLeft = totalTime;
 let eliminated = 0;
-let disconnectCount = 0;
-let disconnectIntervalId = 0;
 
 wss.on("connection", (socket) => {
     const client = {
@@ -359,14 +357,6 @@ function game() {
 				min_player.eliminated = true;
 				eliminated++;
 				broadcast(JSON.stringify({"type": "dc", "id": min_player.id}));
-				let disconnectIntervalId = setInterval(() => {
-					broadcast(JSON.stringify({"type": "dc", "id": min_player.id}));
-					disconnectCount++;
-					if (disconnectCount > 20) {
-						clearInterval(disconnectIntervalId);
-						disconnectCount = 0;
-					}
-				}, 100);
 				console.log(`Eliminated player '${min_player.data.name}' at id ${min_player.id}`);
 			}
 		}
