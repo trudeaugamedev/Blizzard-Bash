@@ -389,7 +389,7 @@ class Player(VisibleSprite):
                 self.throwing = False
                 for snowball in list(self.snowballs.values()):
                     snowball.trigger()
-            elif self.can_throw:
+            elif self.can_throw and not self.just_triggered:
                 m_pos = VEC(pygame.mouse.get_pos())
                 if self.bot_mpos != VEC():
                     m_pos = self.bot_mpos
