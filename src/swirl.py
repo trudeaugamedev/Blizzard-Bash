@@ -105,6 +105,8 @@ class VortexSwirl(Swirl):
 
         if time.time() - self.startTime > self.maxTime:
             self.kill()
+        elif time.time() - self.startTime > self.maxTime - 0.5:
+            self.scale = 1 - (time.time() - self.startTime - (self.maxTime - 0.5)) * 2
 
     def draw(self) -> None:
         super().draw()
