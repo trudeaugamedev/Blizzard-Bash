@@ -407,6 +407,23 @@ class Player(VisibleSprite):
                 self.throwing = False
                 for snowball in list(self.snowballs.values()):
                     snowball.trigger()
+            elif self.can_throw and not self.just_triggered:
+                m_pos = VEC(pygame.mouse.get_pos())
+                if self.bot_mpos != VEC():
+                    m_pos = self.bot_mpos
+                self.throwing = True
+                if self.can_throw and self.dig_iterations < 3:
+                    self.frame_group = self.assets.player_throw_s
+                elif self.can_throw:
+                    self.frame_group = self.assets.player_throw_l
+                # Use camera offset to convert screen-space pos to in-world pos
+                try:
+                    self.sb_vel = ((m_pos - (self.SB_OFFSET - self.camera.offset)) - VEC(self.rect.topleft)) * 8
+                    self.sb_vel.scale_to_length(self.THROW_SPEED)
+                    if (self.powerup == "strength"):
+                        self.sb_vel *= 2
+                except ValueError:
+                    self.sb_vel = VEC() # 0 vector
         if MOUSEBUTTONUP in self.manager.events or self.bot_pressing.find(" click ") != -1:
             if (self.bot_pressing.find(" click ") != -1 or self.manager.events[MOUSEBUTTONUP].button == 1) and self.can_throw and not self.just_triggered:
                 self.throwing = False
