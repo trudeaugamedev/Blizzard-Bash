@@ -216,7 +216,7 @@ class Snowball(VisibleSprite):
                     self.scene.player.snowballs[sb.id] = sb
             self.kill()
 
-            Wave(self.scene, self.pos, (78, 180, 93))
+            Wave(self.scene, self.pos, (88, 210, 103))
 
         if self.type == 5 or self.type == 6: # telekinesis
             m_pos = VEC(pygame.mouse.get_pos() if not self.scene.player.aimbot else self.scene.player.bot_mpos)

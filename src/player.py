@@ -313,7 +313,7 @@ class Player(VisibleSprite):
         self.manager.screen.blit(shadow(self.image), VEC(self.rect.topleft) - self.camera.offset + (3, 3), special_flags=BLEND_RGB_SUB)
 
         if self.powerup:
-            color = {"rapidfire": (63, 134, 165), "strength": (233, 86, 86), "clustershot": (78, 180, 93), "telekinesis": (204, 102, 255)}[self.powerup]
+            color = {"rapidfire": (63, 134, 165), "strength": (233, 86, 86), "clustershot": (88, 210, 103), "telekinesis": (204, 102, 255)}[self.powerup]
             alpha = (sin((time.time() - self.powerup_flash_time) * pi * 3) * 0.5 + 0.5) * 255
             mask = pygame.mask.from_surface(self.image)
             powerup_overlay = mask.scale(VEC(mask.get_size()) + (20, 14)).to_surface(setcolor=(*color, alpha), unsetcolor=(0, 0, 0, 0))

@@ -90,7 +90,7 @@ class OtherPlayer(VisibleSprite):
         self.manager.screen.blit(shadow(self.image), VEC(self.rect.topleft) - self.scene.player.camera.offset + (3, 3), special_flags=BLEND_RGB_SUB)
 
         if self.powerup != -1:
-            color = [(63, 134, 165), (233, 86, 86), (78, 180, 93), (204, 102, 255)][self.powerup]
+            color = [(63, 134, 165), (233, 86, 86), (88, 210, 103), (204, 102, 255)][self.powerup]
             alpha = (sin((time.time() - self.powerup_flash_time) * pi * 3) * 0.5 + 0.5) * 255
             mask = pygame.mask.from_surface(self.image)
             powerup_overlay = mask.scale(VEC(mask.get_size()) + (20, 14)).to_surface(setcolor=(*color, alpha), unsetcolor=(0, 0, 0, 0))
