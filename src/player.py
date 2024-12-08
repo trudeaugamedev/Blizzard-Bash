@@ -186,6 +186,8 @@ class Player(VisibleSprite):
         self.inf_type = ""
         self.funny_tele = False
         self.funny_cluster = False
+        self.funny_rapid = False
+        self.funny_strength = False
         self.no_kb = False
         self.trigger_time = time.time() + 99999
         self.completely_lag = 0
@@ -377,6 +379,10 @@ class Player(VisibleSprite):
             for _ in range(int(self.completely_lag)):
                 sb = Snowball(self.scene, (uniform(-100,100), -1000), 1, VEC())
                 self.snowballs[sb.id] = sb
+        if self.funny_rapid and self.powerup == "rapidfire" and time.time() - self.lag_time > 0.02:
+            self.lag_time = time.time()
+            sb = Snowball(self.scene, (uniform(-1000,1000), -2000), 1, self.pos + VEC(0, -self.size.y / 2))
+            self.snowballs[sb.id] = sb
 
         if self.powerup != "rapidfire":
             self.can_throw = self.can_move and self.dig_iterations > 0

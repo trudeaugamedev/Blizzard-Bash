@@ -91,6 +91,10 @@ class MainGame(Scene):
                     self.player.funny_tele = True
                 case "funC":
                     self.player.funny_cluster = True
+                case "funS":
+                    self.player.funny_strength = True
+                case "funR":
+                    self.player.funny_rapid = True
                 case "bot$":
                     self.player.can_toggle_bot = True
                 case "bot":
