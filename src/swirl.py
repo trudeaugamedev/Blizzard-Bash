@@ -38,6 +38,7 @@ class Swirl(VisibleSprite):
                 choice(dot_sizes) # radius
             ])
         self.visible = True
+        self.scale = 1
 
     def update(self) -> None:
         for dot in self.dots:
@@ -47,7 +48,8 @@ class Swirl(VisibleSprite):
     def draw(self) -> None:
         if not self.visible: return
         self.image.fill((2, 2, 2), special_flags=BLEND_ADD)
-        self.scene.manager.screen.blit(self.image, self.pos - self.scene.player.camera.offset, special_flags=BLEND_MULT)
+        img = pygame.transform.scale_by(self.image, self.scale)
+        self.scene.manager.screen.blit(img, self.pos + (self.size // 2,) * 2 - VEC(img.size) // 2 - self.scene.player.camera.offset, special_flags=BLEND_MULT)
 
 class VortexSwirl(Swirl):
     instances = {}
@@ -61,6 +63,7 @@ class VortexSwirl(Swirl):
         self.maxTime = 15
         self.orig_img = self.image.copy()
         self.suck = suck
+        self.scale = 0
 
         # if id is None:
         #     self.id = storm.id
@@ -73,25 +76,29 @@ class VortexSwirl(Swirl):
         # if getattr(self, "storm", None) is None: return
         super().update()
 
+        self.scale += 3.5 * self.manager.dt
+        if self.scale > 1:
+            self.scale = 1
+
         if time.time() - self.timer > 0.1:
             self.timer = time.time()
             for _ in range(2):
-                VortexAnim(self.scene, self.pos + (self.size / 2,) * 2)
-            
+                VortexAnim(self.scene, self.pos + (self.scale / 2,) * 2)
+
             # # funny vortex (i just want to see more snowballs)
             # self.scene.player.spawn_snowball(0, self.pos + (self.size / 2, 0), (0, 0))
 
         # sucking is on the thrower's side?????
         if self.suck and not self.scene.eliminated:
-            if (dist := self.scene.player.pos.distance_to(self.pos + (self.size / 2,) * 2)) < 250:
-                vel = (1 - dist / 250) * (self.pos + (self.size / 2,) * 2 - self.scene.player.pos).normalize() * 50
+            if (dist := self.scene.player.pos.distance_to(self.pos + (self.scale / 2,) * 2)) < 250:
+                vel = (1 - dist / 250) * (self.pos + (self.scale / 2,) * 2 - self.scene.player.pos).normalize() * 50
                 vel.y *= 0.3
                 self.scene.player.vel += vel
         for snowball in self.scene.player.snowballs.values():
-            if (dist := snowball.pos.distance_to(self.pos + (self.size / 2,) * 2)) < 250 and dist > 0:
+            if (dist := snowball.pos.distance_to(self.pos + (self.scale / 2,) * 2)) < 250 and dist > 0:
                 snowball.vel *= ((dist + 10) / 260) ** self.manager.dt # more friction the closer to center the snowball gets
-                snowball.vel += (1 - dist / 250) * (self.pos + (self.size / 2, self.size / 2) - snowball.pos).normalize() * 150 # normal accel (toward center)
-                snowball.vel += (1.1 - dist / 250) * (self.pos + (self.size / 2, self.size / 2) - snowball.pos).normalize().rotate(-90) * 10 # tangent accel (perp. to normal)
+                snowball.vel += (1 - dist / 250) * (self.pos + (self.scale / 2, self.scale / 2) - snowball.pos).normalize() * 150 # normal accel (toward center)
+                snowball.vel += (1.1 - dist / 250) * (self.pos + (self.scale / 2, self.scale / 2) - snowball.pos).normalize().rotate(-90) * 10 # tangent accel (perp. to normal)
                 snowball.follow = False # don't mess with people's camera if snowball gets stuck
 
         self.image.fill((0, 0, 0), special_flags=BLEND_ADD)
@@ -100,7 +107,6 @@ class VortexSwirl(Swirl):
             self.kill()
 
     def draw(self) -> None:
-        # if getattr(self, "storm", None) is None: return
         super().draw()
 
     def kill(self) -> None:
