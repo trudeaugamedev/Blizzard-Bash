@@ -16,49 +16,54 @@ class Parser:
         self.manager = client.manager
 
     def parse(self, data: dict) -> None:
-        # THIS SECTION MIGHT NOT RAISE EXCEPTIONS PROPERLY!!!!!!!!
-        match data["type"]:
-            case "hi": # Initial
-                self.client.id = data["id"]
-                self.manager.scene.seed = data["seed"]
-                self.manager.scene.waiting = data["waiting"]
-                if not data["waiting"]:
+        try:
+            # THIS SECTION MIGHT NOT RAISE EXCEPTIONS PROPERLY!!!!!!!!
+            match data["type"]:
+                case "hi": # Initial
+                    self.client.id = data["id"]
+                    self.manager.scene.seed = data["seed"]
+                    self.manager.scene.waiting = data["waiting"]
+                    if not data["waiting"]:
+                        self.manager.scene.eliminated = True
+                    self.client_data(data["data"], init=True)
+                case "cl": # Client data
+                    self.client_data(data)
+                case "ir": # Irregular client data
+                    self.irregular_client_data(data)
+                case "ad": # Admin command
+                    if data["command"].startswith("start"):
+                        self.manager.scene.waiting = False
+                        self.manager.scene.player.powerup = None
+                        self.manager.scene.player.powerup_time = 0
+                        while self.manager.scene.player.snowball_queue:
+                            self.manager.scene.player.pop_snowball()
+                        self.manager.scene.player.dig_iterations = 0
+                    elif data["command"] == "stop":
+                        self.manager.scene.time_left = -1
+                case "tp": # teleport
+                    self.manager.scene.player.pos = VEC(data["tppos"])
+                case "wd": # Wind
+                    self.manager.scene.wind_vel = VEC(data["speed"], 0)
+                case "tm": # Time
+                    self.manager.scene.time_left = data["seconds"]
+                case "el": # Eliminated
                     self.manager.scene.eliminated = True
-                self.client_data(data["data"], init=True)
-            case "cl": # Client data
-                self.client_data(data)
-            case "ir": # Irregular client data
-                self.irregular_client_data(data)
-            case "ad": # Admin command
-                if data["command"].startswith("start"):
-                    self.manager.scene.waiting = False
-                    self.manager.scene.player.powerup = None
-                    self.manager.scene.player.powerup_time = 0
-                    while self.manager.scene.player.snowball_queue:
-                        self.manager.scene.player.pop_snowball()
-                    self.manager.scene.player.dig_iterations = 0
-                elif data["command"] == "stop":
-                    self.manager.scene.time_left = -1
-            case "tp": # teleport
-                self.manager.scene.player.pos = VEC(data["tppos"])
-            case "wd": # Wind
-                self.manager.scene.wind_vel = VEC(data["speed"], 0)
-            case "tm": # Time
-                self.manager.scene.time_left = data["seconds"]
-            case "el": # Eliminated
-                self.manager.scene.eliminated = True
-            case "cn": # Connect
-                self.manager.other_players[data["id"]] = OtherPlayer(self.manager.scene, data["id"], (0, -3000))
-            case "dc": # Disconnect
-                if data["id"] in self.manager.other_players:
-                    self.manager.other_players.pop(data["id"]).kill()
-            case "en": # End (game over)
-                print("GAME OVER")
-                self.manager.scene.score_data = data["data"]
-                self.manager.scene.game_over = True
-            case "kc": # Kick
-                print("KICKED")
-                raise ConnectionClosedError(None, None)
+                case "cn": # Connect
+                    self.manager.other_players[data["id"]] = OtherPlayer(self.manager.scene, data["id"], (0, -3000))
+                case "dc": # Disconnect
+                    if data["id"] in self.manager.other_players:
+                        self.manager.other_players.pop(data["id"]).kill()
+                case "en": # End (game over)
+                    print("GAME OVER")
+                    self.manager.scene.score_data = data["data"]
+                    self.manager.scene.game_over = True
+                case "kc": # Kick
+                    print("KICKED")
+                    raise ConnectionClosedError(None, None)
+        except ConnectionClosedError:
+            raise ConnectionClosedError(None, None)
+        except Exception as e:
+            print(e)
 
     def client_data(self, data: dict, init: bool = False) -> None:
         if not init and not isinstance(self.manager.scene, self.manager.Scenes.MainGame.value): return
