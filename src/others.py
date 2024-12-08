@@ -126,6 +126,8 @@ class OtherPlayer(VisibleSprite):
 
     def kill(self) -> None:
         self.arrow.kill()
+        if self.aura is not None:
+            self.aura.kill()
         # i fucking hate myself
         for snowball in self.snowballs.values():
             snowball.kill()
