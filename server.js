@@ -189,7 +189,11 @@ wss.on("connection", (socket) => {
 		const data = JSON.parse(strMsg);
 		if (data.type === "ir") {
 			if (data.hit) {
-				players.get(data.id).socket.send(strMsg);
+				try {
+					players.get(data.id).socket.send(strMsg);
+				} catch (err) {
+					console.error(err);
+				}
 			} else if (data.powerup) {
 				powerups.delete(data.id);
 			} else if (data.storm_id) {
