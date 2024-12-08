@@ -22,7 +22,7 @@ class GameManager:
     def __init__(self) -> None:
         pygame.init()
         pygame.key.set_repeat(500, 25)
-        pygame.mouse.set_cursor((16, 16), assets.crosshair)
+        pygame.mouse.set_cursor((19, 19), assets.crosshair)
 
         self.client = Client(self)
 
