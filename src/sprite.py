@@ -28,6 +28,7 @@ class Layers(Enum):
     STORM_ANIM = auto()
     STORM = auto()
     BORDER = auto()
+    AURA = auto()
     THROW_TRAIL = auto()
     VIGNETTE = auto()
     ARROW = auto()

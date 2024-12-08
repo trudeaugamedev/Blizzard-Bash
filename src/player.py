@@ -140,6 +140,38 @@ class DigProgress(VisibleSprite):
                 if display.type == 2:
                     display.swirl.visible = False
 
+class Aura(VisibleSprite):
+    base_img = pygame.Surface((500, 500), SRCALPHA)
+    base_img.fill((0, 0, 0, 0))
+    for i in range(10):
+        pygame.draw.circle(base_img, (204, 102, 255, 15 + i * 12), (250, 250), 250 - i * 25, 26)
+    pygame.draw.circle(base_img, (204, 102, 255, 30), (250, 250), 250, 10)
+
+    def __init__(self, scene: Scene, player: Player) -> None:
+        super().__init__(scene, Layers.AURA)
+        self.player = player
+        self.pos = player.pos
+        self.image = self.base_img.copy()
+        self.rings = []
+        self.ring_time = time.time()
+
+    def update(self) -> None:
+        self.pos = self.player.pos
+        if time.time() - self.ring_time > 0.5:
+            self.rings.append(0)
+            self.ring_time = time.time()
+
+    def draw(self) -> None:
+        self.image = self.base_img.copy()
+        for i, rad in enumerate(self.rings):
+            if rad > 250:
+                self.rings.pop(i)
+                continue
+            pygame.draw.circle(self.image, (204, 102, 255, 45), (250, 250), rad, int(5 + 10 * (rad / 250)))
+            self.rings[i] += 100 * self.manager.dt
+
+        self.scene.manager.screen.blit(self.image, self.pos - self.player.camera.offset - (250, 250))
+
 class Player(VisibleSprite):
     def __init__(self, scene: Scene) -> None:
         super().__init__(scene, Layers.PLAYER1)
@@ -195,6 +227,7 @@ class Player(VisibleSprite):
         self.snowball_queue = []
         self.snowballs: dict[Snowball] = {}
         self.rapidfire_time = time.time()
+        self.aura = None
 
         self.frame_group = self.assets.player_idle
         self.frame = 0
@@ -274,15 +307,6 @@ class Player(VisibleSprite):
             mask = pygame.mask.from_surface(self.image)
             powerup_overlay = mask.scale(VEC(mask.get_size()) + (20, 14)).to_surface(setcolor=(*color, alpha), unsetcolor=(0, 0, 0, 0))
             self.manager.screen.blit(powerup_overlay, VEC(self.rect.topleft) - (10, 7) - self.camera.offset)
-
-        # CRUDE (AND BAD) GRAPHICS HERE
-        if self.powerup == "telekinesis":
-            trans_surf = pygame.Surface(self.manager.screen.get_size())
-            trans_surf.fill((0, 0, 0))
-            pygame.draw.circle(trans_surf, (204, 102, 255), self.pos - self.camera.offset, 250)
-            pygame.draw.circle(trans_surf, (0, 0, 0), self.pos - self.camera.offset, 240)
-            trans_surf.set_colorkey((0, 0, 0))
-            self.manager.screen.blit(trans_surf, (0,0))
 
         if self.scene.eliminated:
             self.image.set_alpha(80)
@@ -619,6 +643,12 @@ class Player(VisibleSprite):
                     self.powerup = None
         else:
             self.powerup = self.inf_type
+
+        if self.powerup == "telekinesis" and self.aura is None:
+            self.aura = Aura(self.scene, self)
+        elif self.powerup != "telekinesis" and self.aura is not None:
+            self.aura.kill()
+            self.aura = None
 
     def update_camera(self) -> None:
         if self.snowballs:
