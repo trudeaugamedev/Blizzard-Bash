@@ -14,6 +14,7 @@ from .ground import Ground1, Ground2, Ground3
 from .sprite import VisibleSprite, Layers
 from .swirl import Swirl, VortexSwirl
 from .utils import shadow
+from .aura import Aura
 from . import assets
 
 class OtherPlayer(VisibleSprite):
@@ -42,6 +43,7 @@ class OtherPlayer(VisibleSprite):
         self.powerup = -1
         self.powerup_flash_time = time.time()
         self.disconnect_time = time.time()
+        self.aura = None
 
     def update(self) -> None:
         self.rect = self.image.get_rect(midbottom=self.pos)
@@ -96,13 +98,11 @@ class OtherPlayer(VisibleSprite):
             powerup_overlay = mask.scale(VEC(mask.get_size()) + (20, 14)).to_surface(setcolor=(*color, alpha), unsetcolor=(0, 0, 0, 0))
             self.manager.screen.blit(powerup_overlay, VEC(self.rect.topleft) - (10, 7) - self.scene.player.camera.offset)
             # CRUDE (AND BAD) GRAPHICS HERE
-            if self.powerup == 3:
-                trans_surf = pygame.Surface(self.manager.screen.get_size())
-                trans_surf.fill((0, 0, 0))
-                pygame.draw.circle(trans_surf, (204, 102, 255), self.pos - self.scene.player.camera.offset, 250)
-                pygame.draw.circle(trans_surf, (0, 0, 0), self.pos - self.scene.player.camera.offset, 240)
-                trans_surf.set_colorkey((0, 0, 0))
-                self.manager.screen.blit(trans_surf, (0, 0))
+            if self.powerup == 3 and self.aura is None:
+                self.aura = Aura(self.scene, self)
+            elif self.powerup != 3 and self.aura is not None:
+                self.aura.kill()
+                self.aura = None
 
         self.manager.screen.blit(self.image, VEC(self.rect.topleft) - self.scene.player.camera.offset)
 
