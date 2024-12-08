@@ -622,7 +622,7 @@ class Player(VisibleSprite):
             for snowball in list(player.snowballs.values()):
                 if self.close_to(snowball.pos, min_snow_dist) and (tracking_vortex == None or snowball.pos.distance_to(tracking_vortex.pos + (vortex.size / 2, vortex.size / 2)) >= 250):
                     tracking_snowball = snowball
-                    min_snow_dist = self.pos.distance_to(snowball.pos) 
+                    min_snow_dist = self.pos.distance_to(snowball.pos)
         # closest powerup
         for powerup in Powerup.instances.values():
             if self.close_to(powerup.pos, min_pwr_dist) and powerup.pos.y > -700 and \
@@ -673,7 +673,7 @@ class Player(VisibleSprite):
         # before going into attacks, finish powerup logic (go to bottom level to grab powerups)
         if returning != "":
             return returning + " s "
-        
+
         # attacking logic
         if tracking_player != None:
             # trigger powerups if possible

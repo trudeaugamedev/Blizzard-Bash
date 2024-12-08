@@ -76,7 +76,7 @@ class Snowball(VisibleSprite):
         self.acc = VEC(0, GRAVITY)
         self.acc += self.scene.wind_vel
         if self.stasis: self.acc = VEC()
-        if self.really_follow: 
+        if self.really_follow:
             m_pos = VEC(pygame.mouse.get_pos())
             self.vel = ((m_pos + self.scene.player.camera.offset) - (self.pos - self.size / 2)).normalize() * 1000
 
@@ -191,7 +191,7 @@ class Snowball(VisibleSprite):
 
         if self.type == 5 or self.type == 6: # telekinesis
             m_pos = VEC(pygame.mouse.get_pos() if not self.scene.player.aimbot else self.scene.player.bot_mpos)
-            self.vel = ((m_pos + self.scene.player.camera.offset) - self.pos).normalize() * 1000
+            self.vel = ((m_pos + self.scene.player.camera.offset) - self.pos).normalize() * 1500
             self.start_time = time.time() # reset lifespan lol
             self.stasis = True
 
