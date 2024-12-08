@@ -184,8 +184,6 @@ class Snowball(VisibleSprite):
         self.manager.screen.blit(self.image, VEC(self.rect.topleft) - self.player.camera.offset)
         self.image.set_alpha(255)
 
-        pygame.draw.circle(self.manager.screen, (255, 0, 0), pygame.mouse.get_pos(), 5)
-
     def kill(self) -> None:
         if self.type == 2:
             try:
