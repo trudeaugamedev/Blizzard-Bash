@@ -1,11 +1,14 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
+
+import pygame.gfxdraw
 if TYPE_CHECKING:
     from scene import Scene
     from player import Player
 
 from random import randint, choice, uniform
 from pygame.locals import BLEND_RGB_SUB
+from math import atan, degrees, pi
 from uuid import uuid4
 import pygame
 import time
@@ -150,12 +153,38 @@ class Snowball(VisibleSprite):
                 return True
         return False
 
+    arrowhead = pygame.Surface((21, 16), pygame.SRCALPHA)
+    pygame.draw.polygon(
+        arrowhead,
+        (204, 102, 255),
+        [(3, 0),
+        (3, 16),
+        (21, 8)]
+    )
+
     def draw(self) -> None:
+        if self.type == 5 or self.type == 6:
+            w = 21 # This is actually the extra width that the surface needs to be extended by to fit both the width of the line and the arrowhead
+            mpos = VEC(pygame.mouse.get_pos()) + self.scene.player.camera.offset
+            start = self.pos - self.scene.player.camera.offset
+            end = self.pos + (mpos - self.pos).normalize() * 80 - self.scene.player.camera.offset
+            trans_surf = pygame.Surface((abs(end.x - start.x) + w, abs(end.y - start.y) + w), pygame.SRCALPHA)
+            topleft = VEC(min(start.x, end.x), min(start.y, end.y))
+            pygame.draw.line(trans_surf, (204, 102, 255), start - topleft + (w / 2,) * 2, end - topleft + (w / 2,) * 2, 6) # width of the line is actually 6
+            # arrowhead
+            diff = end - start
+            head_img = pygame.transform.rotate(self.arrowhead, degrees(-atan(diff.y / diff.x) if diff.x > 0 else pi - atan(diff.y / diff.x)))
+            trans_surf.blit(head_img, end - VEC(head_img.size) / 2 - topleft + (w / 2,) * 2)
+            trans_surf.set_alpha(160)
+            self.manager.screen.blit(trans_surf, topleft - (w / 2,) * 2)
+
         self.manager.screen.blit(shadow(self.image), VEC(self.rect.topleft) - self.scene.player.camera.offset + (3, 3), special_flags=BLEND_RGB_SUB)
         if self.scene.eliminated:
             self.image.set_alpha(80)
         self.manager.screen.blit(self.image, VEC(self.rect.topleft) - self.player.camera.offset)
         self.image.set_alpha(255)
+
+        pygame.draw.circle(self.manager.screen, (255, 0, 0), pygame.mouse.get_pos(), 5)
 
     def kill(self) -> None:
         if self.type == 2:
