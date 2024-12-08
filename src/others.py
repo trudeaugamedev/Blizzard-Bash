@@ -70,7 +70,7 @@ class OtherPlayer(VisibleSprite):
 
         if self.powerup == 3:
             for snowball in self.scene.player.snowballs.values():
-                if (snowball.pos.distance_to(self.pos + VEC(0, -self.size / 2))) <= 250:
+                if (snowball.pos.distance_to(self.pos + VEC(0, -self.size.y / 2))) <= 250:
                     snowball.time_mult = 0.2
                     snowball.follow = False # don't mess with people's camera if snowball gets stuck
 
