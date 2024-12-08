@@ -406,6 +406,8 @@ class Player(VisibleSprite):
                         self.sb_vel *= 2
                 except ValueError:
                     self.sb_vel = VEC() # 0 vector
+        if MOUSEBUTTONDOWN in self.manager.events or self.bot_pressing.find(" click ") != -1:
+            
         if MOUSEBUTTONUP in self.manager.events or self.bot_pressing.find(" click ") != -1:
             if (self.bot_pressing.find(" click ") != -1 or self.manager.events[MOUSEBUTTONUP].button == 1) and self.can_throw and not self.just_triggered:
                 self.throwing = False
