@@ -190,8 +190,9 @@ class Snowball(VisibleSprite):
             self.kill()
 
         if self.type == 5 or self.type == 6: # telekinesis
-            m_pos = VEC(pygame.mouse.get_pos())
+            m_pos = VEC(pygame.mouse.get_pos() if not self.scene.player.aimbot else self.scene.player.bot_mpos)
             self.vel = ((m_pos + self.scene.player.camera.offset) - self.pos).normalize() * 1000
+            self.start_time = time.time() # reset lifespan lol
             self.stasis = True
 
             # funny telekinesis cuz why not

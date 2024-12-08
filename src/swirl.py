@@ -104,7 +104,10 @@ class VortexSwirl(Swirl):
         super().draw()
 
     def kill(self) -> None:
-        # __class__.instances.pop(self.storm.id)
+        try:
+            __class__.instances.pop(self.id)
+        except KeyError:
+            pass
         super().kill()
 
 class VortexAnim(VisibleSprite):

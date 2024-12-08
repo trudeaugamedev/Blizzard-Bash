@@ -15,8 +15,9 @@ from .ground import Ground1, Ground2, Ground3
 from .snowball import Snowball, SelfSnowball
 from .sprite import VisibleSprite, Layers
 from .border import Border
-from .swirl import Swirl
+from .swirl import Swirl, VortexSwirl
 from . import assets
+from .powerup import Powerup
 
 class Camera:
     def __init__(self, scene: Scene, pos: tuple[int, int], follow: int):
@@ -217,6 +218,16 @@ class Player(VisibleSprite):
         self.inf_type = ""
         self.funny_tele = False
         self.funny_cluster = False
+        self.no_kb = False
+        self.trigger_time = time.time() + 99999
+        # bot
+        self.can_toggle_bot = False
+        self.aimbot = False
+        self.bot_mpos = VEC()
+        self.bot_pressing = ""
+        self.bot_target = VEC(99999, 0)
+        self.dodging = False
+        self.debug_brain = ""
 
         self.throw_trail = ThrowTrail(self.scene, self)
         self.throwing = False
@@ -320,13 +331,13 @@ class Player(VisibleSprite):
     def update_keys(self) -> None:
         self.keys = pygame.key.get_pressed()
 
-        if self.keys[K_SPACE] and self.on_ground and self.powerup != "rapidfire":
+        if (self.keys[K_SPACE] or self.bot_pressing.find(" space ") != -1) and self.on_ground and self.powerup != "rapidfire":
             self.digging = True
             self.idle = False
             self.throwing = False
 
         self.acc = VEC(0, GRAVITY)
-        if self.keys[K_a]: # Acceleration
+        if self.keys[K_a] or self.bot_pressing.find(" a ") != -1: # Acceleration
             self.acc.x -= self.CONST_ACC
             self.flip = True
             if self.can_move:
@@ -339,7 +350,7 @@ class Player(VisibleSprite):
         elif self.vel.x < 0: # Deceleration
             self.acc.x += self.CONST_ACC
             self.idle = True
-        if self.keys[K_d]:
+        if self.keys[K_d] or self.bot_pressing.find(" d ") != -1:
             self.acc.x += self.CONST_ACC
             self.flip = False
             if self.can_move:
@@ -355,6 +366,13 @@ class Player(VisibleSprite):
         if self.keys[K_a] and self.keys[K_d]:
             self.acc.x = -sign(self.vel.x) * self.CONST_ACC
             self.idle = True
+        if self.keys[K_q] and self.can_toggle_bot and self.on_ground: # jump when toggling because I don't want to log keys
+            self.aimbot = not self.aimbot
+            self.bot_mpos = VEC()
+            self.vel.y = self.JUMP_SPEED1
+            self.on_ground = False
+        if self.keys[K_p] and self.aimbot:
+            print(self.debug_brain)
 
         if self.can_move:
             self.vel.x *= 0.004 ** self.manager.dt
@@ -366,7 +384,7 @@ class Player(VisibleSprite):
 
         if self.on_ground:
             self.jump_time = time.time()
-        if self.keys[K_w] and self.can_move and not self.digging:
+        if (self.keys[K_w] or self.bot_pressing.find(" w ") != -1) and self.can_move and not self.digging:
             if time.time() - self.jump_time < 0.2:
                 self.vel.y = self.JUMP_SPEED1
             elif time.time() - self.jump_time < 0.3:
@@ -376,7 +394,7 @@ class Player(VisibleSprite):
             self.jumping = True
             self.on_ground = False
 
-        if self.keys[K_s] and self.on_ground and self.ground_level in {Ground2, Ground3}:
+        if (self.keys[K_s] or self.bot_pressing.find(" s ") != -1) and self.on_ground and self.ground_level in {Ground2, Ground3}:
             self.ground_level = Ground2 if self.ground_level == Ground3 else Ground1
             self.on_ground = False
 
@@ -388,7 +406,7 @@ class Player(VisibleSprite):
             self.can_throw = self.can_move and self.dig_iterations > 0
         else:
             self.can_throw = True
-        if pygame.mouse.get_pressed()[0]:
+        if pygame.mouse.get_pressed()[0] or self.bot_pressing.find(" click ") != -1:
             if self.has_trigger:
                 self.has_trigger = False
                 self.just_triggered = True
@@ -397,6 +415,8 @@ class Player(VisibleSprite):
                     snowball.trigger()
             elif self.can_throw:
                 m_pos = VEC(pygame.mouse.get_pos())
+                if self.bot_mpos != VEC():
+                    m_pos = self.bot_mpos
                 self.throwing = True
                 if self.can_throw and self.dig_iterations < 3:
                     self.frame_group = self.assets.player_throw_s
@@ -404,14 +424,14 @@ class Player(VisibleSprite):
                     self.frame_group = self.assets.player_throw_l
                 # Use camera offset to convert screen-space pos to in-world pos
                 try:
-                    self.sb_vel = ((m_pos - self.SB_OFFSET + self.camera.offset) - self.pos) * 8
+                    self.sb_vel = ((m_pos - (self.SB_OFFSET - self.camera.offset)) - VEC(self.rect.topleft)) * 8
                     self.sb_vel.scale_to_length(self.THROW_SPEED)
                     if (self.powerup == "strength"):
                         self.sb_vel *= 2
                 except ValueError:
                     self.sb_vel = VEC() # 0 vector
-        if MOUSEBUTTONUP in self.manager.events:
-            if self.manager.events[MOUSEBUTTONUP].button == 1 and self.can_throw and not self.just_triggered:
+        if MOUSEBUTTONUP in self.manager.events or self.bot_pressing.find(" click ") != -1:
+            if (self.bot_pressing.find(" click ") != -1 or self.manager.events[MOUSEBUTTONUP].button == 1) and self.can_throw and not self.just_triggered:
                 self.throwing = False
                 assets.throw_sound.set_volume(0.2)
                 assets.throw_sound.play()
@@ -501,7 +521,8 @@ class Player(VisibleSprite):
             sound = choice(assets.hit_sounds)
             sound.set_volume(self.hit_strength ** 2 * 0.2)
             sound.play()
-            self.vel.x = sign(self.hit_strength) * abs(self.hit_strength) * 100
+            if not self.no_kb:
+                self.vel.x = sign(self.hit_strength) * abs(self.hit_strength) * 100
             if not self.scene.waiting and not self.scene.eliminated:
                 if self.hit_powerup not in {"rapidfire", "clustershot"}:
                     self.scene.score -= 2 # Penalty for getting hit (2 for now, may depend on self.hit_size)
@@ -535,7 +556,196 @@ class Player(VisibleSprite):
                     snowball.time_mult = 0.2
                     snowball.follow = False # temporarily remove follow because camera is acting weird
 
+        # bot decision making
+        if self.aimbot:
+            self.bot_pressing = self.get_bot_decision()
+        else:
+            self.bot_pressing = ""
+
         self.can_move = self.frame_group != self.assets.player_dig and not self.digging
+
+    # helper functions for decision making
+    def left_of(self, o: float) -> bool:
+        return self.pos.x < o
+    def right_of(self, o: float) -> bool:
+        return self.pos.x > o
+    def close_to(self, o: VEC|float, dist: float) -> bool:
+        if isinstance(o, VEC):
+            return self.pos.distance_to(o) < dist
+        return abs(self.pos.x - o) < dist
+
+    def get_bot_decision(self) -> str:
+        # TODO: shoot powerups
+        min_dist = 99999
+        min_snow_dist = 99999
+        min_pwr_dist = 99999
+        min_vortex_dist = 99999
+        tracking_player = None
+        tracking_snowball = None
+        tracking_powerup: Powerup = None
+        tracking_vortex: VortexSwirl = None
+        returning = ""
+        self.debug_brain = ""
+
+        # avoid the border at all costs
+        if self.right_of(Border.x):
+            self.bot_target.x = Border.x - uniform(500, 1000)
+        if self.left_of(-Border.x):
+            self.bot_target.x = -Border.x + uniform(500, 1000)
+        if self.bot_target.x != 99999:
+            self.debug_brain += "run_away_border "
+            if self.close_to(self.bot_target.x, 20):
+                self.bot_target.x = 99999
+                self.dodging = False
+            elif self.right_of(self.bot_target.x):
+                returning += " a w "
+                self.dodging = True
+            else:
+                returning += " d w "
+                self.dodging = True
+
+        # find all relevant data
+        # closest vortex
+        for vortex in VortexSwirl.instances.values():
+            if self.close_to(vortex.pos + (vortex.size / 2, vortex.size / 2), min_vortex_dist) and self.powerup == None:
+                tracking_vortex = vortex
+                min_vortex_dist = self.pos.distance_to(vortex.pos)
+        # closest player
+        for player in self.manager.other_players.values():
+            if self.close_to(player.pos, min_dist) and \
+               (tracking_vortex == None or \
+               self.close_to(player.pos.x, abs(self.pos.x - (tracking_vortex.pos.x + vortex.size / 2))) or \
+               sign(player.pos.x - self.pos.x) != sign(tracking_vortex.pos.x + vortex.size / 2 - self.pos.x)):
+                tracking_player = player
+                min_dist = self.pos.distance_to(player.pos)
+            # closest snowball
+            for snowball in list(player.snowballs.values()):
+                if self.close_to(snowball.pos, min_snow_dist) and (tracking_vortex == None or snowball.pos.distance_to(tracking_vortex.pos + (vortex.size / 2, vortex.size / 2)) >= 250):
+                    tracking_snowball = snowball
+                    min_snow_dist = self.pos.distance_to(snowball.pos) 
+        # closest powerup
+        for powerup in Powerup.instances.values():
+            if self.close_to(powerup.pos, min_pwr_dist) and powerup.pos.y > -700 and \
+               (tracking_vortex == None or \
+               self.close_to(powerup.pos.x, abs(self.pos.x - tracking_vortex.pos.x)) or \
+               sign(powerup.pos.x - self.pos.x) != sign(tracking_vortex.pos.x + vortex.size / 2 - self.pos.x)) :
+                tracking_powerup = powerup
+                min_pwr_dist = self.pos.distance_to(powerup.pos)
+
+        # go for powerups when you don't have powerups
+        if tracking_powerup != None and min_pwr_dist < 1500:
+            if (tracking_player == None or \
+               self.close_to(tracking_powerup.pos, self.pos.distance_to(tracking_player.pos) + 100) or \
+               (sign(self.pos.x - tracking_powerup.pos.x) != sign(self.pos.x - tracking_player.pos.x))) and \
+               self.powerup == None:
+                if self.close_to(tracking_powerup.pos.x, 50):
+                    pass
+                self.debug_brain += "tracking_powerup "
+                if self.left_of(tracking_powerup.pos.x):
+                    returning += " d "
+                else:
+                    returning += " a "
+
+        # dodging logic
+        if tracking_snowball != None:
+            # don't jump with telekinesis, you won't need to
+            if self.powerup == "telekinesis" and abs(tracking_snowball.pos.x - self.pos.x) < 225:
+                returning += " a " if self.left_of(tracking_snowball.pos.x) else " d "
+                self.dodging = True
+            # dodge if you don't have a powerup that needs rolling
+            if self.powerup != "strength" and self.powerup != "clustershot":
+                if abs(tracking_snowball.pos.x - self.pos.x) < 275 and not tracking_snowball.pos.y - self.pos.y < -100:
+                    returning += " w "
+                    self.dodging = True
+                    # dodge away from player
+                    if self.left_of(tracking_snowball.pos.x):
+                        returning += " a "
+                    else:
+                        returning += " d "
+                else:
+                    self.dodging = False
+            else:
+                self.dodging = False
+        else:
+            self.dodging = False
+        if self.dodging:
+            self.debug_brain += "dodging "
+        # before going into attacks, finish powerup logic (go to bottom level to grab powerups)
+        if returning != "":
+            return returning + " s "
+        
+        # attacking logic
+        if tracking_player != None:
+            # trigger powerups if possible
+            if time.time() - self.trigger_time >= (1.5 if self.powerup == "telekinesis" else 0.1 if self.powerup == "clustershot" else 99999):
+                self.bot_mpos = (tracking_player.pos - VEC(0, self.size.y) - self.camera.offset)
+                self.trigger_time = time.time() + 99999
+                return returning + " click "
+            # run away from rapidfire or cluster or strength holders unless owning a close-range powerup yourself
+            if (tracking_player.powerup >= 0 and tracking_player.powerup <= 2) and self.powerup not in ["strength", "telekinesis"] and min_dist < 750:
+                self.debug_brain += "running_from_power_user(distance = " + str(min_dist) + ")"
+                if self.powerup == None or self.dig_iterations < 4:
+                    if self.left_of(tracking_player.pos.x):
+                        return returning + " a " + (" space " if min_dist > 300 else "")
+                    else:
+                        return returning + " d " + (" space " if min_dist > 300 else "")
+            # dig when you don't have a large snowball, dig while walking away from closest player
+            if self.dig_iterations < 3 and self.powerup != "rapidfire" and not self.dodging:
+                self.debug_brain += "digging "
+                if self.powerup != "clustershot" and min_dist < 300 and not self.close_to(Border.x, 100) and not self.close_to(-Border.x, 100):
+                    if self.left_of(player.pos.x):
+                        returning += " a "
+                    else:
+                        returning += " d "
+                return returning + " space "
+            # start shooting at a certain range
+            if min_dist < (2000 if self.powerup == "telekinesis" else \
+                                600 if self.powerup == "strength" else \
+                                250 if self.powerup == "rapidfire" else 300):
+                self.bot_mpos = (tracking_player.pos - VEC(0, self.size.y) - self.camera.offset)
+                self.bot_mpos -= VEC(0, abs(tracking_player.pos.x - self.pos.x)) / 6
+
+                self.debug_brain += "in_shooting_range "
+
+                # aim adjustment due to powerups
+                if self.powerup == "clustershot": # aim slightly higher
+                    self.bot_mpos -= VEC(0, 15)
+                if self.powerup == "strength": # less distance-based adj.
+                    self.bot_mpos += VEC(0, abs(tracking_player.pos.x - self.pos.x)) / 10
+                    if self.close_to(tracking_player.pos.x, 100):
+                        self.bot_mpos = (tracking_player.pos - VEC(0, self.size.y) - self.camera.offset)
+                if self.powerup == "telekinesis": # aim a lot higher
+                    self.bot_mpos -= VEC(0, 1000)
+
+                # account for wind when target too high
+                if tracking_player.pos.y - self.pos.y < -150 and self.close_to(tracking_player.pos.x, 100):
+                    self.bot_mpos -= VEC(self.scene.wind_vel * 0.1, 0)
+
+                returning += " click "
+                # # too close, move further away
+                # if (min_dist < (0 if self.powerup == "rapidfire" else 150)) and \
+                #    tracking_player.pos.y - self.pos.y > -50 or \
+                #    (self.powerup == "strength" and min_dist < 250):
+                #     if self.left_of(tracking_player.pos.x):
+                #         returning = " a "
+                #     else:
+                #         returning = " d "
+            elif not self.dodging:
+                self.debug_brain += "following_player "
+                if self.left_of(tracking_player.pos.x): # move toward tracking player
+                    returning += " d "
+                else:
+                    returning += " a "
+            if tracking_player.pos.y - self.pos.y < -50 or (self.powerup != None and tracking_player.pos.y - self.pos.y < 50): # jump up if target too high or if you have powerup
+                returning += " w "
+            if tracking_player.pos.y - self.pos.y > 100 if self.powerup == None else 150: # drop down if target too low
+                returning += " s "
+        else: # more snowballs if no target
+            self.debug_brain += "no_target "
+            return " space "
+        if self.powerup == "telekinesis" or self.powerup == "clustershot":
+            self.trigger_time = time.time()
+        return returning
 
     def add_snowball(self, size: int) -> None:
         self.snowball_queue.append(size)
@@ -576,7 +786,7 @@ class Player(VisibleSprite):
                 self.frame_time = time.time()
                 self.frame += 1
                 if self.frame > 8:
-                    if not self.keys[K_SPACE]:
+                    if (not self.keys[K_SPACE] and not self.aimbot) or (self.bot_pressing.find(" space ") == -1 and self.aimbot):
                         self.digging = False
                         self.can_throw = True
                     else:
@@ -590,7 +800,7 @@ class Player(VisibleSprite):
                     else:
                         self.add_snowball(0) # small snowball
                 elif self.frame <= 7:
-                    if not self.keys[K_SPACE]:
+                    if (not self.keys[K_SPACE] and not self.aimbot) or (self.bot_pressing.find(" space ") == -1 and self.aimbot):
                         self.frame_group = self.assets.player_idle
                         self.idle = True
                         self.frame = 0
