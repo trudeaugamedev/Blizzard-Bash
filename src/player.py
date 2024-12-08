@@ -531,7 +531,7 @@ class Player(VisibleSprite):
 
         if self.powerup == "telekinesis":
             for snowball in self.snowballs.values():
-                if (snowball.pos.distance_to(self.pos + VEC(self.size / 2, self.size / 2))) <= 250 and not snowball.stasis:
+                if (snowball.pos.distance_to(self.pos + VEC(0, -self.size / 2))) <= 250 and not snowball.stasis:
                     snowball.time_mult = 0.2
                     snowball.follow = False # temporarily remove follow because camera is acting weird
 
