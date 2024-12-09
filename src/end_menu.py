@@ -31,5 +31,5 @@ class EndMenu(Scene):
         super().update()
 
     def draw(self) -> None:
-        self.manager.window.blit(self.background, (0, 0))
+        self.manager.screen.blit(self.background, (0, 0))
         super().draw()

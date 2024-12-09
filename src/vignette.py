@@ -11,7 +11,6 @@ class FrostVignette(VisibleSprite):
         self.opacity = 0
 
     def update(self) -> None:
-        return
         self.opacity *= 0.8 ** self.manager.dt
         if self.opacity > 320:
             self.opacity = 320
@@ -20,7 +19,6 @@ class FrostVignette(VisibleSprite):
         self.image.set_alpha(self.opacity)
 
     def draw(self) -> None:
-        return
         if self.opacity == 0: return
         self.manager.screen.blit(self.image, (0, 0))
 
@@ -34,7 +32,6 @@ class ElimVignette(VisibleSprite):
         self.flashing = False
 
     def update(self) -> None:
-        return
         self.flashing = self.scene.time_left is not None and self.scene.time_left < self.scene.total_time / 2 and self.manager.other_players and min(map(lambda p: p.score, self.manager.other_players.values())) >= self.scene.score
         if not self.flashing:
             self.progress = 0
@@ -54,6 +51,5 @@ class ElimVignette(VisibleSprite):
         self.image.set_alpha(self.opacity)
 
     def draw(self) -> None:
-        return
         if self.opacity < 0 or self.scene.eliminated or not self.flashing or self.scene.waiting: return
         self.manager.screen.blit(self.image, (0, 0))

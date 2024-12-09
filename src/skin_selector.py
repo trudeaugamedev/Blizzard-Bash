@@ -63,7 +63,6 @@ class SkinSelector(VisibleSprite):
         pass
 
     def draw(self) -> None:
-        return
         self.image = pygame.transform.scale_by(assets.player_idle[0], 2)
         for color in assets.PlayerAssets.clothe_colors:
             self.image = assets.palette_swap(self.image, color, assets.hue_shift(color, self.clothes_hue))

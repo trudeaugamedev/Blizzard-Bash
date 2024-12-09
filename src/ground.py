@@ -39,7 +39,6 @@ class Ground1Manager(VisibleSprite):
             (choices([Tree, Rock], [1, 3])[0])(self.scene, ground.pos + (TILE_SIZE // 2, 0), ground.incline, choice([Layers.DECOR1, Layers.DECOR2]))
 
     def update(self) -> None:
-        return
         if self.scene.player.camera.offset.x < self.pos.x:
             self.pos.x -= TILE_SIZE
             self.tile_x = self.pos.x // TILE_SIZE

@@ -44,9 +44,6 @@ class StartMenu(Scene):
     def update(self) -> None:
         super().update()
 
-        self.client.running = False
-        self.manager.new_scene("MainGame")
-
         self.title_linear_progress += 0.9 * self.manager.dt
         if self.title_linear_progress > 1:
             self.title_linear_progress = 1
@@ -67,9 +64,9 @@ class StartMenu(Scene):
             self.start_game()
 
     def draw(self) -> None:
-        self.manager.window.blit(assets.background, (0, 0))
+        self.manager.screen.blit(assets.background, (0, 0))
 
-        self.manager.window.blit(assets.title, (WIDTH // 2 - assets.title.get_width() // 2, HEIGHT // 2 - 240 - 300 * (1 - self.title_progress)))
+        self.manager.screen.blit(assets.title, (WIDTH // 2 - assets.title.get_width() // 2, HEIGHT // 2 - 240 - 300 * (1 - self.title_progress)))
 
         (surf := pygame.Surface((748 * self.input_progress, 76), SRCALPHA)).fill((255, 255, 255, 80))
         self.manager.screen.blit(surf, (WIDTH // 2 - 374 * self.input_progress, HEIGHT // 2 - 60))

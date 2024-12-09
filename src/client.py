@@ -119,8 +119,6 @@ class Client:
         else:
             self.socket = await ws_client.connect("wss://blizzard-bash-e8a3a44e5011.herokuapp.com")
             print("Connected to remote server")
-        await asyncio.sleep(0.5)
-        await self.socket.send("spectator")
         print("Coroutine 'connect' completed")
 
     async def main(self) -> None:

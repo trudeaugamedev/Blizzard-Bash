@@ -45,7 +45,6 @@ class ThrowTrail(VisibleSprite):
         ...
 
     def draw(self) -> None:
-        return
         if not self.player.throwing: return
         factor = 0.01 # Basically how accurate we want the calculation to be, the distance factor between two points
         pos = VEC(self.player.rect.topleft) + self.player.SB_OFFSET
@@ -90,7 +89,6 @@ class DigProgress(VisibleSprite):
                 self.swirl = Swirl(scene, Layers.GUI, 52)
 
         def update(self) -> None:
-            return
             self.pos = self.player.pos + VEC(0, 65) - VEC(self.width_sum // 2, 0) - VEC(0, self.size.y // 2) + VEC(__class__.x, 0) + ((self.size.x - self.image.width) // 2, 0)
             __class__.x += self.size.x + 6
 
@@ -98,7 +96,6 @@ class DigProgress(VisibleSprite):
                 self.swirl.pos = self.pos - ((self.size.x - self.image.width) // 2, self.size.y // 2)
 
         def draw(self) -> None:
-            return
             self.scene.manager.screen.blit(self.image, self.pos - self.player.camera.offset)
 
         def kill(self) -> None:
@@ -106,7 +103,6 @@ class DigProgress(VisibleSprite):
                 self.swirl.kill()
 
     def update(self) -> None:
-        return
         if self.progress < 0.01:
             self.snowball_img = assets.snowball_large[0] if (self.player.dig_iterations + 1) % 3 == 0 else assets.snowball_small[0]
         if self.player.powerup == "rapidfire":
@@ -128,7 +124,6 @@ class DigProgress(VisibleSprite):
             snowball.update()
 
     def draw(self) -> None:
-        return
         rect = pygame.draw.rect(self.manager.screen, (0, 0, 0), (self.pos - (2, 2) - self.player.camera.offset, (104, 10)), 2)
         pygame.draw.rect(self.manager.screen, (255, 255, 255), (self.pos - self.player.camera.offset, (100, 6)))
         pygame.draw.rect(self.manager.screen, (0, 100, 220), (self.pos - self.player.camera.offset, (self.progress * 100, 6)))
@@ -239,7 +234,6 @@ class Player(VisibleSprite):
         self.camera = Camera(self.scene, self.pos, 5)
 
     def update(self) -> None:
-        return
         self.update_keys()
         self.update_throw()
         self.update_position()
@@ -289,7 +283,6 @@ class Player(VisibleSprite):
         # self.client.queue_data("storm_blobs", storm_blobs)
 
     def draw(self) -> None:
-        return
         self.manager.screen.blit(shadow(self.image), VEC(self.rect.topleft) - self.camera.offset + (3, 3), special_flags=BLEND_RGB_SUB)
 
         if self.powerup:
