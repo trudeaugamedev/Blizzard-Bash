@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from manager import GameManager
 
-from pygame.locals import K_RETURN, KEYDOWN
+from pygame.locals import K_RETURN, KEYDOWN, K_SPACE
 from random import randint, choice, seed
 import opensimplex as noise
 import pygame
@@ -149,7 +149,7 @@ class MainGame(Scene):
         self.client.queue_data("score", self.score)
 
     def draw(self) -> None:
-        self.manager.screen.blit(assets.background, (0, 0))
+        self.manager.window.blit(assets.background, (0, 0))
 
         super().draw()
 
@@ -160,10 +160,10 @@ class MainGame(Scene):
         for i, x in enumerate(range(screen_x - 15, -30, -15)):
             self.manager.screen.fill((0, min(255, 20 + i * 2), min(255, 20 + i * 2)), (x, 0, 15, HEIGHT), special_flags=pygame.BLEND_SUB)
 
-        self.manager.screen.blit(FONT[60].render(f"Score: {self.score}", False, TEXT_COLOR), (20, 0))
-        text = FONT[60].render(f"Score: {self.score}", False, TEXT_COLOR)
-        text.set_alpha(70)
-        self.manager.screen.blit(text, VEC(20, 0) + (3, 3))
+        # self.manager.screen.blit(FONT[60].render(f"Score: {self.score}", False, TEXT_COLOR), (20, 0))
+        # text = FONT[60].render(f"Score: {self.score}", False, TEXT_COLOR)
+        # text.set_alpha(70)
+        # self.manager.screen.blit(text, VEC(20, 0) + (3, 3))
 
         if self.time_left is not None:
             text_str = f"Time Left: {max(self.time_left // 60, 0)}:{'0' if self.time_left % 60 < 10 else ''}{self.time_left % 60}"
@@ -191,6 +191,8 @@ class MainGame(Scene):
 
         if self.waiting:
             self.draw_waiting_text()
+
+        self.manager.screen.blit(pygame.transform.scale_by(assets.title, 1.4), (100, 100))
 
     def draw_waiting_text(self) -> None:
         text = FONT[54].render("Waiting for game to start...", False, (0, 0, 0))

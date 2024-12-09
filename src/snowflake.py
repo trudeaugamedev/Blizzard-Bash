@@ -45,6 +45,7 @@ class SnowFlake(VisibleSprite):
         self.size = VEC(self.image.get_size())
 
     def update(self) -> None:
+        return
         self.vel.y += GRAVITY * self.manager.dt
         self.vel += self.scene.wind_vel * 5 * self.manager.dt
         self.vel *= self.resistance ** self.manager.dt

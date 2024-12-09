@@ -27,7 +27,8 @@ class GameManager:
         self.client = Client(self)
 
         self.flags = HWSURFACE | DOUBLEBUF | RESIZABLE | SCALED | FULLSCREEN
-        self.screen = pygame.display.set_mode((WIDTH, HEIGHT), self.flags)
+        self.window = pygame.display.set_mode((WIDTH, HEIGHT), self.flags)
+        self.screen = pygame.Surface((4800, HEIGHT + 250), SRCALPHA)
         self.clock = pygame.time.Clock()
         self.dt = self.clock.tick_busy_loop(FPS) / 1000
         self.window_changing = False
@@ -50,6 +51,8 @@ class GameManager:
                     self.scene.draw()
             except AbortScene:
                 pass
+            h = WIDTH / self.screen.get_width() * self.screen.get_height()
+            self.window.blit(pygame.transform.scale(self.screen, (WIDTH, h)), (0, HEIGHT - h + 25))
 
     def update(self) -> None:
         self.dt = self.clock.tick_busy_loop(FPS) / 1000

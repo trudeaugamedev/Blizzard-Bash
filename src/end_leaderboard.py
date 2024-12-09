@@ -21,7 +21,7 @@ def get_superscript(n: int) -> str:
         case _: return "th"
 
 class EndLeaderboard(VisibleSprite):
-    def __init__(self, scene: Scene, index: int, name: str, score: int, mine: bool) -> None:
+    def __init__(self, scene: Scene, index: int, name: str,  int, mine: bool) -> None:
         super().__init__(scene, Layers.GUI)
         self.pos = VEC(30, 30 + index * 50)
         self.offset2 = 60
