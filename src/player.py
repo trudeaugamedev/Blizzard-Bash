@@ -6,6 +6,7 @@ if TYPE_CHECKING:
 from random import uniform, choice, randint
 from math import sin, pi, ceil, cos
 from pygame.locals import *
+from typing import Optional
 import pygame
 import time
 
@@ -314,7 +315,7 @@ class Player(VisibleSprite):
             self.flip = True
             if self.can_move:
                 self.frame_group = self.assets.player_run
-                if self.can_throw and self.dig_iterations < 3:
+                if self.can_throw and self.next_snowball in {0, 3, 5}:
                     self.frame_group = self.assets.player_run_s
                 elif self.can_throw:
                     self.frame_group = self.assets.player_run_l
@@ -327,7 +328,7 @@ class Player(VisibleSprite):
             self.flip = False
             if self.can_move:
                 self.frame_group = self.assets.player_run
-                if self.can_throw and self.dig_iterations < 3:
+                if self.can_throw and self.next_snowball in {0, 3, 5}:
                     self.frame_group = self.assets.player_run_s
                 elif self.can_throw:
                     self.frame_group = self.assets.player_run_l
@@ -373,6 +374,10 @@ class Player(VisibleSprite):
         if self.keys[K_s] and not self.on_ground:
             self.acc.y += GRAVITY
 
+    @property
+    def next_snowball(self) -> Optional[int]:
+        return self.snowball_queue[-1] if self.snowball_queue else None
+
     def update_throw(self) -> None:
         if self.completely_lag and time.time() - self.lag_time > 0.1:
             self.lag_time = time.time()
@@ -394,7 +399,7 @@ class Player(VisibleSprite):
                 if self.bot_mpos != VEC():
                     m_pos = self.bot_mpos
                 self.throwing = True
-                if self.can_throw and self.dig_iterations < 3:
+                if self.can_throw and self.next_snowball in {0, 3, 5}:
                     self.frame_group = self.assets.player_throw_s
                 elif self.can_throw:
                     self.frame_group = self.assets.player_throw_l
@@ -418,7 +423,7 @@ class Player(VisibleSprite):
                 if self.bot_mpos != VEC():
                     m_pos = self.bot_mpos
                 self.throwing = True
-                if self.can_throw and self.dig_iterations < 3:
+                if self.can_throw and self.next_snowball in {0, 3, 5}:
                     self.frame_group = self.assets.player_throw_s
                 elif self.can_throw:
                     self.frame_group = self.assets.player_throw_l
@@ -766,7 +771,7 @@ class Player(VisibleSprite):
 
         if self.idle and not self.throwing and self.frame_group not in {self.assets.player_throw_l, self.assets.player_throw_s}:
             self.frame_group = self.assets.player_idle
-            if self.can_throw and self.dig_iterations < 3:
+            if self.can_throw and self.next_snowball in {0, 3, 5}:
                 self.frame_group = self.assets.player_idle_s
             elif self.can_throw:
                 self.frame_group = self.assets.player_idle_l
@@ -833,6 +838,10 @@ class Player(VisibleSprite):
                     self.frame += 1
                     if self.frame >= self.frame_group.length:
                         self.idle = True
+                        if self.can_throw and self.next_snowball in {0, 3, 5}:
+                            self.frame_group = self.assets.player_idle_s
+                        elif self.can_throw:
+                            self.frame_group = self.assets.player_idle_l
 
         if self.frame >= self.frame_group.length:
             self.frame = self.frame_group.length - 1
