@@ -528,11 +528,16 @@ class Player(VisibleSprite):
             sound.play()
             if not self.no_kb:
                 self.vel.x = sign(self.hit_strength) * abs(self.hit_strength) * 100
+            dscore = 0
+            if self.hit_powerup not in {"rapidfire", "clustershot"}:
+                dscore -= 2 # Penalty for getting hit (2 for now, may depend on self.hit_size)
+            if self.hit_powerup == "strength":
+                dscore -= 2 # lose another 2 points
+            if dscore != 0:
+                self.scene.spawn_hit_text(self.pos + (-sign(self.hit_strength) * 35, -self.size.y / 2), dscore)
             if not self.scene.waiting and not self.scene.eliminated:
-                if self.hit_powerup not in {"rapidfire", "clustershot"}:
-                    self.scene.score -= 2 # Penalty for getting hit (2 for now, may depend on self.hit_size)
-                if (self.hit_powerup == "strength"):
-                    self.scene.score -= 2 # lose another 2 points
+                self.scene.score += dscore
+
             self.hit_strength = self.hit_size = 0
             self.hit_powerup = None
 

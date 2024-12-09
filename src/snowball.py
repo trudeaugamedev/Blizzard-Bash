@@ -136,12 +136,15 @@ class Snowball(VisibleSprite):
                 sound = choice(assets.hit_sounds)
                 sound.set_volume(self.score ** 2 * 0.2)
                 sound.play()
-                self.scene.hit = True
-                self.scene.hit_pos = self.pos
+
+                dscore = self.score * (2 if self.player.powerup == "strength" else 1)
+                offset = (self.pos - self.scene.player.pos).normalize() * 35 + VEC(0, -self.scene.player.size.y / 2)
+                self.scene.spawn_hit_text(self.scene.player.pos + offset, dscore)
+
                 self.hit_player = player
                 self.kill()
                 if not self.scene.waiting and not self.scene.eliminated:
-                    self.scene.score += self.score * (2 if self.player.powerup == "strength" else 1)
+                    self.scene.score += dscore
                     self.client.queue_data("score", self.scene.score)
                 hit_strength = (2 + self.score + (4 * self.score + 6 if self.player.powerup == "strength" else 0)) * sign(self.vel.x) # LOT of knockback if strength (temporary?)
                 if self.scene.player.funny_strength:
@@ -152,6 +155,15 @@ class Snowball(VisibleSprite):
                     "hit_powerup": self.player.powerup,
                     "id": player.id
                 })
+
+                dscore = 0
+                if self.scene.player.powerup not in {"rapidfire", "clustershot"}:
+                    dscore -= 2
+                if self.scene.player.powerup == "strength":
+                    dscore -= 2
+                if dscore != 0:
+                    self.scene.spawn_hit_text(self.pos, dscore)
+
                 return True
         return False
 

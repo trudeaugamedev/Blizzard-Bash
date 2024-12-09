@@ -14,7 +14,7 @@ from .ground import Ground1Manager, Ground2Manager, Ground3Manager
 from .snowflake import SnowFlake, SnowflakeRenderer
 from .vignette import FrostVignette, ElimVignette
 from .game_leaderboard import GameLeaderboard
-from .sprite import Layers
+from .sprite import VisibleSprite, Layers
 from .player import Player
 from .border import Border
 from .utils import clamp
@@ -68,8 +68,13 @@ class MainGame(Scene):
         self.lost = False
         self.started = False
         self.hit = False
+        self.hit_neg = False
+        self.hit_score = 0
+        self.hit_neg_score = 0
         self.hit_alpha = 255
+        self.hit_neg_alpha = 255
         self.hit_pos = None
+        self.hit_neg_pos = None
 
         codes = self.previous_scene.input_box.text.split('@')
         self.name = codes[0]
@@ -106,7 +111,7 @@ class MainGame(Scene):
                 case _:
                     self.name += "@"
                     self.name += codes[i]
-        
+
         self.client.queue_data("name", self.name.lower()) # makes it so that server always receives lowercase names
         self.client.queue_data("colors", [self.player.clothes_hue, self.player.hat_hue, self.player.skin_tone])
         self.game_over = False
@@ -160,21 +165,6 @@ class MainGame(Scene):
         text.set_alpha(70)
         self.manager.screen.blit(text, VEC(20, 0) + (3, 3))
 
-        if self.hit:
-            self.hit_alpha -= 250 * self.manager.dt
-            if self.hit_alpha < 0:
-                self.hit_alpha = 255
-                self.hit = False
-            else:
-                pos = VEC(self.hit_pos - self.player.camera.offset)
-                text = FONT[32].render("HIT!", False, TEXT_COLOR)
-                text.set_alpha(self.hit_alpha)
-                pos.x, _ = clamp(pos.x, text.get_width() // 2 + 10, WIDTH - text.get_width() // 2 - 10)
-                text_shadow = FONT[32].render("HIT!", False, TEXT_COLOR)
-                text_shadow.set_alpha(70)
-                self.manager.screen.blit(text_shadow, pos - (text.get_width() // 2, 0) + (3, 3))
-                self.manager.screen.blit(text, pos - (text.get_width() // 2, 0))
-
         if self.time_left is not None:
             text_str = f"Time Left: {max(self.time_left // 60, 0)}:{'0' if self.time_left % 60 < 10 else ''}{self.time_left % 60}"
             text = FONT[30].render(text_str, False, TEXT_COLOR)
@@ -205,3 +195,27 @@ class MainGame(Scene):
     def draw_waiting_text(self) -> None:
         text = FONT[54].render("Waiting for game to start...", False, (0, 0, 0))
         self.manager.screen.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 - text.get_height() // 2))
+
+    def spawn_hit_text(self, pos: VEC, score: int) -> None:
+        HitText(self, pos, score)
+
+class HitText(VisibleSprite):
+    def __init__(self, scene: MainGame, pos: VEC, score: int) -> None:
+        super().__init__(scene, Layers.GUI)
+        self.pos = pos
+        self.score = score
+        self.color = (20, 180, 40) if score > 0 else (180, 20, 40)
+        self.alpha = 255
+
+    def update(self) -> None:
+        self.alpha -= 250 * self.scene.manager.dt
+        if self.alpha < 0:
+            self.kill()
+        else:
+            self.image = FONT[32].render(f"{self.score}", False, self.color)
+            self.image.set_alpha(self.alpha)
+
+    def draw(self) -> None:
+        pos = self.pos - VEC(self.image.size) // 2 - self.scene.player.camera.offset
+        pos = clamp(pos, VEC(40, 40), VEC(WIDTH - 40, HEIGHT - 40))
+        self.scene.manager.screen.blit(self.image, pos)
