@@ -97,12 +97,12 @@ class OtherPlayer(VisibleSprite):
             mask = pygame.mask.from_surface(self.image)
             powerup_overlay = mask.scale(VEC(mask.get_size()) + (20, 14)).to_surface(setcolor=(*color, alpha), unsetcolor=(0, 0, 0, 0))
             self.manager.screen.blit(powerup_overlay, VEC(self.rect.topleft) - (10, 7) - self.scene.player.camera.offset)
-            # CRUDE (AND BAD) GRAPHICS HERE
-            if self.powerup == 3 and self.aura is None:
-                self.aura = Aura(self.scene, self)
-            elif self.powerup != 3 and self.aura is not None:
-                self.aura.kill()
-                self.aura = None
+
+        if self.powerup == 3 and self.aura is None:
+            self.aura = Aura(self.scene, self)
+        elif self.powerup != 3 and self.aura is not None:
+            self.aura.kill()
+            self.aura = None
 
         self.manager.screen.blit(self.image, VEC(self.rect.topleft) - self.scene.player.camera.offset)
 
