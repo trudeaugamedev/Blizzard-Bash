@@ -206,14 +206,13 @@ class HitText(VisibleSprite):
         self.score = score
         self.color = (20, 150, 40) if score > 0 else (180, 20, 40)
         self.alpha = 255
+        self.image = FONT[32].render(f"{self.score}", False, self.color)
+        self.image.set_alpha(self.alpha)
 
     def update(self) -> None:
         self.alpha -= 250 * self.scene.manager.dt
         if self.alpha < 0:
             self.kill()
-        else:
-            self.image = FONT[32].render(f"{self.score}", False, self.color)
-            self.image.set_alpha(self.alpha)
 
     def draw(self) -> None:
         pos = self.pos - VEC(self.image.size) // 2 - self.scene.player.camera.offset
