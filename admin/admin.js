@@ -13,8 +13,21 @@ socket.addEventListener("open", (event) => {
     socket.send("admin");
 });
 socket.addEventListener("message", (event) => {
-    // document.getElementById("received").innerHTML = event.data + "<br>" + document.getElementById("received").innerHTML;
     let parsed = JSON.parse(event.data.toString());
+    function deleteKey(obj, k) {
+        for (let key in obj) {
+            if (key === k) {
+                delete obj[key];
+            } else if (typeof obj[key] === "object") {
+                deleteKey(obj[key], k);
+            }
+        }
+    }
+
+    hidden.forEach((key) => {
+        deleteKey(parsed, key);
+    });
+
     if (parsed.type === "cl") {
         displayGameState(parsed);
     }
@@ -24,9 +37,38 @@ socket.addEventListener("close", (event) => {
     console.log("Websocket closed");
 });
 
+let toggles = [];
+let hidden = [];
+
+function getKeys(obj) {
+    for (let key in obj) {
+        if (!toggles.includes(key)) {
+            toggles.push(key);
+            document.getElementById("viewToggles").innerHTML += `<button class="toggle" id="toggle-${key}" onclick="toggleView('${key}')">${key}</button>`;
+        }
+        if (Array.isArray(obj[key])) {
+            getKeys(obj[key][0]);
+        } else if (typeof obj[key] === "object") {
+            getKeys(obj[key]);
+        }
+    }
+}
+
 function displayGameState(data) {
     data = JSON.stringify(data, null, 3);
     document.getElementById("received").innerHTML = data;
+
+    getKeys(JSON.parse(data.toString()));
+}
+
+function toggleView(key) {
+    if (hidden.includes(key)) {
+        hidden.splice(hidden.indexOf(key), 1);
+        document.getElementById(`toggle-${key}`).classList.remove("hidden");
+    } else {
+        hidden.push(key);
+        document.getElementById(`toggle-${key}`).classList.add("hidden");
+    }
 }
 
 function sendCommand() {

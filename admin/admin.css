@@ -28,3 +28,11 @@ input {
 #info th, #info td {
     border: 1px solid black;
 }
+
+.toggle {
+    background-color: white;
+    border-style: solid;
+}
+.toggle.hidden {
+    background-color: lightgray;
+}
