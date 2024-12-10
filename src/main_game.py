@@ -206,7 +206,7 @@ class HitText(VisibleSprite):
         super().__init__(scene, Layers.GUI)
         self.pos = pos
         self.score = score
-        self.color = (20, 150, 40) if score > 0 else (180, 20, 40)
+        self.color = (10, 140, 30) if score > 0 else (180, 20, 40)
         self.alpha = 255
         self.image = FONT[32].render(f"{self.score}", False, self.color)
         self.image.set_alpha(self.alpha)
