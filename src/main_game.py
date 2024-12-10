@@ -230,6 +230,8 @@ class HitText(VisibleSprite):
     def set_score(self, score: int) -> None:
         self.score = score
         self.font_size += int(min(abs(score), 5))
+        if self.font_size > 128:
+            self.font_size = 128
         self.image = FONT[self.font_size].render(f"{self.score}", False, self.color)
 
     def draw(self) -> None:
