@@ -200,6 +200,8 @@ class MainGame(Scene):
         HitText(self, pos, score)
 
 class HitText(VisibleSprite):
+    hittexts = []
+
     def __init__(self, scene: MainGame, pos: VEC, score: int) -> None:
         super().__init__(scene, Layers.GUI)
         self.pos = pos
@@ -209,12 +211,30 @@ class HitText(VisibleSprite):
         self.image = FONT[32].render(f"{self.score}", False, self.color)
         self.image.set_alpha(self.alpha)
 
+        for text in self.hittexts:
+            if text.pos.distance_to(self.pos) < 50 and text.color == self.color:
+                text.set_score(text.score + self.score)
+                super().kill()
+                return
+
+        self.hittexts.append(self)
+
     def update(self) -> None:
-        self.alpha -= 250 * self.scene.manager.dt
+        self.alpha -= 100 * self.scene.manager.dt
         if self.alpha < 0:
             self.kill()
+        else:
+            self.image.set_alpha(self.alpha)
+
+    def set_score(self, score: int) -> None:
+        self.score = score
+        self.image = FONT[32].render(f"{self.score}", False, self.color)
 
     def draw(self) -> None:
         pos = self.pos - VEC(self.image.size) // 2 - self.scene.player.camera.offset
         pos = clamp(pos, VEC(40, 40), VEC(WIDTH - 40, HEIGHT - 40))
         self.scene.manager.screen.blit(self.image, pos)
+
+    def kill(self) -> None:
+        self.hittexts.remove(self)
+        super().kill()
