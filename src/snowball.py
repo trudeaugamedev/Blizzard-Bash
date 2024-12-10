@@ -254,6 +254,7 @@ class SelfSnowball(Snowball):
             sound.play()
             self.kill()
             self.scene.player.vel.x = self.score * choice([-1, 1]) * 100
+            self.scene.spawn_hit_text(self.pos, -1)
             if not self.scene.waiting and not self.scene.eliminated:
                 self.scene.score -= 1
             return True
