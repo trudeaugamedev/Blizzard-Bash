@@ -80,14 +80,6 @@ class VortexSwirl(Swirl):
         # if getattr(self, "storm", None) is None: return
         super().update()
 
-        if time.time() - self.timer > 0.1:
-            self.timer = time.time()
-            for _ in range(2):
-                VortexAnim(self.scene, self.pos + (self.size / 2,) * 2)
-
-            # # funny vortex (i just want to see more snowballs)
-            # self.scene.player.spawn_snowball(0, self.pos + (self.size / 2, 0), (0, 0))
-
         # sucking is on the thrower's side?????
         if self.suck and not self.scene.eliminated:
             if (dist := self.scene.player.pos.distance_to(self.pos + (self.size / 2,) * 2)) < 250:
@@ -120,47 +112,3 @@ class VortexSwirl(Swirl):
         except KeyError:
             pass
         super().kill()
-
-class VortexAnim(VisibleSprite):
-    def __init__(self, scene: Scene, pos: VEC) -> None:
-        super().__init__(scene, Layers.STORM_ANIM)
-        self.start_pos = pos.copy()
-        self.pos = pos.copy()
-        # blob = choice(storm.blobs)
-        # radius = blob.radius * PIXEL_SIZE
-        radius = 0
-        # self.target_offset = blob.offset * PIXEL_SIZE
-        # self.target_pos = storm.pos + self.target_offset
-        self.radius = radius
-        self.scale = 0
-        # self.storm = storm
-        self.orig_image = pygame.Surface((radius * 2, radius * 2), pygame.SRCALPHA)
-        pygame.draw.circle(self.orig_image, (138, 155, 178), (radius, radius), radius)
-        self.orig_image.set_alpha(50)
-        # self.alpha_target = self.storm.alpha * 0.7
-        self.alpha_target = 255 * 0.7
-        self.linear_progress = 0
-        self.progress = 0
-
-    def update(self) -> None:
-        self.linear_progress += 1.0 * self.manager.dt
-        self.progress = tween.easeOutCubic(self.linear_progress)
-
-        if self.linear_progress < 1:
-            # self.alpha_target = self.storm.alpha * 0.7
-            self.alpha = self.progress * (self.alpha_target - 50) + 50
-        else:
-            self.alpha -= 270 * self.manager.dt
-        self.orig_image.set_alpha(self.alpha)
-
-        if self.alpha <= 0:
-            self.kill()
-
-        # self.target_pos = self.storm.pos + self.target_offset
-        # self.pos = self.progress * (self.target_pos - self.start_pos) + self.start_pos
-
-        self.scale = min(self.progress, 1)
-
-    def draw(self) -> None:
-        image = pygame.transform.scale_by(self.orig_image, self.scale)
-        self.scene.manager.screen.blit(image, self.pos - VEC(image.size) // 2 - self.scene.player.camera.offset)
