@@ -659,7 +659,7 @@ class Player(VisibleSprite):
                 self_in_middle = sign(self.pos.x - tracking_powerup.pos.x) != sign(self.pos.x - tracking_player.pos.x)
                 pwr_in_middle = sign(tracking_powerup.pos.x - self.pos.x) != sign(tracking_powerup.pos.x - tracking_player.pos.x)
             no_pwr = self.powerup == None
-            if (not is_tracking or closer_to_pwr) or self_in_middle and no_pwr:
+            if ((not is_tracking or closer_to_pwr) or self_in_middle) and no_pwr:
                 self.debug_brain += "tracking_powerup "
                 if self.left_of(tracking_powerup.pos.x):
                     returning += " d "
@@ -681,6 +681,7 @@ class Player(VisibleSprite):
                     if self.powerup == "strength": # less distance-based adj.
                         self.bot_mpos += VEC(0, abs(tracking_player.pos.x - self.pos.x)) / 10
                     returning += " click "
+                    self.debug_brain += "shooting_powerup "
 
 
         # dodging logic
