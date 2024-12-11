@@ -716,8 +716,11 @@ class Player(VisibleSprite):
         if self.dodging and time.time() - self.dodging_time > 8:
             returning = ""
             self.bot_target.x = 99999
-            self.doding = False
+            self.dodging = False
             self.tired_time = time.time()
+
+        if time.time() - self.tired_time < 2:
+            self.debug_brain += "tired from dodging "
 
         # trigger powerups if possible
         if tracking_player != None and time.time() - self.trigger_time >= (1.5 if self.powerup == "telekinesis" else 0.1 if self.powerup == "clustershot" else 99999):
