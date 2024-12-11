@@ -106,6 +106,8 @@ class MainGame(Scene):
                     self.player.aimbot = True
                 case "noKB":
                     self.player.no_kb = True
+                case "noMove":
+                    self.player.no_move = True
                 case c if c.startswith("testLag"):
                     self.player.completely_lag = c[7:]
                 case _:

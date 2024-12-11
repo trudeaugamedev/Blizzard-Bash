@@ -190,6 +190,7 @@ class Player(VisibleSprite):
         self.funny_rapid = False
         self.funny_strength = False
         self.no_kb = False
+        self.no_move = False
         self.trigger_time = time.time() + 99999
         self.completely_lag = 0
         self.lag_time = time.time()
@@ -201,6 +202,7 @@ class Player(VisibleSprite):
         self.bot_target = VEC(99999, 0)
         self.dodging = False
         self.debug_brain = ""
+        self.dodging_time = time.time()
 
         self.throw_trail = ThrowTrail(self.scene, self)
         self.throwing = False
@@ -508,6 +510,8 @@ class Player(VisibleSprite):
         self.vel += self.acc * self.manager.dt
         # If the absolute value of x vel is less than the constant acceleration, snap to 0 so that deceleration doesn't overshoot
         self.vel.x = snap(self.vel.x, 0, self.CONST_ACC * self.manager.dt)
+        if self.no_move:
+            self.vel.x = 0
         self.pos += self.vel * self.manager.dt
 
         ground_y = self.ground_level.height_map[centerx]
@@ -609,9 +613,13 @@ class Player(VisibleSprite):
                 self.dodging = False
             elif self.right_of(self.bot_target.x):
                 returning += " a w "
+                if self.dodging == False: 
+                    self.dodging_time = time.time()
                 self.dodging = True
             else:
                 returning += " d w "
+                if self.dodging == False: 
+                    self.dodging_time = time.time()
                 self.dodging = True
 
         # find all relevant data
@@ -644,28 +652,50 @@ class Player(VisibleSprite):
 
         # go for powerups when you don't have powerups
         if tracking_powerup != None and min_pwr_dist < 1500:
-            if (tracking_player == None or \
-               self.close_to(tracking_powerup.pos, self.pos.distance_to(tracking_player.pos) + 100) or \
-               (sign(self.pos.x - tracking_powerup.pos.x) != sign(self.pos.x - tracking_player.pos.x))) and \
-               self.powerup == None:
-                if self.close_to(tracking_powerup.pos.x, 50):
-                    pass
+            is_tracking = tracking_player != None
+            if is_tracking:
+                closer_to_pwr = self.close_to(tracking_powerup.pos, tracking_powerup.pos.distance_to(tracking_player.pos))
+                self_in_middle = sign(self.pos.x - tracking_powerup.pos.x) != sign(self.pos.x - tracking_player.pos.x)
+                pwr_in_middle = sign(tracking_powerup.pos.x - self.pos.x) != sign(tracking_powerup.pos.x - tracking_player.pos.x)
+            no_pwr = self.powerup == None
+            if (not is_tracking or closer_to_pwr) or self_in_middle and no_pwr:
                 self.debug_brain += "tracking_powerup "
                 if self.left_of(tracking_powerup.pos.x):
                     returning += " d "
                 else:
                     returning += " a "
+            elif not is_tracking or pwr_in_middle:
+                # roll a small snowball
+                if len(self.snowball_queue) == 0 or self.snowball_queue[-1] != 0 and len(self.snowball_queue) < 5:
+                    returning += " space "
+                elif not self.close_to(tracking_powerup.pos.x, 250 if self.powerup != "strength" else 600):
+                    if self.left_of(tracking_powerup.pos.x):
+                        returning += " d "
+                    else:
+                        returning += " a "                    
+                # try shooting the powerup
+                else:
+                    self.bot_mpos = (tracking_powerup.pos - self.camera.offset)
+                    self.bot_mpos -= VEC(0, abs(tracking_powerup.pos.x - self.pos.x)) / 6
+                    if self.powerup == "strength": # less distance-based adj.
+                        self.bot_mpos += VEC(0, abs(tracking_player.pos.x - self.pos.x)) / 10
+                    returning += " click "
+
 
         # dodging logic
         if tracking_snowball != None:
             # don't jump with telekinesis, you won't need to
             if self.powerup == "telekinesis" and abs(tracking_snowball.pos.x - self.pos.x) < 225:
                 returning += " a " if self.left_of(tracking_snowball.pos.x) else " d "
+                if self.dodging == False: 
+                    self.dodging_time = time.time()
                 self.dodging = True
             # dodge if you don't have a powerup that needs rolling
             if self.powerup != "strength" and self.powerup != "clustershot":
                 if abs(tracking_snowball.pos.x - self.pos.x) < 275 and not tracking_snowball.pos.y - self.pos.y < -100:
                     returning += " w "
+                    if self.dodging == False: 
+                        self.dodging_time = time.time()
                     self.dodging = True
                     # dodge away from player
                     if self.left_of(tracking_snowball.pos.x):
@@ -680,17 +710,25 @@ class Player(VisibleSprite):
             self.dodging = False
         if self.dodging:
             self.debug_brain += "dodging "
+
+        # prevent bot from being stunlocked from dodging
+        if self.dodging and time.time() - self.dodging_time > 8:
+            returning = ""
+            self.bot_target.x = 99999
+            self.dodging_time = time.time()
+
+        # trigger powerups if possible
+        if tracking_player != None and time.time() - self.trigger_time >= (1.5 if self.powerup == "telekinesis" else 0.1 if self.powerup == "clustershot" else 99999):
+            self.bot_mpos = (tracking_player.pos - VEC(0, self.size.y) - self.camera.offset)
+            self.trigger_time = time.time() + 99999
+            return returning + " click "
+
         # before going into attacks, finish powerup logic (go to bottom level to grab powerups)
         if returning != "":
             return returning + " s "
 
         # attacking logic
         if tracking_player != None:
-            # trigger powerups if possible
-            if time.time() - self.trigger_time >= (1.5 if self.powerup == "telekinesis" else 0.1 if self.powerup == "clustershot" else 99999):
-                self.bot_mpos = (tracking_player.pos - VEC(0, self.size.y) - self.camera.offset)
-                self.trigger_time = time.time() + 99999
-                return returning + " click "
             # run away from rapidfire or cluster or strength holders unless owning a close-range powerup yourself
             if (tracking_player.powerup >= 0 and tracking_player.powerup <= 2) and self.powerup not in ["strength", "telekinesis"] and min_dist < 750:
                 self.debug_brain += "running_from_power_user(distance = " + str(min_dist) + ")"
