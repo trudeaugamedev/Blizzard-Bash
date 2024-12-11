@@ -203,6 +203,7 @@ class Player(VisibleSprite):
         self.dodging = False
         self.debug_brain = ""
         self.dodging_time = time.time()
+        self.tired_time = time.time()
 
         self.throw_trail = ThrowTrail(self.scene, self)
         self.throwing = False
@@ -685,14 +686,14 @@ class Player(VisibleSprite):
         # dodging logic
         if tracking_snowball != None:
             # don't jump with telekinesis, you won't need to
-            if self.powerup == "telekinesis" and abs(tracking_snowball.pos.x - self.pos.x) < 225:
+            if self.powerup == "telekinesis" and abs(tracking_snowball.pos.x - self.pos.x) < 225 and time.time() - self.tired_time > 2:
                 returning += " a " if self.left_of(tracking_snowball.pos.x) else " d "
                 if self.dodging == False: 
                     self.dodging_time = time.time()
                 self.dodging = True
             # dodge if you don't have a powerup that needs rolling
             if self.powerup != "strength" and self.powerup != "clustershot":
-                if abs(tracking_snowball.pos.x - self.pos.x) < 275 and not tracking_snowball.pos.y - self.pos.y < -100:
+                if abs(tracking_snowball.pos.x - self.pos.x) < 275 and not tracking_snowball.pos.y - self.pos.y < -100 and time.time() - self.tired_time > 2:
                     returning += " w "
                     if self.dodging == False: 
                         self.dodging_time = time.time()
@@ -715,7 +716,8 @@ class Player(VisibleSprite):
         if self.dodging and time.time() - self.dodging_time > 8:
             returning = ""
             self.bot_target.x = 99999
-            self.dodging_time = time.time()
+            self.doding = False
+            self.tired_time = time.time()
 
         # trigger powerups if possible
         if tracking_player != None and time.time() - self.trigger_time >= (1.5 if self.powerup == "telekinesis" else 0.1 if self.powerup == "clustershot" else 99999):
