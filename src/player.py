@@ -699,11 +699,12 @@ class Player(VisibleSprite):
                     if self.dodging == False: 
                         self.dodging_time = time.time()
                     self.dodging = True
-                    # dodge away from player
-                    if self.left_of(tracking_snowball.pos.x):
-                        returning += " a "
-                    else:
-                        returning += " d "
+                    # dodge away from player of not already running from border
+                    if self.debug_brain.find("run_away_border") == -1:
+                        if self.left_of(tracking_snowball.pos.x):
+                            returning += " a "
+                        else:
+                            returning += " d "
                 else:
                     self.dodging = False
             else:
