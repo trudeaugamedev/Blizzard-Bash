@@ -44,6 +44,7 @@ class Client:
             "powerup": None,
             "score": None,
             "pwrnum": None,
+            "cheat": None,
             # "storm_blobs": None,
             # "storms": None,
         }
