@@ -739,7 +739,7 @@ class Player(VisibleSprite):
         # attacking logic
         if tracking_player != None:
             # run away from rapidfire or cluster or strength holders unless owning a close-range powerup yourself
-            if (tracking_player.powerup >= 0 and tracking_player.powerup <= 2) and self.powerup not in ["strength", "telekinesis"] and min_dist < 750:
+            if (tracking_player.powerup >= 0 and tracking_player.powerup <= 2) and self.powerup in ["strength", "telekinesis"] and min_dist < 750:
                 self.debug_brain += "running_from_power_user(distance = " + str(min_dist) + ")"
                 if self.powerup == None or self.dig_iterations < 4:
                     if self.left_of(tracking_player.pos.x):
