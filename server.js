@@ -119,14 +119,14 @@ class Powerup {
 		if (randint(0, 10) < maxNum - minNum) {
 			let positions = []
 			for (const [id, player] of players) {
-				if (player.data.pwrnum == minNum) {
+				for (let i = 0; i < maxNum - player.data.pwrnum; i++) {
 					positions.push(player.data.pos[0]);
 				}
 			}
 			let pos = positions[randint(0, positions.length)];
 			if (pos != NaN && typeof(pos) === 'number') {
 				this.pos[0] = pos;
-				console.log(`special delivery to an unlucky player at x = %d!`, this.pos[0]);
+				console.log(`special delivery to a player at x = %d!`, this.pos[0]);
 			}
 		}
 		if (type == -1) type = randint(0, 4);
