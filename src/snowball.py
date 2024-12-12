@@ -112,6 +112,7 @@ class Snowball(VisibleSprite):
         # if not self.is_storm:
         for powerup in Powerup.instances.values():
             if powerup.rect.colliderect(self.real_rect) and not powerup.touched:
+                self.scene.player.collected_powerups += 1
                 if powerup.type == "hailstorm":
                     self.scene.player.add_snowball(2)
                     self.scene.player.dig_iterations += 3

@@ -109,6 +109,26 @@ class Powerup {
 		this.vel = [0, 0]
 		let x = 2400 - (1 - secondsLeft / totalTime) * 1600
 		this.pos = [randint(-x, x), -1200];
+		let maxNum = 0; let minNum = 999;
+		for (const [id, player] of players) {
+			if (id === -1) continue;
+			maxNum = Math.max(player.data.pwrnum, maxNum);
+			minNum = Math.min(player.data.pwrnum, minNum);
+		}
+		// difference * 10% chance to spawn powerup on top of a player
+		if (randint(0, 10) < maxNum - minNum) {
+			let positions = []
+			for (const [id, player] of players) {
+				if (player.data.pwrnum == minNum) {
+					positions.push(player.data.pos[0]);
+				}
+			}
+			let pos = positions[randint(0, positions.length)];
+			if (pos != NaN && typeof(pos) === 'number') {
+				this.pos[0] = pos;
+				console.log(`special delivery to an unlucky player at x = %d!`, this.pos[0]);
+			}
+		}
 		if (type == -1) type = randint(0, 4);
 		this.type = ["rapidfire", "strength", "clustershot", "hailstorm", "telekinesis"][type];
 		this.startTime = Date.now();

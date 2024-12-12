@@ -43,6 +43,7 @@ class Client:
             "snowballs": None,
             "powerup": None,
             "score": None,
+            "pwrnum": None,
             # "storm_blobs": None,
             # "storms": None,
         }

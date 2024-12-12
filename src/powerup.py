@@ -48,6 +48,7 @@ class Powerup(VisibleSprite):
 
         self.rect = pygame.Rect(self.pos - (12, 12), self.size + (24, 24))
         if self.rect.colliderect(self.scene.player.real_rect) and not self.touched:
+            self.scene.player.collected_powerups += 1
             # MODIFICATIONS TO THIS SECTION SHOULD BE REFLECTED IN snowball.py AS WELL or else throwing a snowball at the powerup will crash the game!!!
             if self.type == "hailstorm":
                 self.scene.player.add_snowball(2)

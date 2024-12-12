@@ -181,6 +181,7 @@ class Player(VisibleSprite):
         self.powerup_flash_time = time.time()
         self.overheat = 0
         # self.storms = []
+        self.collected_powerups = 0
 
         # Cheats
         self.infinite = False
@@ -252,6 +253,7 @@ class Player(VisibleSprite):
         self.client.queue_data("flip", self.flip)
         self.client.queue_data("frame", self.assets.player.index(self.orig_image))
         self.client.queue_data("powerup", ["rapidfire", "strength", "clustershot", "telekinesis"].index(self.powerup) if self.powerup else -1)
+        self.client.queue_data("pwrnum", self.collected_powerups)
 
         snowballs = []
         for snowball in self.snowballs.values():
