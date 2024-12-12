@@ -78,43 +78,57 @@ class MainGame(Scene):
 
         codes = self.previous_scene.input_box.text.split('@')
         self.name = codes[0]
+        cheating = False
         for i in range(1, len(codes)):
             match codes[i]:
                 case "infS":
                     self.player.infinite = True
                     self.player.inf_type = "strength"
+                    cheating = True
                 case "infC":
                     self.player.infinite = True
                     self.player.inf_type = "clustershot"
+                    cheating = True
                 case "infR":
                     self.player.infinite = True
                     self.player.inf_type = "rapidfire"
+                    cheating = True
                 case "infT":
                     self.player.infinite = True
                     self.player.inf_type = "telekinesis"
+                    cheating = True
                 case "funT":
                     self.player.funny_tele = True
+                    cheating = True
                 case "funC":
                     self.player.funny_cluster = True
+                    cheating = True
                 case "funS":
                     self.player.funny_strength = True
+                    cheating = True
                 case "funR":
                     self.player.funny_rapid = True
+                    cheating = True
                 case "bot$":
                     self.player.can_toggle_bot = True
+                    cheating = True
                 case "bot":
                     self.player.aimbot = True
+                    cheating = True
                 case "noKB":
                     self.player.no_kb = True
+                    cheating = True
                 case "noMove":
                     self.player.no_move = True
                 case c if c.startswith("testLag"):
+                    cheating = True
                     self.player.completely_lag = c[7:]
                 case _:
                     self.name += "@"
                     self.name += codes[i]
 
         self.client.queue_data("name", self.name.lower()) # makes it so that server always receives lowercase names
+        self.client.queue_data("cheat", cheating)
         self.client.queue_data("colors", [self.player.clothes_hue, self.player.hat_hue, self.player.skin_tone])
         self.game_over = False
         self.score_data = []
