@@ -616,12 +616,12 @@ class Player(VisibleSprite):
                 self.dodging = False
             elif self.right_of(self.bot_target.x):
                 returning += " a w "
-                if self.dodging == False: 
+                if self.dodging == False:
                     self.dodging_time = time.time()
                 self.dodging = True
             else:
                 returning += " d w "
-                if self.dodging == False: 
+                if self.dodging == False:
                     self.dodging_time = time.time()
                 self.dodging = True
 
@@ -675,7 +675,7 @@ class Player(VisibleSprite):
                     if self.left_of(tracking_powerup.pos.x):
                         returning += " d "
                     else:
-                        returning += " a "                    
+                        returning += " a "
                 # try shooting the powerup
                 else:
                     self.bot_mpos = (tracking_powerup.pos - self.camera.offset)
@@ -691,14 +691,14 @@ class Player(VisibleSprite):
             # don't jump with telekinesis, you won't need to
             if self.powerup == "telekinesis" and abs(tracking_snowball.pos.x - self.pos.x) < 225 and time.time() - self.tired_time > 2:
                 returning += " a " if self.left_of(tracking_snowball.pos.x) else " d "
-                if self.dodging == False: 
+                if self.dodging == False:
                     self.dodging_time = time.time()
                 self.dodging = True
             # dodge if you don't have a powerup that needs rolling
             if self.powerup != "strength" and self.powerup != "clustershot":
                 if abs(tracking_snowball.pos.x - self.pos.x) < 275 and not tracking_snowball.pos.y - self.pos.y < -100 and time.time() - self.tired_time > 2:
                     returning += " w "
-                    if self.dodging == False: 
+                    if self.dodging == False:
                         self.dodging_time = time.time()
                     self.dodging = True
                     # dodge away from player of not already running from border
@@ -900,7 +900,7 @@ class Player(VisibleSprite):
 
         self.orig_image = self.frame_group[self.frame]
         self.upright_image = pygame.transform.flip(self.orig_image, self.flip, False)
-        self.image = pygame.transform.rotate(self.upright_image, self.rotation)
+        self.image = pygame.transform.rotate(self.upright_image, self.rotation % 360)
 
         self.rect = self.image.get_rect(midbottom=self.pos)
         self.real_rect.midbottom = self.rect.midbottom

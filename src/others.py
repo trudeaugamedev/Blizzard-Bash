@@ -68,7 +68,7 @@ class OtherPlayer(VisibleSprite):
 
         self.orig_image = self.assets.player[self.frame]
         self.upright_image = pygame.transform.flip(self.orig_image, self.flip, False)
-        self.image = pygame.transform.rotate(self.upright_image, self.rotation)
+        self.image = pygame.transform.rotate(self.upright_image, self.rotation % 360)
 
         if self.powerup == 3:
             for snowball in self.scene.player.snowballs.values():
