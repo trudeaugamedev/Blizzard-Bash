@@ -83,7 +83,7 @@ class VortexSwirl(Swirl):
         # sucking is on the thrower's side?????
         if self.suck and not self.scene.eliminated:
             if (dist := self.scene.player.pos.distance_to(self.pos + (self.size / 2,) * 2)) < 250:
-                vel = (1 - dist / 250) * (self.pos + (self.size / 2,) * 2 - self.scene.player.pos).normalize() * 25
+                vel = (1 - dist / 250) * (self.pos + (self.size / 2,) * 2 - self.scene.player.pos).normalize() * 20
                 vel.y *= 0.5
                 self.scene.player.vel += vel
         for snowball in self.scene.player.snowballs.values():
