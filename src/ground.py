@@ -30,7 +30,7 @@ class Ground1Manager(VisibleSprite):
         for x in range(-110, 110):
             # Horizontal stretch and vertical stretch (essentially)
             y = noise.noise2(x * 0.1, 0) * 150
-            ground = Ground1(self.scene, self, (x * TILE_SIZE, y), (TILE_SIZE, 330 - y))
+            ground = Ground1(self.scene, self, (x * TILE_SIZE, y), (TILE_SIZE, 400 - y))
         for ground in Ground1.instances.values():
             ground.generate_image() # Create a images only after all tiles have been created
             ground.draw()
