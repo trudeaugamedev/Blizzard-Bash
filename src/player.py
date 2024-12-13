@@ -684,7 +684,7 @@ class Player(VisibleSprite):
                     self.bot_mpos = (tracking_powerup.pos - self.camera.offset)
                     self.bot_mpos -= VEC(0, abs(tracking_powerup.pos.x - self.pos.x)) / 6
                     if self.powerup == "strength": # less distance-based adj.
-                        self.bot_mpos += VEC(0, abs(tracking_player.pos.x - self.pos.x)) / 10
+                        self.bot_mpos += VEC(0, abs(tracking_powerup.pos.x - self.pos.x)) / 10
                     returning += " click "
                     self.debug_brain += "shooting_powerup "
 
@@ -698,8 +698,7 @@ class Player(VisibleSprite):
                     self.dodging_time = time.time()
                 self.dodging = True
             # dodge if you don't have a powerup that needs rolling
-            if self.powerup != "strength" and self.powerup != "clustershot":
-                if self.powerup == "rapidfire" and tracking_snowball.type == 0: return
+            if self.powerup != "strength" and self.powerup != "clustershot" and not (self.powerup == "rapidfire" and tracking_snowball.type == 0):
                 if abs(tracking_snowball.pos.x - self.pos.x) < 275 and not tracking_snowball.pos.y - self.pos.y < -100 and time.time() - self.tired_time > 2:
                     returning += " w "
                     if self.dodging == False:
