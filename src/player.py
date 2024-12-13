@@ -696,6 +696,7 @@ class Player(VisibleSprite):
                 self.dodging = True
             # dodge if you don't have a powerup that needs rolling
             if self.powerup != "strength" and self.powerup != "clustershot":
+                if self.powerup == "rapidfire" and tracking_snowball.type == 0: return
                 if abs(tracking_snowball.pos.x - self.pos.x) < 275 and not tracking_snowball.pos.y - self.pos.y < -100 and time.time() - self.tired_time > 2:
                     returning += " w "
                     if self.dodging == False:
