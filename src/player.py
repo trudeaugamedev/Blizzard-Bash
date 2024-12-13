@@ -540,6 +540,8 @@ class Player(VisibleSprite):
             dscore = 0
             if self.hit_powerup not in {"rapidfire", "clustershot"}:
                 dscore -= 2 # Penalty for getting hit (2 for now, may depend on self.hit_size)
+            else:
+                dscore -= 2 if randint(1, 10) <= (3 if self.hit_powerup == "rapidfire" else 5) else 0
             if self.hit_powerup == "strength":
                 dscore -= 2 # lose another 2 points
             if dscore != 0:
