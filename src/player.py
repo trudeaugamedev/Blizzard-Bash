@@ -596,7 +596,6 @@ class Player(VisibleSprite):
         return abs(self.pos.x - o) < dist
 
     def get_bot_decision(self) -> str:
-        # TODO: shoot powerups
         min_dist = 99999
         min_snow_dist = 99999
         min_pwr_dist = 99999
@@ -677,7 +676,7 @@ class Player(VisibleSprite):
                     returning += " a "
             elif not is_tracking or pwr_in_middle:
                 # roll a small snowball
-                if len(self.snowball_queue) == 0 or self.snowball_queue[-1] != 0 and len(self.snowball_queue) < 5:
+                if (len(self.snowball_queue) == 0 or self.snowball_queue[-1] != 0 and len(self.snowball_queue) < 5) and self.powerup != "rapidfire":
                     returning += " space "
                 elif not self.close_to(tracking_powerup.pos.x, 250 if self.powerup != "strength" else 600):
                     if self.left_of(tracking_powerup.pos.x):
