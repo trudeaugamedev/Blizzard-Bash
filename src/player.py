@@ -651,8 +651,9 @@ class Player(VisibleSprite):
             is_closer = self.close_to(powerup.pos, min_pwr_dist)
             low_enough = powerup.pos.y > -700
             no_vortex = tracking_vortex == None
-            not_behind_vortex = self.close_to(powerup.pos.x, abs(self.pos.x - tracking_vortex.pos.x))
-            self_in_middle = sign(powerup.pos.x - self.pos.x) != sign(tracking_vortex.pos.x + vortex.size / 2 - self.pos.x)
+            if not no_vortex:
+                not_behind_vortex = self.close_to(powerup.pos.x, abs(self.pos.x - tracking_vortex.pos.x))
+                self_in_middle = sign(powerup.pos.x - self.pos.x) != sign(tracking_vortex.pos.x + vortex.size / 2 - self.pos.x)
             not_outside_border = abs(powerup.pos.x) < Border.x
             if is_closer and low_enough and (no_vortex or not_behind_vortex or self_in_middle) and not_outside_border:
                 tracking_powerup = powerup
