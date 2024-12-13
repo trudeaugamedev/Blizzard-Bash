@@ -237,7 +237,7 @@ class HitText(VisibleSprite):
         self.hittexts.append(self)
 
     def update(self) -> None:
-        self.alpha -= 100 * self.scene.manager.dt
+        self.alpha -= 150 * self.scene.manager.dt
         if self.alpha < 0:
             self.kill()
         else:
@@ -249,6 +249,7 @@ class HitText(VisibleSprite):
         if self.font_size > 127:
             self.font_size = 127
         self.image = FONT[self.font_size].render(f"{self.score}", False, self.color)
+        self.alpha = 255
 
     def draw(self) -> None:
         pos = self.pos - VEC(self.image.size) // 2 - self.scene.player.camera.offset
