@@ -65,7 +65,7 @@ class VortexSwirl(Swirl):
         self.pos = pos
         self.timer = time.time()
         self.startTime = time.time()
-        self.maxTime = 15
+        self.maxTime = 12
         self.orig_img = self.image.copy()
         self.suck = suck
 
@@ -83,8 +83,8 @@ class VortexSwirl(Swirl):
         # sucking is on the thrower's side?????
         if self.suck and not self.scene.eliminated:
             if (dist := self.scene.player.pos.distance_to(self.pos + (self.size / 2,) * 2)) < 250:
-                vel = (1 - dist / 250) * (self.pos + (self.size / 2,) * 2 - self.scene.player.pos).normalize() * 50
-                vel.y *= 0.3
+                vel = (1 - dist / 250) * (self.pos + (self.size / 2,) * 2 - self.scene.player.pos).normalize() * 25
+                vel.y *= 0.5
                 self.scene.player.vel += vel
         for snowball in self.scene.player.snowballs.values():
             if (dist := snowball.pos.distance_to(self.pos + (self.size / 2,) * 2)) < 250 and dist > 0:
