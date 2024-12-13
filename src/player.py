@@ -396,8 +396,11 @@ class Player(VisibleSprite):
 
         if self.powerup != "rapidfire":
             self.can_throw = self.can_move and self.dig_iterations > 0
-        else:
+        elif time.time() - self.rapidfire_time > 0.05:
             self.can_throw = True
+            self.rapidfire_time = time.time()
+        else:
+            self.can_throw = False
         if pygame.mouse.get_pressed()[0] or self.bot_pressing.find(" click ") != -1:
             if self.can_throw and not self.just_triggered:
                 m_pos = VEC(pygame.mouse.get_pos())
