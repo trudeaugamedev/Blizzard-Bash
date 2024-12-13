@@ -214,6 +214,8 @@ class Snowball(VisibleSprite):
         self.landed = True
 
     def trigger(self) -> None:
+        if self.frame != 0: return
+
         if self.type == 2: # vortex
             self.kill()
 
