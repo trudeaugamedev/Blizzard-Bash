@@ -396,11 +396,8 @@ class Player(VisibleSprite):
 
         if self.powerup != "rapidfire":
             self.can_throw = self.can_move and self.dig_iterations > 0
-        elif time.time() - self.rapidfire_time > 0.05:
-            self.can_throw = True
-            self.rapidfire_time = time.time()
         else:
-            self.can_throw = False
+            self.can_throw = True
         if pygame.mouse.get_pressed()[0] or self.bot_pressing.find(" click ") != -1:
             if self.can_throw and not self.just_triggered:
                 m_pos = VEC(pygame.mouse.get_pos())
@@ -458,9 +455,11 @@ class Player(VisibleSprite):
                     sb = Snowball(self.scene, self.sb_vel, 3 + size)
                     self.snowballs[sb.id] = sb
                 elif self.powerup == "rapidfire":
-                    sb = Snowball(self.scene, self.sb_vel, 0)
-                    self.snowballs[sb.id] = sb
-                    self.overheat = min(30, self.overheat + 1)
+                    if time.time() - self.rapidfire_time > 0.05:
+                        sb = Snowball(self.scene, self.sb_vel, 0)
+                        self.snowballs[sb.id] = sb
+                        self.overheat = min(30, self.overheat + 1)
+                        self.rapidfire_time = time.time()
                 else:
                     size = self.pop_snowball()
                     sb = Snowball(self.scene, self.sb_vel, size + (5 if self.powerup == "telekinesis" and size != 2 else 0))
