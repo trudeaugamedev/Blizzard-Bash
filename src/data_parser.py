@@ -42,6 +42,7 @@ class Parser:
                         self.manager.scene.time_left = -1
                 case "tp": # teleport
                     self.manager.scene.player.pos = VEC(data["tppos"])
+                    self.manager.scene.player.collected_powerups = 0
                 case "wd": # Wind
                     self.manager.scene.wind_vel = VEC(data["speed"], 0)
                 case "tm": # Time
