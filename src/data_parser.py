@@ -40,16 +40,20 @@ class Parser:
                             self.manager.scene.player.pop_snowball()
                         self.manager.scene.player.dig_iterations = 0
                         for sb in self.manager.scene.player.snowballs.values():
-                            sb.kill()
+                            try:
+                                sb.kill()
+                            except KeyError:
+                                pass
                         self.manager.scene.player.snowballs.clear()
-                        for swirl in VortexSwirl.instances.values():
-                            swirl.kill()
-                        for swirl in OtherVortex.instances.values():
-                            swirl.kill()
+                        try:
+                            for swirl in VortexSwirl.instances.values():
+                                swirl.kill()
+                        except Exception as e:
+                            print(e)
                     elif data["command"] == "stop":
                         self.manager.scene.time_left = -1
                 case "tp": # teleport
-                    self.manager.scene.player.pos = VEC(data["tppos"])
+                    # self.manager.scene.player.pos = VEC(data["tppos"])
                     self.manager.scene.player.collected_powerups = 0
                 case "wd": # Wind
                     self.manager.scene.wind_vel = VEC(data["speed"], 0)
