@@ -45,11 +45,8 @@ class Parser:
                             except KeyError:
                                 pass
                         self.manager.scene.player.snowballs.clear()
-                        try:
-                            for swirl in VortexSwirl.instances.values():
-                                swirl.kill()
-                        except Exception as e:
-                            print(e)
+                        for swirl in [v for v in VortexSwirl.instances.values()]:
+                            swirl.kill()
                     elif data["command"] == "stop":
                         self.manager.scene.time_left = -1
                 case "tp": # teleport
