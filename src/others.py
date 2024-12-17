@@ -149,22 +149,25 @@ class OtherArrow(VisibleSprite):
         ...
 
     def draw(self) -> None:
-        points = []
-        if self.player.rect.right - self.scene.player.camera.offset.x < 0:
-            points = [
-                VEC(5, self.player.rect.centery - self.scene.player.camera.offset.y),
-                VEC(25, self.player.rect.centery - 7 - self.scene.player.camera.offset.y),
-                VEC(25, self.player.rect.centery + 7 - self.scene.player.camera.offset.y)
-            ]
-        elif self.player.rect.left - self.scene.player.camera.offset.x > WIDTH:
-            points = [
-                VEC(WIDTH - 5, self.player.rect.centery - self.scene.player.camera.offset.y),
-                VEC(WIDTH - 25, self.player.rect.centery - 7 - self.scene.player.camera.offset.y),
-                VEC(WIDTH - 25, self.player.rect.centery + 7 - self.scene.player.camera.offset.y)
-            ]
-        if points:
-            pygame.draw.polygon(self.manager.screen, (71, 139, 161), points)
-            pygame.draw.polygon(self.manager.screen, (0, 0, 0), points, 3)
+        try:
+            points = []
+            if self.player.rect.right - self.scene.player.camera.offset.x < 0:
+                points = [
+                    VEC(5, self.player.rect.centery - self.scene.player.camera.offset.y),
+                    VEC(25, self.player.rect.centery - 7 - self.scene.player.camera.offset.y),
+                    VEC(25, self.player.rect.centery + 7 - self.scene.player.camera.offset.y)
+                ]
+            elif self.player.rect.left - self.scene.player.camera.offset.x > WIDTH:
+                points = [
+                    VEC(WIDTH - 5, self.player.rect.centery - self.scene.player.camera.offset.y),
+                    VEC(WIDTH - 25, self.player.rect.centery - 7 - self.scene.player.camera.offset.y),
+                    VEC(WIDTH - 25, self.player.rect.centery + 7 - self.scene.player.camera.offset.y)
+                ]
+            if points:
+                pygame.draw.polygon(self.manager.screen, (71, 139, 161), points)
+                pygame.draw.polygon(self.manager.screen, (0, 0, 0), points, 3)
+        except Exception as e:
+            print(e)
 
 class OtherSnowball(VisibleSprite):
     # Sometimes snowball data can get sent marginally after the snowball is killed, this set is used to prevent that data from being processed
@@ -193,9 +196,12 @@ class OtherSnowball(VisibleSprite):
             print(e)
 
     def draw(self) -> None:
-        if self.rect.right - self.scene.player.camera.offset.x < -20 or self.rect.left - self.scene.player.camera.offset.x > WIDTH + 20: return
-        self.manager.screen.blit(shadow(self.image), VEC(self.rect.topleft) - self.scene.player.camera.offset + (3, 3), special_flags=BLEND_RGB_SUB)
-        self.manager.screen.blit(self.image, VEC(self.rect.topleft) - self.scene.player.camera.offset)
+        try:
+            if self.rect.right - self.scene.player.camera.offset.x < -20 or self.rect.left - self.scene.player.camera.offset.x > WIDTH + 20: return
+            self.manager.screen.blit(shadow(self.image), VEC(self.rect.topleft) - self.scene.player.camera.offset + (3, 3), special_flags=BLEND_RGB_SUB)
+            self.manager.screen.blit(self.image, VEC(self.rect.topleft) - self.scene.player.camera.offset)
+        except Exception as e:
+            print(e)
 
     def kill(self) -> None:
         if self.type == 2:

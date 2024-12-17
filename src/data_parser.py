@@ -44,6 +44,9 @@ class Parser:
                         self.manager.scene.player.snowballs.clear()
                         for swirl in [v for v in VortexSwirl.instances.values()]:
                             swirl.kill()
+                        if self.manager.scene.player.aura is not None:
+                            self.manager.scene.player.aura.kill()
+                            self.manager.scene.player.aura = None
                     elif data["command"] == "stop":
                         self.manager.scene.time_left = -1
                 case "tp": # teleport
