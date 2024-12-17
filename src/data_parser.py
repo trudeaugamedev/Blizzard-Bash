@@ -41,6 +41,7 @@ class Parser:
                         self.manager.scene.player.dig_iterations = 0
                         for sb in self.manager.scene.player.snowballs.values():
                             sb.kill()
+                        self.manager.scene.player.snowballs.clear()
                         for swirl in VortexSwirl.instances.values():
                             swirl.kill()
                         for swirl in OtherVortex.instances.values():
