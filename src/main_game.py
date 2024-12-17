@@ -133,7 +133,33 @@ class MainGame(Scene):
         self.game_over = False
         self.score_data = []
 
+        self.question_mdown = False
+        self.show_instru = False
+        self.q_anim_timer = 0
+        self.page2 = False
+
     def update(self) -> None:
+        if self.waiting:
+            if pygame.MOUSEBUTTONDOWN in self.manager.events:
+                mpos = VEC(pygame.mouse.get_pos())
+                if mpos.distance_to((WIDTH, HEIGHT)) < 100:
+                    self.question_mdown = True
+                else:
+                    self.question_mdown = False
+            if pygame.MOUSEBUTTONUP in self.manager.events:
+                mpos = VEC(pygame.mouse.get_pos())
+                if mpos.distance_to((WIDTH, HEIGHT)) < 100 and self.question_mdown:
+                    if self.page2:
+                        self.page2 = False
+                        self.show_instru = False
+                    elif self.show_instru:
+                        self.page2 = True
+                    else:
+                        self.show_instru = True
+                    self.question_mdown = False
+            if self.show_instru or self.question_mdown:
+                self.manager.events.clear()
+
         super().update()
 
         if time.time() - self.snowflake_time > 0.05:
@@ -207,6 +233,38 @@ class MainGame(Scene):
 
         if self.waiting:
             self.draw_waiting_text()
+
+            if self.show_instru:
+                self.q_anim_timer += 3 * self.manager.dt
+                if self.q_anim_timer > 1:
+                    self.q_anim_timer = 1
+            else:
+                self.q_anim_timer -= 3 * self.manager.dt
+                if self.q_anim_timer < 0:
+                    self.q_anim_timer = 0
+
+            if self.q_anim_timer > 0:
+                trans_surf = pygame.Surface((WIDTH, HEIGHT))
+                trans_surf.fill((255 - self.q_anim_timer * 150,) * 3)
+                self.manager.screen.blit(trans_surf, (0, 0), special_flags=pygame.BLEND_MULT)
+                if not self.page2 and self.show_instru:
+                    assets.instruction1.set_alpha(int(self.q_anim_timer * 255))
+                    self.manager.screen.blit(assets.instruction1, (WIDTH // 2 - assets.instruction1.get_width() // 2, HEIGHT // 2 - assets.instruction1.get_height() // 2))
+                else:
+                    assets.instruction2.set_alpha(int(self.q_anim_timer * 255))
+                    self.manager.screen.blit(assets.instruction2, (WIDTH // 2 - assets.instruction2.get_width() // 2, HEIGHT // 2 - assets.instruction2.get_height() // 2))
+
+            pygame.draw.circle(self.manager.screen, (255, 255, 255), (WIDTH, HEIGHT), 100)
+            pygame.draw.circle(self.manager.screen, (0, 0, 0), (WIDTH, HEIGHT), 100, 6)
+            if not self.show_instru:
+                text = FONT[50].render("?", False, (0, 0, 0))
+                self.manager.screen.blit(text, (WIDTH - text.width - 18, HEIGHT - text.height - 9))
+            elif not self.page2:
+                text = FONT[40].render(">>", False, (0, 0, 0))
+                self.manager.screen.blit(text, (WIDTH - text.width - 12, HEIGHT - text.height - 9))
+            else:
+                text = FONT[40].render("OK", False, (0, 0, 0))
+                self.manager.screen.blit(text, (WIDTH - text.width - 12, HEIGHT - text.height - 9))
 
     def draw_waiting_text(self) -> None:
         text = FONT[54].render("Waiting for game to start...", False, (0, 0, 0))

@@ -310,13 +310,13 @@ class Player(VisibleSprite):
     def update_keys(self) -> None:
         self.keys = pygame.key.get_pressed()
 
-        if (self.keys[K_SPACE] or self.bot_pressing.find(" space ") != -1) and self.on_ground and self.powerup != "rapidfire":
+        if ((self.keys[K_SPACE] and not self.scene.show_instru) or self.bot_pressing.find(" space ") != -1) and self.on_ground and self.powerup != "rapidfire":
             self.digging = True
             self.idle = False
             self.throwing = False
 
         self.acc = VEC(0, GRAVITY)
-        if self.keys[K_a] or self.bot_pressing.find(" a ") != -1: # Acceleration
+        if (self.keys[K_a] and not self.scene.show_instru) or self.bot_pressing.find(" a ") != -1: # Acceleration
             self.acc.x -= self.CONST_ACC
             self.flip = True
             if self.can_move:
@@ -329,7 +329,7 @@ class Player(VisibleSprite):
         elif self.vel.x < 0: # Deceleration
             self.acc.x += self.CONST_ACC
             self.idle = True
-        if self.keys[K_d] or self.bot_pressing.find(" d ") != -1:
+        if (self.keys[K_d] and not self.scene.show_instru) or self.bot_pressing.find(" d ") != -1:
             self.acc.x += self.CONST_ACC
             self.flip = False
             if self.can_move:
@@ -342,7 +342,7 @@ class Player(VisibleSprite):
         elif self.vel.x > 0:
             self.acc.x -= self.CONST_ACC
             self.idle = True
-        if self.keys[K_a] and self.keys[K_d]:
+        if (self.keys[K_a] and not self.scene.show_instru) and (self.keys[K_d] and not self.scene.show_instru):
             self.acc.x = -sign(self.vel.x) * self.CONST_ACC
             self.idle = True
         if self.keys[K_q] and self.can_toggle_bot and self.on_ground: # jump when toggling because I don't want to log keys
@@ -399,7 +399,7 @@ class Player(VisibleSprite):
             self.can_throw = self.can_move and self.dig_iterations > 0
         else:
             self.can_throw = True
-        if pygame.mouse.get_pressed()[0] or self.bot_pressing.find(" click ") != -1:
+        if (pygame.mouse.get_pressed()[0] and not self.scene.question_mdown) or self.bot_pressing.find(" click ") != -1:
             if self.can_throw and not self.just_triggered:
                 m_pos = VEC(pygame.mouse.get_pos())
                 if self.bot_mpos != VEC():
@@ -441,7 +441,7 @@ class Player(VisibleSprite):
                         self.sb_vel *= 2
                 except ValueError:
                     self.sb_vel = VEC() # 0 vector
-        if MOUSEBUTTONUP in self.manager.events or self.bot_pressing.find(" click ") != -1:
+        if (MOUSEBUTTONUP in self.manager.events and self.scene.q_anim_timer == 0) or self.bot_pressing.find(" click ") != -1:
             if (self.bot_pressing.find(" click ") != -1 or self.manager.events[MOUSEBUTTONUP].button == 1) and self.can_throw and not self.just_triggered:
                 self.throwing = False
                 assets.throw_sound.set_volume(0.2)
@@ -538,7 +538,7 @@ class Player(VisibleSprite):
             sound.play()
             if not self.no_kb:
                 self.vel.x = sign(self.hit_strength) * abs(self.hit_strength) * 100
-                
+
             dscore = self.hit_penalty
             if dscore != 0:
                 self.scene.spawn_hit_text(self.pos + (-sign(self.hit_strength) * 35, -self.size.y / 2), dscore)
