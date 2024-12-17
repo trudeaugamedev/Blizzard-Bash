@@ -46,39 +46,42 @@ class OtherPlayer(VisibleSprite):
         self.aura = None
 
     def update(self) -> None:
-        self.rect = self.image.get_rect(midbottom=self.pos)
-        self.real_rect.midbottom = self.rect.midbottom
+        try:
+            self.rect = self.image.get_rect(midbottom=self.pos)
+            self.real_rect.midbottom = self.rect.midbottom
 
-        centerx = int(self.rect.centerx // PIXEL_SIZE * PIXEL_SIZE)
-        y1 = Ground1.height_map[centerx]
-        y2 = Ground2.height_map[centerx]
-        y3 = Ground3.height_map[centerx]
-        if self.pos.y < y3 + 12 and y2 > y3 and self._layer != Layers.PLAYER3:
-            self.scene.sprite_manager.remove(self)
-            self._layer = Layers.PLAYER3
-            self.scene.sprite_manager.add(self)
-        elif y3 + 12 < self.pos.y < y2 + 12 and self._layer != Layers.PLAYER2:
-            self.scene.sprite_manager.remove(self)
-            self._layer = Layers.PLAYER2
-            self.scene.sprite_manager.add(self)
-        elif y2 + 12 < self.pos.y < y1 + 12 and self._layer != Layers.PLAYER1:
-            self.scene.sprite_manager.remove(self)
-            self._layer = Layers.PLAYER1
-            self.scene.sprite_manager.add(self)
+            centerx = int(self.rect.centerx // PIXEL_SIZE * PIXEL_SIZE)
+            y1 = Ground1.height_map[centerx]
+            y2 = Ground2.height_map[centerx]
+            y3 = Ground3.height_map[centerx]
+            if self.pos.y < y3 + 12 and y2 > y3 and self._layer != Layers.PLAYER3:
+                self.scene.sprite_manager.remove(self)
+                self._layer = Layers.PLAYER3
+                self.scene.sprite_manager.add(self)
+            elif y3 + 12 < self.pos.y < y2 + 12 and self._layer != Layers.PLAYER2:
+                self.scene.sprite_manager.remove(self)
+                self._layer = Layers.PLAYER2
+                self.scene.sprite_manager.add(self)
+            elif y2 + 12 < self.pos.y < y1 + 12 and self._layer != Layers.PLAYER1:
+                self.scene.sprite_manager.remove(self)
+                self._layer = Layers.PLAYER1
+                self.scene.sprite_manager.add(self)
 
-        self.orig_image = self.assets.player[self.frame]
-        self.upright_image = pygame.transform.flip(self.orig_image, self.flip, False)
-        self.image = pygame.transform.rotate(self.upright_image, self.rotation % 360)
+            self.orig_image = self.assets.player[self.frame]
+            self.upright_image = pygame.transform.flip(self.orig_image, self.flip, False)
+            self.image = pygame.transform.rotate(self.upright_image, self.rotation % 360)
 
-        if self.powerup == 3:
-            for snowball in self.scene.player.snowballs.values():
-                dist = snowball.pos.distance_to(self.pos + VEC(0, -self.size.y / 2))
-                if dist <= 250:
-                    snowball.time_mult = 0.32
-                    snowball.follow = False # don't mess with people's camera if snowball gets stuck
+            if self.powerup == 3:
+                for snowball in self.scene.player.snowballs.values():
+                    dist = snowball.pos.distance_to(self.pos + VEC(0, -self.size.y / 2))
+                    if dist <= 250:
+                        snowball.time_mult = 0.32
+                        snowball.follow = False # don't mess with people's camera if snowball gets stuck
 
-        if time.time() - self.disconnect_time > 1500:
-            self.kill()
+            if time.time() - self.disconnect_time > 1500:
+                self.kill()
+        except Exception as e:
+            print(e)
 
     def set_colors(self, clothes, hat, skin):
         if clothes == self.clothes_hue and hat == self.hat_hue and skin == self.skin_tone: return
@@ -88,42 +91,45 @@ class OtherPlayer(VisibleSprite):
         self.assets = assets.PlayerAssets(clothes, hat, skin)
 
     def draw(self) -> None:
-        if self.rect.right - self.scene.player.camera.offset.x < -20 or self.rect.left - self.scene.player.camera.offset.x > WIDTH + 20: return
+        try:
+            if self.rect.right - self.scene.player.camera.offset.x < -20 or self.rect.left - self.scene.player.camera.offset.x > WIDTH + 20: return
 
-        self.manager.screen.blit(shadow(self.image), VEC(self.rect.topleft) - self.scene.player.camera.offset + (3, 3), special_flags=BLEND_RGB_SUB)
+            self.manager.screen.blit(shadow(self.image), VEC(self.rect.topleft) - self.scene.player.camera.offset + (3, 3), special_flags=BLEND_RGB_SUB)
 
-        if self.powerup != -1:
-            color = [(63, 134, 165), (233, 86, 86), (88, 210, 103), (204, 102, 255)][self.powerup]
-            alpha = (sin((time.time() - self.powerup_flash_time) * pi * 3) * 0.5 + 0.5) * 255
-            mask = pygame.mask.from_surface(self.image)
-            powerup_overlay = mask.scale(VEC(mask.get_size()) + (20, 14)).to_surface(setcolor=(*color, alpha), unsetcolor=(0, 0, 0, 0))
-            self.manager.screen.blit(powerup_overlay, VEC(self.rect.topleft) - (10, 7) - self.scene.player.camera.offset)
+            if self.powerup != -1:
+                color = [(63, 134, 165), (233, 86, 86), (88, 210, 103), (204, 102, 255)][self.powerup]
+                alpha = (sin((time.time() - self.powerup_flash_time) * pi * 3) * 0.5 + 0.5) * 255
+                mask = pygame.mask.from_surface(self.image)
+                powerup_overlay = mask.scale(VEC(mask.get_size()) + (20, 14)).to_surface(setcolor=(*color, alpha), unsetcolor=(0, 0, 0, 0))
+                self.manager.screen.blit(powerup_overlay, VEC(self.rect.topleft) - (10, 7) - self.scene.player.camera.offset)
 
-        if self.powerup == 3 and self.aura is None:
-            self.aura = Aura(self.scene, self)
-        elif self.powerup != 3 and self.aura is not None:
-            self.aura.kill()
-            self.aura = None
+            if self.powerup == 3 and self.aura is None:
+                self.aura = Aura(self.scene, self)
+            elif self.powerup != 3 and self.aura is not None:
+                self.aura.kill()
+                self.aura = None
 
-        self.manager.screen.blit(self.image, VEC(self.rect.topleft) - self.scene.player.camera.offset)
+            self.manager.screen.blit(self.image, VEC(self.rect.topleft) - self.scene.player.camera.offset)
 
-        if self.powerup != -1:
-            powerup_overlay.set_alpha(100)
-            self.manager.screen.blit(powerup_overlay, VEC(self.rect.topleft) - (10, 7) - self.scene.player.camera.offset)
+            if self.powerup != -1:
+                powerup_overlay.set_alpha(100)
+                self.manager.screen.blit(powerup_overlay, VEC(self.rect.topleft) - (10, 7) - self.scene.player.camera.offset)
 
-        text = FONT[28].render(f"{self.score}", False, (0, 0, 0))
-        pos = VEC(self.rect.midtop) - (text.get_width() // 2, text.get_height() + 5)
-        text_shadow = FONT[28].render(f"{self.score}", False, (0, 0, 0))
-        text_shadow.set_alpha(70)
-        self.manager.screen.blit(text_shadow, pos + (3, 3) - self.scene.player.camera.offset)
-        self.manager.screen.blit(text, pos - self.scene.player.camera.offset)
+            text = FONT[28].render(f"{self.score}", False, (0, 0, 0))
+            pos = VEC(self.rect.midtop) - (text.get_width() // 2, text.get_height() + 5)
+            text_shadow = FONT[28].render(f"{self.score}", False, (0, 0, 0))
+            text_shadow.set_alpha(70)
+            self.manager.screen.blit(text_shadow, pos + (3, 3) - self.scene.player.camera.offset)
+            self.manager.screen.blit(text, pos - self.scene.player.camera.offset)
 
-        text = FONT[20].render(f"{self.name}", False, (0, 0, 0))
-        pos = VEC(self.rect.midtop) - (text.get_width() // 2, text.get_height() + 40)
-        text_shadow = FONT[20].render(f"{self.name}", False, (0, 0, 0))
-        text_shadow.set_alpha(70)
-        self.manager.screen.blit(text_shadow, pos + (3, 3) - self.scene.player.camera.offset)
-        self.manager.screen.blit(text, pos - self.scene.player.camera.offset)
+            text = FONT[20].render(f"{self.name}", False, (0, 0, 0))
+            pos = VEC(self.rect.midtop) - (text.get_width() // 2, text.get_height() + 40)
+            text_shadow = FONT[20].render(f"{self.name}", False, (0, 0, 0))
+            text_shadow.set_alpha(70)
+            self.manager.screen.blit(text_shadow, pos + (3, 3) - self.scene.player.camera.offset)
+            self.manager.screen.blit(text, pos - self.scene.player.camera.offset)
+        except Exception as e:
+            print(e)
 
     def kill(self) -> None:
         self.arrow.kill()
@@ -177,11 +183,14 @@ class OtherSnowball(VisibleSprite):
         self.rect = self.image.get_rect(center=self.pos)
 
     def update(self) -> None:
-        if not hasattr(self, "frames"): return
-        self.image = self.frames[self.frame]
-        self.rect = self.image.get_rect(center=self.pos)
-        if self.type == 2:
-            self.swirl.pos = self.pos - (32, 32)
+        try:
+            if not hasattr(self, "frames"): return
+            self.image = self.frames[self.frame]
+            self.rect = self.image.get_rect(center=self.pos)
+            if self.type == 2:
+                self.swirl.pos = self.pos - (32, 32)
+        except Exception as e:
+            print(e)
 
     def draw(self) -> None:
         if self.rect.right - self.scene.player.camera.offset.x < -20 or self.rect.left - self.scene.player.camera.offset.x > WIDTH + 20: return
@@ -227,8 +236,11 @@ class OtherVortex(VisibleSprite):
         self.size *= PIXEL_SIZE
 
     def update(self) -> None:
-        if self.image is None: return
-        self.image.set_alpha(self.alpha)
+        try:
+            if self.image is None: return
+            self.image.set_alpha(self.alpha)
+        except Exception as e:
+            print(e)
 
         # if self.id in StormSwirl.instances:
         #     StormSwirl.instances[self.id].storm = self
