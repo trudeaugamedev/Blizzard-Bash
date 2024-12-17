@@ -560,7 +560,7 @@ class Player(VisibleSprite):
             if self.pos.x < -Border.x - 800:
                 self.pos.x = -Border.x - 800
                 self.vel.x = 0
-        if self.pos.x > Border.x or self.pos.x < -Border.x:
+        if (self.pos.x > Border.x or self.pos.x < -Border.x) and not self.scene.eliminated:
             if time.time() - self.self_snowball_time > 800 / diff * 0.06:
                 pos = self.pos - (0, 400) - self.scene.wind_vel * 0.25 + (self.vel.x * 0.4, 0) + (uniform(-80, 80), 0)
                 sb = SelfSnowball(self.scene, VEC(0, 0), randint(0, 1), pos=pos, follow=False)

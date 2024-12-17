@@ -114,17 +114,18 @@ class Snowball(VisibleSprite):
             return
 
         # if not self.is_storm:
-        for powerup in Powerup.instances.values():
-            if powerup.rect.colliderect(self.real_rect) and not powerup.touched:
-                self.scene.player.collected_powerups += 1
-                if powerup.type == "hailstorm":
-                    self.scene.player.add_snowball(2)
-                    self.scene.player.dig_iterations += 3
-                else:
-                    self.player.powerup = powerup.type
-                    self.player.powerup_time = time.time()
-                self.client.irreg_data.put({"id": powerup.id, "powerup": 1}) # powerup key to uniquify the message
-                powerup.touched = True
+        if not self.scene.eliminated:
+            for powerup in Powerup.instances.values():
+                if powerup.rect.colliderect(self.real_rect) and not powerup.touched:
+                    self.scene.player.collected_powerups += 1
+                    if powerup.type == "hailstorm":
+                        self.scene.player.add_snowball(2)
+                        self.scene.player.dig_iterations += 3
+                    else:
+                        self.player.powerup = powerup.type
+                        self.player.powerup_time = time.time()
+                    self.client.irreg_data.put({"id": powerup.id, "powerup": 1}) # powerup key to uniquify the message
+                    powerup.touched = True
 
         if self.type == 2:
             self.swirl.pos = self.pos - VEC(32, 32)
@@ -136,6 +137,7 @@ class Snowball(VisibleSprite):
             self.kill()
 
     def collide(self) -> bool:
+        if self.scene.eliminated: return False
         for player in self.manager.other_players.values():
             if player.real_rect.colliderect(self.real_rect):
                 sound = choice(assets.hit_sounds)
