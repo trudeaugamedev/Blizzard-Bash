@@ -36,3 +36,7 @@ input {
 .toggle.hidden {
     background-color: lightgray;
 }
+#viewToggles {
+    position: absolute;
+    width: 45%;
+}
