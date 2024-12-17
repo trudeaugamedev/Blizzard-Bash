@@ -50,6 +50,12 @@ class ThrowTrail(VisibleSprite):
         pos = VEC(self.player.rect.topleft) + self.player.SB_OFFSET
         vel = self.player.sb_vel.copy()
         for i in range(100): # Number of points on the parabola that will be calculated
+            for v in VortexSwirl.instances.values():
+                if (dist := pos.distance_to(v.pos + (v.size / 2,) * 2)) < 250 and dist > 0:
+                    vel *= ((dist + 10) / 260) ** self.manager.dt # more friction the closer to center the snowball gets
+                    vel += (1 - dist / 250) * (v.pos + (v.size / 2, v.size / 2) - pos).normalize() * 150 # normal accel (toward center)
+                    vel += (1.1 - dist / 250) * (v.pos + (v.size / 2, v.size / 2) - pos).normalize().rotate(-90) * 10 # tangent accel (perp. to normal)
+
             vel.y += GRAVITY * factor
             vel += self.scene.wind_vel * factor
             pos += vel * factor
