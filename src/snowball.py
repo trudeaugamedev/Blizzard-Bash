@@ -70,7 +70,7 @@ class Snowball(VisibleSprite):
                     try:
                         self.scene.player.snowballs.pop(self.id)
                     except KeyError:
-                        return
+                        pass
                     self.client.irreg_data.put({"landed": 1, "snowball_id": self.id, "player_id": self.client.id})
                     super().kill()
             return
