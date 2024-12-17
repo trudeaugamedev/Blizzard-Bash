@@ -142,6 +142,12 @@ class Snowball(VisibleSprite):
                 offset = (self.pos - self.scene.player.pos).normalize() * 35 + VEC(0, -self.scene.player.size.y / 2)
                 self.scene.spawn_hit_text(self.scene.player.pos + offset, dscore)
 
+                penalty = -2
+                if (self.player.powerup in ["rapidfire", "clustershot"]):
+                    penalty += 2 if randint(1, 10) > (3 if self.player.powerup == "rapidfire" else 5) else 0
+                if self.player.powerup == "strength":
+                    penalty -= 2
+
                 self.hit_player = player
                 self.kill()
                 if not self.scene.waiting and not self.scene.eliminated:
@@ -154,16 +160,13 @@ class Snowball(VisibleSprite):
                     "hit": hit_strength,
                     "hit_size": 1 if self.frames == assets.snowball_small else 2,
                     "hit_powerup": self.player.powerup,
-                    "id": player.id
+                    "id": player.id,
+                    "penalty": penalty,
                 })
 
-                dscore = 0
-                if self.scene.player.powerup not in {"rapidfire", "clustershot"}:
-                    dscore -= 2
-                if self.scene.player.powerup == "strength":
-                    dscore -= 2
-                if dscore != 0:
-                    self.scene.spawn_hit_text(self.pos, dscore)
+
+                if penalty != 0:
+                    self.scene.spawn_hit_text(self.pos, penalty)
 
                 return True
         return False
