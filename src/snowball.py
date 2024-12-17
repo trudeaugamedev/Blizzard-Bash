@@ -58,7 +58,8 @@ class Snowball(VisibleSprite):
             self.swirl = Swirl(self.scene, Layers.SNOWBALL, 64)
 
     def update(self) -> None:
-        self.image = self.frames[self.frame]
+        if self.frame < self.frames.length:
+            self.image = self.frames[self.frame]
         self.rect = self.image.get_rect(center=self.pos)
 
         if self.landed:
