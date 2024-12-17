@@ -66,7 +66,10 @@ class Snowball(VisibleSprite):
                 self.frame_time = time.time()
                 self.frame += 1
                 if self.frame == self.frames.length:
-                    self.scene.player.snowballs.pop(self.id)
+                    try:
+                        self.scene.player.snowballs.pop(self.id)
+                    except KeyError:
+                        return
                     self.client.irreg_data.put({"landed": 1, "snowball_id": self.id, "player_id": self.client.id})
                     super().kill()
             return
