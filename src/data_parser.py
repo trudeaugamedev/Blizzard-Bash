@@ -6,6 +6,7 @@ if TYPE_CHECKING:
 from src.others import OtherPlayer, OtherSnowball, OtherVortex
 from src.powerup import Powerup
 from src.constants import VEC
+from src.swirl import VortexSwirl
 
 from websockets.exceptions import ConnectionClosedError
 import time
@@ -38,6 +39,12 @@ class Parser:
                         while self.manager.scene.player.snowball_queue:
                             self.manager.scene.player.pop_snowball()
                         self.manager.scene.player.dig_iterations = 0
+                        for sb in self.manager.scene.player.snowballs.values():
+                            sb.kill()
+                        for swirl in VortexSwirl.instances.values():
+                            swirl.kill()
+                        for swirl in OtherVortex.instances.values():
+                            swirl.kill()
                     elif data["command"] == "stop":
                         self.manager.scene.time_left = -1
                 case "tp": # teleport
