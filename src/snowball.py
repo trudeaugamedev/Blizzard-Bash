@@ -124,6 +124,9 @@ class Snowball(VisibleSprite):
                     else:
                         self.player.powerup = powerup.type
                         self.player.powerup_time = time.time()
+                    if self.scene.player.aura:
+                        self.scene.player.aura.kill()
+                        self.scene.player.aura = None
                     self.client.irreg_data.put({"id": powerup.id, "powerup": 1}) # powerup key to uniquify the message
                     powerup.touched = True
 

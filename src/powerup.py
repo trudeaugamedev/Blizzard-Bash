@@ -58,6 +58,9 @@ class Powerup(VisibleSprite):
                     self.scene.player.throwing = False
                 self.scene.player.powerup = self.type
                 self.scene.player.powerup_time = time.time()
+            if self.scene.player.aura:
+                self.scene.player.aura.kill()
+                self.scene.player.aura = None
             self.client.irreg_data.put({"id": self.id, "powerup": 1}) # powerup key to uniquify the message
             self.touched = True
 
