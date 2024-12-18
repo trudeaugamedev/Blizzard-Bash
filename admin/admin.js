@@ -16,6 +16,7 @@ socket.addEventListener("message", (event) => {
     let parsed = JSON.parse(event.data.toString());
     function deleteKey(obj, k) {
         for (let key in obj) {
+            if (key === "type") continue;
             if (key === k) {
                 delete obj[key];
             } else if (typeof obj[key] === "object") {
@@ -44,7 +45,8 @@ function getKeys(obj) {
     for (let key in obj) {
         if (!toggles.includes(key)) {
             toggles.push(key);
-            document.getElementById("viewToggles").innerHTML += `<button class="toggle" id="toggle-${key}" onclick="toggleView('${key}')">${key}</button>`;
+            hidden.push(key);
+            document.getElementById("viewToggles").innerHTML += `<button class="toggle hidden" id="toggle-${key}" onclick="toggleView('${key}')">${key}</button>`;
         }
         if (Array.isArray(obj[key])) {
             getKeys(obj[key][0]);
