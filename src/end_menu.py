@@ -10,6 +10,7 @@ from .end_leaderboard import EndLeaderboard
 from .constants import WIDTH, HEIGHT
 from .button import Button
 from .scene import Scene
+import time
 
 class EndMenu(Scene):
     def __init__(self, manager: GameManager, previous_scene: Scene) -> None:
@@ -25,10 +26,13 @@ class EndMenu(Scene):
 
         self.manager.other_players = {}
 
-        self.button = Button(self, (WIDTH - 300 - 30, HEIGHT - 80 - 30), (300, 80), "Back", lambda: self.manager.new_scene("StartMenu"))
+        self.appear_timer = time.time()
 
     def update(self) -> None:
         super().update()
+
+        if time.time() - self.appear_timer > 5:
+            self.button = Button(self, (WIDTH - 300 - 30, HEIGHT - 80 - 30), (300, 80), "Back", lambda: self.manager.new_scene("StartMenu"))
 
     def draw(self) -> None:
         self.manager.screen.blit(self.background, (0, 0))
