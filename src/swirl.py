@@ -59,7 +59,7 @@ class Swirl(VisibleSprite):
 class VortexSwirl(Swirl):
     instances = {}
 
-    def __init__(self, scene: Scene, layer: Layers, pos: VEC, size: int, density: int = 6, id: str = None, suck: bool = False) -> None:
+    def __init__(self, scene: Scene, layer: Layers, pos: VEC, size: int, density: int = 6, suck: bool = False) -> None:
         super().__init__(scene, layer, size, density, range(2, 4))
         # self.storm = storm
         self.pos = pos
@@ -69,11 +69,7 @@ class VortexSwirl(Swirl):
         self.orig_img = self.image.copy()
         self.suck = suck
 
-        # if id is None:
-        #     self.id = storm.id
-        # else:
-        #     self.id = id
-        self.id = id
+        self.id = uuid4().hex
         __class__.instances[self.id] = self
 
     def update(self) -> None:

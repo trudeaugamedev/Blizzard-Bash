@@ -44,6 +44,7 @@ class Parser:
                         self.manager.scene.player.snowballs.clear()
                         for swirl in [v for v in VortexSwirl.instances.values()]:
                             swirl.kill()
+                        VortexSwirl.instances.clear()
                         if self.manager.scene.player.aura is not None:
                             self.manager.scene.player.aura.kill()
                             self.manager.scene.player.aura = None
