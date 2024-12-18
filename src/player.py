@@ -405,7 +405,7 @@ class Player(VisibleSprite):
             self.can_throw = self.can_move and self.dig_iterations > 0
         else:
             self.can_throw = True
-        if (pygame.mouse.get_pressed()[0] and not self.scene.question_mdown) or self.bot_pressing.find(" click ") != -1:
+        if (pygame.mouse.get_pressed()[0] and not self.scene.question_mdown and not self.scene.show_instru) or self.bot_pressing.find(" click ") != -1:
             if self.can_throw and not self.just_triggered:
                 m_pos = VEC(pygame.mouse.get_pos())
                 if self.bot_mpos != VEC():
