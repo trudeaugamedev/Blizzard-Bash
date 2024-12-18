@@ -26,12 +26,13 @@ class EndMenu(Scene):
 
         self.manager.other_players = {}
 
+        self.button = None
         self.appear_timer = time.time()
 
     def update(self) -> None:
         super().update()
 
-        if time.time() - self.appear_timer > 5:
+        if time.time() - self.appear_timer > 5 and self.button is None:
             self.button = Button(self, (WIDTH - 300 - 30, HEIGHT - 80 - 30), (300, 80), "Back", lambda: self.manager.new_scene("StartMenu"))
 
     def draw(self) -> None:
