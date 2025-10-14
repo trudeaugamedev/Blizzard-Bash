@@ -68,7 +68,7 @@ No distribution is available. However, you may run from source.
 Run `pyinstaller build.spec` and the resulting executable should appear under `dist/`.
 
 # Credits
-- Programming by Andrew Wang and Lucas Fu
+- Programming by Ione Wang and Lucas Fu
 - Art by Richard Zhang
 - Programming help from Martin Baldwin
 - Playtesting by our club members! ❤️
